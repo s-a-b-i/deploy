@@ -32,7 +32,12 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
       { name: "Profile", path: "/profile", icon: <MdPerson size={24} /> },
       { name: "Withdraw", path: "/balance/withdraw", icon: <MdPayments size={24} /> },
       { name: "Balance", path: "/balance", icon: <MdAccountBalance size={24} /> },
-      { name: "Faq", path: "/faq", icon: <MdHelp size={24} /> },
+      { 
+        name: "Faq", 
+        path: "https://sqlinkbuildings.help", 
+        icon: <MdHelp size={24} />, 
+        external: true 
+      },
     ],
     Advertiser: [
       { name: "Dashboard", path: "/dashboard", icon: <MdDashboard size={24} /> },
@@ -44,7 +49,12 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
       { name: "Profile", path: "/profile", icon: <MdPerson size={24} /> },
       { name: "Deposit", path: "/deposit", icon: <MdCreditCard size={24} /> },
       { name: "Balance", path: "/balance", icon: <MdAccountBalance size={24} /> },
-      { name: "Faq", path: "/faq", icon: <MdHelp size={24} /> },
+      { 
+        name: "Faq", 
+        path: "https://sqlinkbuildings.help", 
+        icon: <MdHelp size={24} />, 
+        external: true 
+      },
     ],
   };
 
@@ -78,7 +88,6 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
       </button>
     </div>
   );
-  
 
   const MobileMenuButton = () => (
     <button
@@ -93,23 +102,43 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
   const NavigationLinks = () => (
     <nav className="mt-6">
       <ul className="space-y-2">
-        {links[mode].map((link) => (
-          <li key={link.name}>
-            <Link
-              to={getFullPath(link.path)}
-              className={`flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
-                ${
-                  isActiveLink(link.path)
-                    ? 'bg-[#3158D3] text-white'
-                    : 'hover:bg-[#3158D3] hover:text-white text-gray-200'
-                }`}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {link.icon}
-              <span className="font-medium">{link.name}</span>
-            </Link>
-          </li>
-        ))}
+        {links[mode].map((link) => {
+          if (link.external) {
+            return (
+              <li key={link.name}>
+                <a
+                  href={link.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
+                    hover:bg-[#3158D3] hover:text-white text-gray-200`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.icon}
+                  <span className="font-medium">{link.name}</span>
+                </a>
+              </li>
+            );
+          }
+
+          return (
+            <li key={link.name}>
+              <Link
+                to={getFullPath(link.path)}
+                className={`flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
+                  ${
+                    isActiveLink(link.path)
+                      ? 'bg-[#3158D3] text-white'
+                      : 'hover:bg-[#3158D3] hover:text-white text-gray-200'
+                  }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {link.icon}
+                <span className="font-medium">{link.name}</span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

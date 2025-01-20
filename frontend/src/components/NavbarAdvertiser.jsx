@@ -74,6 +74,13 @@ const NavbarAdvertiser = ({ userName }) => {
             € 0.00 / 0.00
           </div>
 
+          <div className="relative cursor-pointer">
+    <MdShoppingCart className="w-6 h-6 text-gray-700" />
+    <span className="absolute -top-1 -right-1 bg-foundations-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+      0
+    </span>
+  </div>
+
           <div className="relative" ref={dropdownRef}>
             <div
               className="flex items-center gap-3 cursor-pointer"

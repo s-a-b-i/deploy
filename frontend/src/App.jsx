@@ -28,7 +28,6 @@ import Profile from "./pages/Publisher/Profile";
 import Withdraw from "./pages/Publisher/Withdraw";
 import Balance from "./pages/Publisher/Balance";
 import Deposit from "./components/Forms/Deposit";
-import Faq from "./pages/Publisher/Faq";
 import AddWebsiteForm from "./components/Forms/AddWebsiteForm";
 
 // Advertiser Pages
@@ -40,8 +39,8 @@ import Favorite from "./pages/Advertiser/Favorite";
 import Cart from "./pages/Advertiser/Cart";
 import AdvertiserDeposit from "./pages/Advertiser/Deposit";
 import AdvertiserBalance from "./pages/Advertiser/Balance";
-import AdvertiserFaq from "./pages/Advertiser/Faq";
 import CreateProject from "./components/Forms/CreateProject";
+import ProductDetails from "./components/Product/ProductDetails";
 
 const ProtectedRoutes = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -144,7 +143,7 @@ const App = () => {
               <Route path="/publisher/promos" element={<Promos />} />
               <Route path="/publisher/orders" element={<Orders />} />
               <Route path="/publisher/profile" element={<Profile />} />
-              <Route path="/publisher/faq" element={<Faq />} />
+              {/* <Route path="/publisher/faq" element={<Faq />} /> */}
             </>
           ) : (
             <>
@@ -152,13 +151,14 @@ const App = () => {
               <Route path="/advertiser/projects" element={<Projects />} />
               <Route path="/advertiser/projects/create" element={<CreateProject />} />
               <Route path="/advertiser/catalogue" element={<Catalogue />} />
+              <Route path="/advertiser/products/view/:id" element={<ProductDetails />} />
               <Route path="/advertiser/orders" element={<AdvertiserOrders />} />
               <Route path="/advertiser/favorite" element={<Favorite />} />
               <Route path="/advertiser/profile" element={<Profile />} />
               <Route path="/advertiser/cart" element={<Cart />} />
               <Route path="/advertiser/deposit" element={<AdvertiserDeposit />} />
               <Route path="/advertiser/balance" element={<AdvertiserBalance />} />
-              <Route path="/advertiser/faq" element={<AdvertiserFaq />} />
+              {/* <Route path="/advertiser/faq" element={<AdvertiserFaq />} /> */}
             </>
           )}
 
