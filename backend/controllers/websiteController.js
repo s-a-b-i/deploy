@@ -63,3 +63,39 @@ export async function deleteWebsite(req, res) {
     res.status(500).json({ message: 'Error deleting website', error: error.message });
   }
 }
+
+
+// discount
+export async function discount(req, res) {
+  try {
+    const website = await Website.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!website) {
+      return res.status(404).json({ message: 'Website not found' });
+    }
+    res.status(200).json(website);
+  } catch (error) {
+    res.status(400).json({ message: 'Error applying discount to website', error: error.message });
+  }
+}
+
+
+// highlight media
+export async function highlightMedia(req, res) {
+  try {
+    const website = await Website.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!website) {
+      return res.status(404).json({ message: 'Website not found' });
+    }
+    res.status(200).json(website);
+  } catch (error) {
+    res.status(400).json({ message: 'Error to highlight media', error: error.message });
+  }
+}

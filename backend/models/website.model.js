@@ -68,6 +68,22 @@ const websiteSchema = new Schema({
     type: Boolean,
     default: false
   },
+  discount : {
+    type : Boolean,
+    default : false,
+  },
+  slots : {
+    type : Number,
+    default : 0,
+  },
+  pricePerPublication :{
+    type : Number,
+    default : 0,
+  },
+  highlightMonths :{
+    type : Number,
+    default : 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now
