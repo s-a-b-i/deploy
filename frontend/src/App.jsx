@@ -29,6 +29,7 @@ import Withdraw from "./pages/Publisher/Withdraw";
 import Balance from "./pages/Publisher/Balance";
 import Deposit from "./components/Forms/Deposit";
 import AddWebsiteForm from "./components/Forms/AddWebsiteForm";
+import EditWebsiteForm from './components/Forms/EditWebsiteForm';
 
 // Advertiser Pages
 import AdvertiserDashboard from "./pages/Advertiser/Dashboard";
@@ -140,6 +141,7 @@ const App = () => {
               <Route path="/publisher/dashboard" element={<PublisherDashboard />} />
               <Route path="/publisher/products" element={<Products toggleMode={toggleMode} />} />
               <Route path="/publisher/products/add" element={<AddWebsiteForm />} />
+              <Route path="/publisher/products/:id/edit" element={<EditWebsiteForm />} />
               <Route path="/publisher/promos" element={<Promos />} />
               <Route path="/publisher/orders" element={<Orders />} />
               <Route path="/publisher/profile" element={<Profile />} />

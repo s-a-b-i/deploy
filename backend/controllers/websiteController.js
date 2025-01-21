@@ -1,9 +1,13 @@
-import Website  from '../models/website.model.js';
+import Website from '../models/website.model.js';
+import mongoose from 'mongoose';
 
 // Get all websites
 export async function getWebsites(req, res) {
   try {
-    const websites = await find();
+    const websites = await Website.find({});
+    if (websites.length === 0) {
+      return res.status(404).json({ message: 'No websites found' });
+    }
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching websites', error: error.message });
@@ -13,6 +17,9 @@ export async function getWebsites(req, res) {
 // Get single website
 export async function getWebsite(req, res) {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid website ID' });
+    }
     const foundwebsite = await Website.findById(req.params.id);
     if (!foundwebsite) {
       return res.status(404).json({ message: 'Website not found' });
@@ -26,7 +33,7 @@ export async function getWebsite(req, res) {
 // Create website
 export async function createWebsite(req, res) {
   try {
-    const website = new Website(req.body);
+    const website = new Website(req.body); // Ensure required fields are validated in the model
     const savedWebsite = await website.save();
     res.status(201).json(savedWebsite);
   } catch (error) {
@@ -37,7 +44,10 @@ export async function createWebsite(req, res) {
 // Update website
 export async function updateWebsite(req, res) {
   try {
-    const website = await findByIdAndUpdate(
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid website ID' });
+    }
+    const website = await Website.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
@@ -54,7 +64,10 @@ export async function updateWebsite(req, res) {
 // Delete website
 export async function deleteWebsite(req, res) {
   try {
-    const website = await findByIdAndDelete(req.params.id);
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid website ID' });
+    }
+    const website = await Website.findByIdAndDelete(req.params.id);
     if (!website) {
       return res.status(404).json({ message: 'Website not found' });
     }
