@@ -2,8 +2,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';  // Notice the '.js' extension is required in ES modules
 import authRoutes from './routes/auth.routes.js';
+import websiteRoutes from './routes/website.routes.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+
 
 
 dotenv.config();
@@ -30,6 +32,8 @@ app.get("/" , (req, res) => {
 })
 
 app.use("/api/auth" , authRoutes)
+
+app.use("/api/websites" , websiteRoutes)
 
 // Start the server
 const PORT = process.env.PORT || 5000;

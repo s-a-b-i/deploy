@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { FiInfo } from 'react-icons/fi';
 import { Popover } from '@headlessui/react';
+import { debounce } from 'lodash';
 
+// Editor configuration
 const editorModules = {
   toolbar: [
     ['bold', 'italic', 'underline'],
@@ -11,6 +13,14 @@ const editorModules = {
     [{ align: [] }],
     ['clean'],
   ],
+  keyboard: {
+    bindings: {
+      tab: false
+    }
+  },
+  clipboard: {
+    matchVisual: false
+  }
 };
 
 const editorFormats = ['bold', 'italic', 'underline', 'list', 'bullet', 'align'];
@@ -25,17 +35,35 @@ const EditorSection = ({
 }) => {
   const [error, setError] = useState('');
 
-  const handleEditorChange = (value) => {
-    handleDescriptionChange(value);
+  // Debounced word count validation
+  const validateWordCount = useCallback(
+    debounce((value) => {
+      const text = value.replace(/<[^>]*>/g, '');
+      const wordCount = text.trim().split(/\s+/).length;
+      if (wordCount < 100) {
+        setError('Description must be at least 100 words.');
+      } else {
+        setError('');
+      }
+    }, 500),
+    []
+  );
 
-    // Count the words in the description
-    const wordCount = value.trim().split(/\s+/).length;
-    if (wordCount < 100) {
-      setError('Description must be at least 100 words.');
-    } else {
-      setError('');
+  const handleEditorChange = useCallback((value) => {
+    // Limit content size if needed
+    if (value.length > 50000) {
+      value = value.slice(0, 50000);
     }
-  };
+    handleDescriptionChange(value);
+    validateWordCount(value);
+  }, [handleDescriptionChange, validateWordCount]);
+
+  const handleGuidelinesChange = useCallback((value) => {
+    if (value.length > 50000) {
+      value = value.slice(0, 50000);
+    }
+    setPublicationGuidelines(value);
+  }, [setPublicationGuidelines]);
 
   return (
     <div className="space-y-6">
@@ -57,7 +85,7 @@ const EditorSection = ({
             theme="snow"
             value={description}
             onChange={handleEditorChange}
-            className="border border-gray-300 rounded-md h-full"
+            className="border border-gray-300 rounded-md"
             modules={editorModules}
             formats={editorFormats}
           />
@@ -68,7 +96,7 @@ const EditorSection = ({
       {/* Publication Guidelines */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <label className="block font-semibold">Publication Guidelines <span className="text-red-500">*</span> </label>
+          <label className="block font-semibold">Publication Guidelines <span className="text-red-500">*</span></label>
           <Popover className="relative">
             <Popover.Button className="focus:outline-none">
               <FiInfo className="text-gray-500 hover:text-gray-700 transition-colors" size={16} />
@@ -82,8 +110,8 @@ const EditorSection = ({
           <ReactQuill
             theme="snow"
             value={publicationGuidelines}
-            onChange={setPublicationGuidelines}
-            className="border border-gray-300 rounded-md h-full"
+            onChange={handleGuidelinesChange}
+            className="border border-gray-300 rounded-md"
             modules={editorModules}
             formats={editorFormats}
           />
@@ -93,7 +121,7 @@ const EditorSection = ({
       {/* Publication Duration */}
       <div>
         <div className="flex items-center gap-2">
-          <label className="block font-semibold">Publication Duration <span className="text-red-500">*</span> </label>
+          <label className="block font-semibold">Publication Duration <span className="text-red-500">*</span></label>
           <Popover className="relative">
             <Popover.Button className="focus:outline-none">
               <FiInfo className="text-gray-500 hover:text-gray-700 transition-colors" size={16} />
@@ -120,7 +148,7 @@ const EditorSection = ({
       {/* Average Publication Time */}
       <div>
         <div className="flex items-center gap-2">
-          <label className="block font-semibold">Average Publication Time <span className="text-red-500">*</span> </label>
+          <label className="block font-semibold">Average Publication Time <span className="text-red-500">*</span></label>
           <Popover className="relative">
             <Popover.Button className="focus:outline-none">
               <FiInfo className="text-gray-500 hover:text-gray-700 transition-colors" size={16} />
