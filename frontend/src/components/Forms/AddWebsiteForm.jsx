@@ -178,6 +178,7 @@
 // components/AddWebsiteForm.jsx
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 import { websiteService } from '../../utils/services';
 import BasicInfo from './BasicInfo';
 import CategorySelection from './CategorySelection';
@@ -210,11 +211,12 @@ const initialFormData = {
   googleNews: false,
 };
 
-const AddWebsiteForm = () => {
-  const [formData, setFormData] = useState(initialFormData);
-  const [description, setDescription] = useState("");
-  const [publicationGuidelines, setPublicationGuidelines] = useState("");
+const AddWebsiteForm = ({ initialData, isEditing, websiteId }) => {
+  const [formData, setFormData] = useState(initialData || initialFormData);
+  const [description, setDescription] = useState(initialData?.description || "");
+  const [publicationGuidelines, setPublicationGuidelines] = useState(initialData?.publicationGuidelines || "");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -262,26 +264,27 @@ const AddWebsiteForm = () => {
         }
       };
 
-      const response = await websiteService.createWebsite(finalFormData);
-    toast.success('Website added successfully!');
-    setFormData(initialFormData);
-    setDescription("");
-    setPublicationGuidelines("");
-  } catch (error) {
-    toast.error(error.message || 'Error adding website');
-  } finally {
-    setIsLoading(false);
-  }
-};
+      if (isEditing) {
+        await websiteService.updateWebsite(websiteId, finalFormData);
+        toast.success('Website updated successfully!');
+      } else {
+        await websiteService.createWebsite(finalFormData);
+        toast.success('Website added successfully!');
+      }
 
+      navigate('/publisher/products');
+    } catch (error) {
+      toast.error(error.message || 'Error saving website');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="w-full mx-auto bg-white shadow-lg rounded-lg p-8 space-y-6">
-      <h1 className="text-2xl font-bold mb-6">Add Website / Fanpage</h1>
-
-      <p className="text-gray-600 mb-6">
-        {/* Your introduction text */}
-      </p>
+      <h1 className="text-2xl font-bold mb-6">
+        {isEditing ? 'Edit Website / Fanpage' : 'Add Website / Fanpage'}
+      </h1>
 
       <BasicInfo 
         formData={formData} 
@@ -319,7 +322,7 @@ const AddWebsiteForm = () => {
           isLoading ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
         } text-white py-2 px-6 rounded-md transition-colors`}
       >
-        {isLoading ? 'Saving...' : 'Save Product'}
+        {isLoading ? 'Saving...' : isEditing ? 'Update Product' : 'Save Product'}
       </button>
     </form>
   );
