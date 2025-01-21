@@ -3,7 +3,7 @@ import Website  from '../models/website.model.js';
 // Get all websites
 export async function getWebsites(req, res) {
   try {
-    const websites = await find();
+    const websites = await Website.find();
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching websites', error: error.message });
@@ -37,7 +37,7 @@ export async function createWebsite(req, res) {
 // Update website
 export async function updateWebsite(req, res) {
   try {
-    const website = await findByIdAndUpdate(
+    const website = await Website.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
@@ -54,7 +54,7 @@ export async function updateWebsite(req, res) {
 // Delete website
 export async function deleteWebsite(req, res) {
   try {
-    const website = await findByIdAndDelete(req.params.id);
+    const website = await Website.findByIdAndDelete(req.params.id);
     if (!website) {
       return res.status(404).json({ message: 'Website not found' });
     }
