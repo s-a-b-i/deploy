@@ -13,11 +13,11 @@ export async function getWebsites(req, res) {
 // Get single website
 export async function getWebsite(req, res) {
   try {
-    const website = await findById(req.params.id);
-    if (!website) {
+    const foundwebsite = await Website.findById(req.params.id);
+    if (!foundwebsite) {
       return res.status(404).json({ message: 'Website not found' });
     }
-    res.status(200).json(website);
+    res.status(200).json(foundwebsite);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching website', error: error.message });
   }
