@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { websiteService } from '../../utils/services';
 import toast from 'react-hot-toast';
 
-const HighlightMediaModal = ({  isOpen, 
-  onClose, 
-  websiteDomain, 
+const HighlightMediaModal = ({
+  isOpen,
+  onClose,
+  websiteDomain,
   websiteId,
   selectedMonths,
-  onMonthsChange  }) => {
+  onMonthsChange,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const PRICE_PER_MONTH = 29.00;
+
+  useEffect(() => {
+    if (isOpen && selectedMonths) {
+      onMonthsChange(selectedMonths);
+    }
+  }, [isOpen, selectedMonths, onMonthsChange]);
 
   if (!isOpen) return null;
 
@@ -35,12 +43,13 @@ const HighlightMediaModal = ({  isOpen,
       }
   
       const highlightData = {
-        months: parseInt(selectedMonths),  // Use selectedMonths instead of months
+        months: parseInt(selectedMonths),
+        highlightMonths: selectedMonths
       };
   
       await websiteService.highlightMedia(websiteId, highlightData);
       toast.success('Media highlighted successfully');
-      onClose();
+      onClose(highlightData);
     } catch (error) {
       toast.error(error.message || 'Failed to highlight media');
     } finally {

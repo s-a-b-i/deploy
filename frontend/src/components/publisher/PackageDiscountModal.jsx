@@ -1,13 +1,28 @@
-// components/publisher/PackageDiscountModal.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { websiteService } from '../../utils/services';
 import toast from 'react-hot-toast';
 
-const PackageDiscountModal = ({ isOpen, onClose, websiteDomain, websiteId,discountprop,slotsprop,pricePerPublicationprop }) => {
-  const [isDiscountActive, setIsDiscountActive] = useState(discountprop);
-  const [slots, setSlots] = useState(slotsprop);
-  const [pricePerPublication, setPricePerPublication] = useState(pricePerPublicationprop);
+const PackageDiscountModal = ({ 
+  isOpen, 
+  onClose, 
+  websiteDomain, 
+  websiteId,
+  discountprop,
+  slotsprop,
+  pricePerPublicationprop 
+}) => {
+  const [isDiscountActive, setIsDiscountActive] = useState(false);
+  const [slots, setSlots] = useState('5');
+  const [pricePerPublication, setPricePerPublication] = useState('20');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsDiscountActive(discountprop || false);
+      setSlots(slotsprop || '5');
+      setPricePerPublication(pricePerPublicationprop || '20');
+    }
+  }, [isOpen, discountprop, slotsprop, pricePerPublicationprop]);
 
   if (!isOpen) return null;
 
@@ -21,14 +36,14 @@ const PackageDiscountModal = ({ isOpen, onClose, websiteDomain, websiteId,discou
       }
   
       const discountData = {
-        discount : isDiscountActive,
+        discount: isDiscountActive,
         slots: parseInt(slots),
         pricePerPublication: parseFloat(pricePerPublication),
       };
   
       await websiteService.applyDiscount(websiteId, discountData);
       toast.success('Discount package updated successfully');
-      onClose();
+      onClose(discountData);
     } catch (error) {
       toast.error(error.message || 'Failed to update discount package');
     } finally {
