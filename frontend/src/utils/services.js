@@ -74,5 +74,25 @@ export const websiteService = {
     } catch (error) {
       throw error.response?.data || error;
     }
+  },
+
+  getWebsitesNotApproved: async (userId) => {
+    try {
+      const response = await api.post('/websites/notApproved', { userId });
+      return response.data;
+    } catch (error) {
+      console.error('Error:', error.response?.data || error);
+      throw error.response?.data || error;
+    }
+},
+  
+  
+  getWebsitesApproved: async (userId) => {
+    try {
+      const response = await api.post('/websites/approved', { userId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
   }
 };

@@ -113,7 +113,7 @@ export async function highlightMedia(req, res) {
 // Get websites for a user where approved is false
 export async function getWebsitesForUserNotApproved(req, res) {
   try {
-    const websites = await Website.find({ userId: req.params.userId, approved: false });
+    const websites = await Website.find({ userId: req.body.userId, approved: false });
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching websites', error: error.message });
