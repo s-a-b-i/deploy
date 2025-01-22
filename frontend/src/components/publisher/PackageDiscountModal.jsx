@@ -1,17 +1,40 @@
 // components/publisher/PackageDiscountModal.jsx
 import React, { useState } from 'react';
+import { websiteService } from '../../utils/services';
+import toast from 'react-hot-toast';
 
-const PackageDiscountModal = ({ isOpen, onClose, websiteDomain }) => {
+const PackageDiscountModal = ({ isOpen, onClose, websiteDomain, websiteId }) => {
   const [isDiscountActive, setIsDiscountActive] = useState(false);
   const [slots, setSlots] = useState('5');
   const [pricePerPublication, setPricePerPublication] = useState('150');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle save logic here
-    onClose();
+    setIsLoading(true);
+  
+    try {
+      if (!websiteId) {
+        throw new Error('Website ID is required');
+      }
+  
+      const discountData = {
+        isDiscountActive,
+        slots: parseInt(slots),
+        pricePerPublication: parseFloat(pricePerPublication),
+        websiteDomain
+      };
+  
+      await websiteService.applyDiscount(websiteId, discountData);
+      toast.success('Discount package updated successfully');
+      onClose();
+    } catch (error) {
+      toast.error(error.message || 'Failed to update discount package');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -22,6 +45,7 @@ const PackageDiscountModal = ({ isOpen, onClose, websiteDomain }) => {
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
+            disabled={isLoading}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -43,6 +67,7 @@ const PackageDiscountModal = ({ isOpen, onClose, websiteDomain }) => {
                 checked={isDiscountActive}
                 onChange={(e) => setIsDiscountActive(e.target.checked)}
                 className="rounded border-gray-300"
+                disabled={isLoading}
               />
               <span>Yes</span>
             </label>
@@ -54,7 +79,7 @@ const PackageDiscountModal = ({ isOpen, onClose, websiteDomain }) => {
               value={slots}
               onChange={(e) => setSlots(e.target.value)}
               className="w-full rounded-lg border border-gray-300 p-2"
-              disabled={!isDiscountActive} // Disable based on checkbox
+              disabled={!isDiscountActive || isLoading}
             >
               <option value="5">5 slot</option>
               <option value="10">10 slot</option>
@@ -71,7 +96,7 @@ const PackageDiscountModal = ({ isOpen, onClose, websiteDomain }) => {
                 onChange={(e) => setPricePerPublication(e.target.value)}
                 min="20"
                 className="w-full rounded-lg border border-gray-300 p-2 pr-8"
-                disabled={!isDiscountActive} // Disable based on checkbox
+                disabled={!isDiscountActive || isLoading}
               />
               <span className="absolute right-3 top-2 text-gray-500">€</span>
             </div>
@@ -81,9 +106,10 @@ const PackageDiscountModal = ({ isOpen, onClose, websiteDomain }) => {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="bg-foundations-primary text-white px-6 py-2 rounded-lg hover:bg-orange-600"
+              disabled={isLoading}
+              className="bg-foundations-primary text-white px-6 py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Save
+              {isLoading ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>

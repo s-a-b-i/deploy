@@ -55,4 +55,24 @@ export const websiteService = {
       throw error.response.data;
     }
   },
+
+  // New discount endpoint
+  applyDiscount: async (id, discountData) => {
+    try {
+      const response = await api.put(`/websites/discount/${id}`, discountData);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  // New highlight media endpoint
+  highlightMedia: async (id, highlightData) => {
+    try {
+      const response = await api.put(`/websites/highlight/${id}`, highlightData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
 };

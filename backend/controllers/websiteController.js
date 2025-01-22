@@ -86,11 +86,14 @@ export async function discount(req, res) {
 // highlight media
 export async function highlightMedia(req, res) {
   try {
+    const { months } = req.body;
+    
     const website = await Website.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      { highlightMonths: months },
       { new: true, runValidators: true }
     );
+    
     if (!website) {
       return res.status(404).json({ message: 'Website not found' });
     }
