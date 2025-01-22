@@ -11,6 +11,8 @@ import PriceSection from './PriceSection';
 import EditorSection from './EditorSection';
 import SocialMediaSection from './SocialMediaSection';
 
+import { useAuthStore } from "../../store/authStore";
+
 const initialFormData = {
   language: "",
   mediaType: "",
@@ -42,6 +44,8 @@ const AddWebsiteForm = ({ initialData, isEditing, websiteId }) => {
   const [publicationGuidelines, setPublicationGuidelines] = useState(initialData?.publicationGuidelines || "");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const { isAuthenticated, user } = useAuthStore();
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -86,7 +90,8 @@ const AddWebsiteForm = ({ initialData, isEditing, websiteId }) => {
           tiktok: formData.socialMedia.tiktok,
           reddit: formData.socialMedia.reddit,
           telegram: formData.socialMedia.telegram,
-        }
+        },
+        userId : user._id,
       };
 
       if (isEditing) {
