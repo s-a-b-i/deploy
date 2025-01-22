@@ -108,3 +108,24 @@ export async function highlightMedia(req, res) {
     res.status(400).json({ message: 'Error to highlight media', error: error.message });
   }
 }
+
+
+// Get websites for a user where approved is false
+export async function getWebsitesForUserNotApproved(req, res) {
+  try {
+    const websites = await Website.find({ userId: req.params.userId, approved: false });
+    res.status(200).json(websites);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching websites', error: error.message });
+  }
+}
+
+// Get websites for a user where approved is true
+export async function getWebsitesForUserApproved(req, res) {
+  try {
+    const websites = await Website.find({ userId: req.params.userId, approved: true });
+    res.status(200).json(websites);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching websites', error: error.message });
+  }
+}

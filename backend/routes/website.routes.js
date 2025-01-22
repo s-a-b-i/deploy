@@ -9,6 +9,9 @@ import { updateWebsite } from '../controllers/websiteController.js';
 import { deleteWebsite } from '../controllers/websiteController.js';
 import { discount } from '../controllers/websiteController.js';
 import { highlightMedia } from '../controllers/websiteController.js';
+import { getWebsitesForUserNotApproved } from '../controllers/websiteController.js';
+import { getWebsitesForUserApproved } from '../controllers/websiteController.js';
+
 
 router.get('/', getWebsites);
 router.get('/:id', getWebsite);
@@ -18,5 +21,8 @@ router.delete('/:id', deleteWebsite);
 
 router.put('/discount/:id', discount);
 router.put('/highlight/:id', highlightMedia);
+
+router.get('/notApproved', getWebsitesForUserNotApproved);
+router.get('/approved', getWebsitesForUserApproved);
 
 export default router;
