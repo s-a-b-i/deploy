@@ -1,7 +1,7 @@
 // components/publisher/ToApproveList.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaGift, FaClock, FaPen, FaChartBar } from 'react-icons/fa';
+import { FaGift, FaClock, FaPen, FaChartBar, FaGlobe } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { websiteService } from '../../utils/services';
 import PackageDiscountModal from './PackageDiscountModal';
@@ -73,15 +73,16 @@ const ToApproveList = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6">Websites To Approve</h1>
-      
+    <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="space-y-4">
         {websites.map((website) => (
-          <div key={website._id} className="border border-gray-200 rounded-lg p-4 space-y-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* Thumbnail */}
-              <div className="w-full md:w-48 h-32 bg-gray-100 rounded-lg overflow-hidden">
+          <div 
+            key={website._id} 
+            className="border border-gray-200 rounded-lg p-6 bg-white hover:shadow-lg transition-all duration-300"
+          >
+            <div className="flex items-start gap-6">
+              {/* Left: Image */}
+              <div className="w-48 h-32 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50">
                 {website.thumbnail ? (
                   <img
                     src={website.thumbnail}
@@ -89,72 +90,71 @@ const ToApproveList = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                  <div className="w-full h-full flex items-center justify-center">
                     <span className="text-gray-400">No Image</span>
                   </div>
                 )}
               </div>
 
-              {/* Content */}
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                  <h3 className="font-medium">{website.webDomain}</h3>
+              {/* Middle: Content */}
+              <div className="flex-grow">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                  <h3 className="text-lg font-semibold">{website.webDomain}</h3>
                 </div>
 
-                <div className="flex items-center gap-2 text-gray-600 mt-1">
-                  <span>{website.mediaType}</span>
-                  <span className="inline-block w-5 h-5 rounded-full bg-gray-200">
-                    {website.language && <span>{website.language}</span>}
-                  </span>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-gray-600">{website.mediaType}</span>
+                  <FaGlobe className="text-gray-400" />
                 </div>
 
-                <p className="text-gray-600 mt-2 text-sm line-clamp-3">
+                 {/* Description */}
+                 <div className="text-gray-600 text-sm mb-4 line-clamp-2">
                   {website.description}
-                </p>
+                </div>
 
-                <div className="flex flex-wrap gap-4 mt-4">
+                <div className="flex gap-12">
                   <div>
-                    <div className="text-gray-600">Total orders</div>
-                    <div>{website.totalOrders || 0}</div>
+                    <div className="text-sm text-gray-500">Total orders</div>
+                    <div className="font-medium">{website.totalOrders || 0}</div>
                   </div>
                   <div>
-                    <div className="text-gray-600">Total revenue</div>
-                    <div>€ {website.totalRevenue || '0,00'}</div>
+                    <div className="text-sm text-gray-500">Total revenue</div>
+                    <div className="font-medium">€ {website.totalRevenue || '0,00'}</div>
                   </div>
                 </div>
               </div>
 
-              {/* Price and Actions */}
+              {/* Right: Price and Actions */}
               <div className="flex flex-col items-end gap-4">
-                <div className="text-xl font-bold">€ {website.price || '0,00'}</div>
+                <div className="text-2xl font-bold">€ {website.price || '149,99'}</div>
                 <div className="flex gap-2">
                   <button
-                    className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-blue-200 transition-colors"
+                    className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition-colors"
                     onClick={() => handleGiftClick(website)}
                     title="Package Discount"
                   >
-                    <FaGift />
+                    <FaGift size={18} />
                   </button>
                   <button 
-                    className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 hover:bg-green-200 transition-colors"
+                    className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 hover:bg-emerald-200 transition-colors"
                     onClick={() => handleClockClick(website)}
                     title="Highlight Media"
                   >
-                    <FaClock />
+                    <FaClock size={18} />
                   </button>
                   <button 
-                    className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-blue-200 transition-colors"
+                    className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-blue-200 transition-colors"
                     onClick={() => handleEditClick(website._id)}
                     title="Edit Website"
                   >
-                    <FaPen />
+                    <FaPen size={18} />
                   </button>
                   <button 
-                    className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 hover:bg-orange-200 transition-colors"
+                    className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 hover:bg-orange-200 transition-colors"
                     title="Analytics"
                   >
-                    <FaChartBar />
+                    <FaChartBar size={18} />
                   </button>
                 </div>
               </div>
