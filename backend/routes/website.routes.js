@@ -16,7 +16,7 @@ import {
 
 // Place specific routes before dynamic routes
 router.post('/notApproved', getWebsitesForUserNotApproved);
-router.get('/approved', getWebsitesForUserApproved);
+router.post('/approved', getWebsitesForUserApproved);
 
 router.put('/discount/:id', discount);
 router.put('/highlight/:id', highlightMedia);
