@@ -35,6 +35,12 @@ const EditorSection = ({
 }) => {
   const [error, setError] = useState('');
 
+  // Function to clean HTML content
+  const cleanHtmlContent = (htmlContent) => {
+    // Remove <p> tags but keep the content
+    return htmlContent.replace(/<p>/g, '').replace(/<\/p>/g, '');
+  };
+
   // Debounced word count validation
   const validateWordCount = useCallback(
     debounce((value) => {
@@ -54,15 +60,19 @@ const EditorSection = ({
     if (value.length > 50000) {
       value = value.slice(0, 50000);
     }
-    handleDescriptionChange(value);
-    validateWordCount(value);
+    // Clean the HTML content before storing
+    const cleanedValue = cleanHtmlContent(value);
+    handleDescriptionChange(cleanedValue);
+    validateWordCount(cleanedValue);
   }, [handleDescriptionChange, validateWordCount]);
 
   const handleGuidelinesChange = useCallback((value) => {
     if (value.length > 50000) {
       value = value.slice(0, 50000);
     }
-    setPublicationGuidelines(value);
+    // Clean the HTML content before storing
+    const cleanedValue = cleanHtmlContent(value);
+    setPublicationGuidelines(cleanedValue);
   }, [setPublicationGuidelines]);
 
   return (
