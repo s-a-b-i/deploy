@@ -178,6 +178,9 @@ const ToApproveList = () => {
         onClose={handleModalClose}
         websiteDomain={selectedWebsite?.webDomain}
         websiteId={selectedWebsite?._id}
+        discountprop={selectedWebsite?.discount}
+        slotsprop={selectedWebsite?.slots}
+        pricePerPublicationprop={selectedWebsite?.price}
       />
 
       <HighlightMediaModal

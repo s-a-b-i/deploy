@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { websiteService } from '../../utils/services';
 import toast from 'react-hot-toast';
 
-const PackageDiscountModal = ({ isOpen, onClose, websiteDomain, websiteId }) => {
-  const [isDiscountActive, setIsDiscountActive] = useState(false);
-  const [slots, setSlots] = useState('5');
-  const [pricePerPublication, setPricePerPublication] = useState('150');
+const PackageDiscountModal = ({ isOpen, onClose, websiteDomain, websiteId,discountprop,slotsprop,pricePerPublicationprop }) => {
+  const [isDiscountActive, setIsDiscountActive] = useState(discountprop);
+  const [slots, setSlots] = useState(slotsprop);
+  const [pricePerPublication, setPricePerPublication] = useState(pricePerPublicationprop);
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
@@ -21,10 +21,9 @@ const PackageDiscountModal = ({ isOpen, onClose, websiteDomain, websiteId }) => 
       }
   
       const discountData = {
-        isDiscountActive,
+        discount : isDiscountActive,
         slots: parseInt(slots),
         pricePerPublication: parseFloat(pricePerPublication),
-        websiteDomain
       };
   
       await websiteService.applyDiscount(websiteId, discountData);
