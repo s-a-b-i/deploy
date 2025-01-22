@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.routes.js';
 import websiteRoutes from './routes/website.routes.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import promoRoutes from './routes/promo.routes.js';
 
 
 
@@ -34,6 +35,8 @@ app.get("/" , (req, res) => {
 app.use("/api/auth" , authRoutes)
 
 app.use("/api/websites" , websiteRoutes)
+
+app.use('/api/promos', promoRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
