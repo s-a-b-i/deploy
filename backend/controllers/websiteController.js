@@ -26,6 +26,12 @@ export async function getWebsite(req, res) {
 // Create website
 export async function createWebsite(req, res) {
   try {
+    const userId = req.body.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
     const website = new Website(req.body);
     const savedWebsite = await website.save();
     res.status(201).json(savedWebsite);

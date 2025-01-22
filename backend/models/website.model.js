@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Mongoose, Schema, model } from 'mongoose';
 
 const websiteSchema = new Schema({
   language: {
@@ -84,10 +84,16 @@ const websiteSchema = new Schema({
     type : Number,
     default : 0,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+  approved : {
+    type : Boolean,
+    default : false,
+  },
+  userId : {
+    type : mongoose.Schema.Types.ObjectId,
+    ref : 'User',
+    required : true
+  },
+
+},{timestamps: true});
 
 export default model('Website', websiteSchema);
