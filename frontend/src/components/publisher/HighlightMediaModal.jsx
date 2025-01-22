@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { websiteService } from '../../utils/services';
 import toast from 'react-hot-toast';
 
-const HighlightMediaModal = ({ isOpen, onClose, websiteDomain, websiteId }) => {
-  const [months, setMonths] = useState('1');
+const HighlightMediaModal = ({  isOpen, 
+  onClose, 
+  websiteDomain, 
+  websiteId,
+  selectedMonths,
+  onMonthsChange  }) => {
   const [isLoading, setIsLoading] = useState(false);
   const PRICE_PER_MONTH = 29.00;
 
@@ -31,7 +35,7 @@ const HighlightMediaModal = ({ isOpen, onClose, websiteDomain, websiteId }) => {
       }
   
       const highlightData = {
-        months: parseInt(months),
+        months: parseInt(selectedMonths),  // Use selectedMonths instead of months
       };
   
       await websiteService.highlightMedia(websiteId, highlightData);
@@ -82,8 +86,8 @@ const HighlightMediaModal = ({ isOpen, onClose, websiteDomain, websiteId }) => {
           <div className="space-y-2">
             <label className="block text-gray-700 font-medium">Months</label>
             <select
-              value={months}
-              onChange={(e) => setMonths(e.target.value)}
+              value={selectedMonths}
+              onChange={(e) => onMonthsChange(e.target.value)}
               className="w-full rounded-lg border border-gray-300 p-2"
               disabled={isLoading}
             >
@@ -96,16 +100,16 @@ const HighlightMediaModal = ({ isOpen, onClose, websiteDomain, websiteId }) => {
           </div>
 
           <div className="flex justify-between items-center mt-8">
-            <div className="flex flex-col">
-              {months !== '1' && (
-                <span className="text-gray-500 line-through">
-                  € {(PRICE_PER_MONTH * parseInt(months)).toFixed(2)}
-                </span>
-              )}
-              <span className="text-xl font-bold">
-                € {getDiscountedPrice(months).toFixed(2)}
-              </span>
-            </div>
+          <div className="flex flex-col">
+          {selectedMonths !== '1' && (
+            <span className="text-gray-500 line-through">
+              € {(PRICE_PER_MONTH * parseInt(selectedMonths)).toFixed(2)}
+            </span>
+          )}
+          <span className="text-xl font-bold">
+            € {getDiscountedPrice(selectedMonths).toFixed(2)}
+          </span>
+        </div>
             <button
               type="submit"
               disabled={isLoading}
