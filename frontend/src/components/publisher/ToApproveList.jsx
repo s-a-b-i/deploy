@@ -11,6 +11,7 @@ import HighlightMediaModal from './HighlightMediaModal';
 
 const ToApproveList = () => {
   const navigate = useNavigate();
+  const [selectedMonths, setSelectedMonths] = useState('1');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHighlightModalOpen, setIsHighlightModalOpen] = useState(false);
   const [selectedWebsite, setSelectedWebsite] = useState(null);
@@ -180,12 +181,14 @@ const ToApproveList = () => {
         websiteId={selectedWebsite?._id}
       />
 
-      <HighlightMediaModal
-        isOpen={isHighlightModalOpen}
-        onClose={handleModalClose}
-        websiteDomain={selectedWebsite?.webDomain}
-        websiteId={selectedWebsite?._id}
-      />
+<HighlightMediaModal
+      isOpen={isHighlightModalOpen}
+      onClose={handleModalClose}
+      websiteDomain={selectedWebsite?.webDomain}
+      websiteId={selectedWebsite?._id}
+      selectedMonths={selectedMonths}
+      onMonthsChange={setSelectedMonths}
+    />
     </div>
   );
 };
