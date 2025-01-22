@@ -188,7 +188,7 @@ const ToApproveList = () => {
         websiteId={selectedWebsite?._id}
         discountprop={selectedWebsite?.discount}
         slotsprop={selectedWebsite?.slots}
-        pricePerPublicationprop={selectedWebsite?.price}
+        pricePerPublicationprop={selectedWebsite?.pricePerPublication}
       />
 
 <HighlightMediaModal
