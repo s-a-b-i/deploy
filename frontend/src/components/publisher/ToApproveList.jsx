@@ -1,12 +1,7 @@
 // components/publisher/ToApproveList.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
 import { FaGift, FaClock, FaPen, FaChartBar ,FaGlobe } from 'react-icons/fa';
-=======
-import { FaGift, FaClock, FaPen, FaChartBar, FaGlobe } from 'react-icons/fa';
-import { toast } from 'react-toastify';
->>>>>>> 298d812229b894559e58f93d8ef58fab50503237
 import { websiteService } from '../../utils/services';
 import toast from 'react-hot-toast';
 import PackageDiscountModal from './PackageDiscountModal';
