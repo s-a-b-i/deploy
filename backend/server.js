@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import promoRoutes from './routes/promo.routes.js';
 import profileRoutes from './routes/profile.routes.js';
-
+import invoiceAccountRoutes from './routes/invoiceAccount.routes.js';
 
 
 dotenv.config();
@@ -40,6 +40,7 @@ app.use("/api/websites" , websiteRoutes)
 app.use('/api/promos', promoRoutes);
 
 app.use('/api', profileRoutes);
+app.use('/api', invoiceAccountRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
