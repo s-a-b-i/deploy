@@ -176,7 +176,7 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
       <MobileMenuButton />
       
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block fixed left-0 top-0 w-64 h-screen bg-foundations-primary overflow-y-auto">
+      <aside className="hidden lg:block fixed left-0 top-0 w-64 h-screen bg-gradient-to-b from-foundations-primary to-foundations-secondary overflow-y-auto">
         <SidebarContent />
       </aside>
 
