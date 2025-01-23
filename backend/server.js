@@ -8,6 +8,7 @@ import cors from 'cors';
 import promoRoutes from './routes/promo.routes.js';
 import profileRoutes from './routes/profile.routes.js';
 import invoiceAccountRoutes from './routes/invoiceAccount.routes.js';
+import emailChangeRoutes from './routes/emailChange.routes.js';
 
 
 dotenv.config();
@@ -41,6 +42,7 @@ app.use('/api/promos', promoRoutes);
 
 app.use('/api/profile', profileRoutes);
 app.use('/api/invoice-account', invoiceAccountRoutes);
+app.use('/api/email-change', emailChangeRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;

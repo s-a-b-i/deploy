@@ -123,6 +123,9 @@ export const login = async (req, res) => {
         user.lastLogin = new Date();
         await user.save();
 
+        // sending welcome email
+        await sendWelcomeEmail(user.email, user.name ?? "User");
+
         res.status(200).json({ success: true, msg: "User logged in successfully", user: {
             ...user._doc,
             password: undefined
