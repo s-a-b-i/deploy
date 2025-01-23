@@ -10,10 +10,10 @@ import {
 const router = express.Router();
 
 // Invoice account routes
-router.post("/invoice-accounts", createInvoiceAccount);
-router.get("/invoice-accounts", getInvoiceAccounts);
-router.get("/invoice-accounts/:id", getInvoiceAccount);
-router.put("/invoice-accounts/:id", updateInvoiceAccount);
-router.delete("/invoice-accounts/:id", deleteInvoiceAccount);
+router.post("/create", createInvoiceAccount);
+router.post("/get-all", getInvoiceAccounts);
+router.get("/get/:id", getInvoiceAccount);
+router.put("/update/:id", updateInvoiceAccount);
+router.delete("/delete/:id", deleteInvoiceAccount);
 
 export default router;

@@ -39,8 +39,8 @@ app.use("/api/websites" , websiteRoutes)
 
 app.use('/api/promos', promoRoutes);
 
-app.use('/api', profileRoutes);
-app.use('/api', invoiceAccountRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/invoice-account', invoiceAccountRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;

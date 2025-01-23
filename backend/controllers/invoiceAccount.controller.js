@@ -3,6 +3,13 @@ import InvoiceAccount from '../models/invoiceAccount.model.js';
 // Create a new invoice account
 export async function createInvoiceAccount(req, res) {
   try {
+
+    const userId = req.body.userId;
+
+    if(!userId){
+        return res.status(400).json({ message: 'User ID is required' });
+    }
+
     const newInvoiceAccount = new InvoiceAccount(req.body);
     const savedInvoiceAccount = await newInvoiceAccount.save();
     res.status(201).json(savedInvoiceAccount);
@@ -14,7 +21,14 @@ export async function createInvoiceAccount(req, res) {
 // Get all invoice accounts
 export async function getInvoiceAccounts(req, res) {
   try {
-    const invoiceAccounts = await InvoiceAccount.find();
+
+    const userId = req.body.userId;
+
+    if(!userId){
+        return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    const invoiceAccounts = await InvoiceAccount.find({ userId: userId });
     res.status(200).json(invoiceAccounts);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching invoice accounts', error: error.message });

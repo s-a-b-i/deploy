@@ -11,6 +11,12 @@ cloudinary.config({
 // Create a new profile
 export async function createProfile(req, res) {
   try {
+    const userId = req.body.userId;
+
+    if(!userId){
+        return res.status(400).json({ message: 'User ID is required' });
+    }
+
     const { avatar } = req.body;
     let avatarUrl = '';
 
@@ -19,7 +25,7 @@ export async function createProfile(req, res) {
       avatarUrl = result.secure_url;
     }
 
-    const newProfile = new Profile({ ...req.body, avatar: avatarUrl });
+    const newProfile = new Profile({ ...req.body, avatar: avatarUrl});
     const savedProfile = await newProfile.save();
     res.status(201).json(savedProfile);
   } catch (error) {
@@ -28,27 +34,35 @@ export async function createProfile(req, res) {
 }
 
 // Get all profiles
-export async function getProfiles(req, res) {
-  try {
-    const profiles = await Profile.find();
-    res.status(200).json(profiles);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching profiles', error: error.message });
-  }
-}
-
-// Get a single profile by ID
 export async function getProfile(req, res) {
   try {
-    const profile = await Profile.findById(req.params.id);
-    if (!profile) {
-      return res.status(404).json({ message: 'Profile not found' });
+
+    const userId = req.body.userId;
+
+    if(!userId){
+        return res.status(400).json({ message: 'User ID is required' });
     }
+
+    const profile = await Profile.findOne({ userId: userId });
+
     res.status(200).json(profile);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching profile', error: error.message });
   }
 }
+
+// Get a single profile by ID
+// export async function getProfile(req, res) {
+//   try {
+//     const profile = await Profile.findById(req.params.id);
+//     if (!profile) {
+//       return res.status(404).json({ message: 'Profile not found' });
+//     }
+//     res.status(200).json(profile);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error fetching profile', error: error.message });
+//   }
+// }
 
 // Update a profile by ID
 export async function updateProfile(req, res) {
