@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { promoService , websiteService } from "../../utils/services";
+import { promoService, websiteService } from "../../utils/services";
 import PromoForm from "../../components/Forms/PromoForm.jsx";
 import { useAuthStore } from "../../store/authStore";
 import { toast } from 'react-hot-toast';
@@ -21,7 +21,6 @@ const Promos = () => {
           const fetchedPromos = await promoService.getPromos(userId);
           setPromos(fetchedPromos.map(promo => ({ ...promo, isExpanded: false })));
           
-          // Fetch approved websites
           const websites = await websiteService.getWebsitesApproved(userId);
           setApprovedWebsites(websites);
         } else {
@@ -36,12 +35,18 @@ const Promos = () => {
     fetchPromos();
   }, [userId]);
 
+  // Get all website IDs currently in promotions
+  const getExistingPromoWebsites = () => {
+    return promos
+      .filter(promo => promo._id !== (editingPromo !== null ? promos[editingPromo]._id : null))
+      .flatMap(promo => promo.products);
+  };
+
   const handleAddPromo = async (promoData) => {
     try {
       const newPromoData = { 
         ...promoData, 
         userId,
-        // No need for separate websiteIds/websiteNames
       };
       
       if (editingPromo !== null) {
@@ -114,11 +119,15 @@ const Promos = () => {
         </div>
       )}
 
-      {showForm && (
+{showForm && (
         <PromoForm
           onSubmit={handleAddPromo}
-          onCancel={handleCancelPromo}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingPromo(null);
+          }}
           initialData={editingPromo !== null ? promos[editingPromo] : null}
+          existingPromoWebsites={getExistingPromoWebsites()}
         />
       )}
 

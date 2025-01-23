@@ -10,8 +10,7 @@ import { websiteService } from "../../utils/services";
 import { useAuthStore } from "../../store/authStore";
 import "react-datepicker/dist/react-datepicker.css";
 
-const PromoForm = ({ onSubmit, onCancel, initialData }) => {
-  // Initial form state
+const PromoForm = ({ onSubmit, onCancel, initialData, existingPromoWebsites = [] }) => {
   const [formData, setFormData] = useState({
     promoName: initialData?.promoName || "",
     startDate: initialData?.startDate || new Date(),
@@ -27,7 +26,6 @@ const PromoForm = ({ onSubmit, onCancel, initialData }) => {
   const user = useAuthStore((state) => state.user);
   const userId = user?._id;
 
-  // Fetch websites on component mount
   useEffect(() => {
     if (userId) {
       fetchWebsites(userId);
@@ -36,14 +34,14 @@ const PromoForm = ({ onSubmit, onCancel, initialData }) => {
     }
   }, [userId]);
 
-  // Fetch approved websites
   const fetchWebsites = async (userId) => {
     try {
       setIsLoading(true);
       const websites = await websiteService.getWebsitesApproved(userId);
       const websiteOptions = websites.map(website => ({
         value: website._id,
-        label: website.webDomain
+        label: website.webDomain,
+        isDisabled: existingPromoWebsites.includes(website._id)
       }));
       setApprovedWebsites(websiteOptions);
       setError(null);
@@ -56,7 +54,6 @@ const PromoForm = ({ onSubmit, onCancel, initialData }) => {
     }
   };
 
-  // Form submission handler
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -166,33 +163,33 @@ const PromoForm = ({ onSubmit, onCancel, initialData }) => {
 
           {/* Websites */}
           <div className="flex flex-col">
-            <label className="flex items-center mb-1 text-sm font-medium text-gray-700">
-              Websites <span className="text-red-500 ml-1">*</span>
-            </label>
-            {isLoading ? (
-              <div className="text-sm text-gray-500">Loading websites...</div>
-            ) : error ? (
-              <div className="text-sm text-red-500">{error}</div>
-            ) : (
-              <Select
-                isMulti
-                options={approvedWebsites}
-                value={approvedWebsites.filter(website => 
-                  formData.products.includes(website.value)
-                )}
-                onChange={(selectedOptions) => {
-                  setFormData({ 
-                    ...formData, 
-                    products: selectedOptions.map(option => option.value)
-                  });
-                }}
-                className="basic-multi-select"
-                classNamePrefix="select"
-                placeholder="Select websites..."
-                required
-              />
-            )}
-          </div>
+          <label className="flex items-center mb-1 text-sm font-medium text-gray-700">
+            Websites <span className="text-red-500 ml-1">*</span>
+          </label>
+          {isLoading ? (
+            <div className="text-sm text-gray-500">Loading websites...</div>
+          ) : error ? (
+            <div className="text-sm text-red-500">{error}</div>
+          ) : (
+            <Select
+      isMulti
+      options={approvedWebsites}
+      value={approvedWebsites.filter(website => 
+        formData.products.includes(website.value)
+      )}
+      onChange={(selectedOptions) => {
+        setFormData({ 
+          ...formData, 
+          products: selectedOptions.map(option => option.value)
+        });
+      }}
+      className="basic-multi-select"
+      classNamePrefix="select"
+      placeholder="Select websites..."
+      required
+    />
+          )}
+        </div>
 
           {/* Discount */}
           <div className="flex flex-col">
