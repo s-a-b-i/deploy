@@ -4,6 +4,8 @@ import { FaGift, FaClock, FaPen, FaChartBar, FaGlobe, FaBars } from 'react-icons
 import { websiteService } from '../../utils/services';
 import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
+import PackageDiscountModal from './PackageDiscountModal';
+import HighlightMediaModal from './HighlightMediaModal';
 
 const ApprovedList = () => {
   const navigate = useNavigate();
@@ -12,6 +14,11 @@ const ApprovedList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHighlightModalOpen, setIsHighlightModalOpen] = useState(false);
+  const [selectedWebsite, setSelectedWebsite] = useState(null);
+  const [selectedMonths, setSelectedMonths] = useState('1');
 
   useEffect(() => {
     if (user?._id) {
@@ -33,6 +40,30 @@ const ApprovedList = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleModalClose = (updatedData = null) => {
+    if (updatedData && selectedWebsite) {
+      setWebsites((prevWebsites) =>
+        prevWebsites.map((website) =>
+          website._id === selectedWebsite._id ? { ...website, ...updatedData } : website
+        )
+      );
+    }
+    setIsModalOpen(false);
+    setIsHighlightModalOpen(false);
+    setSelectedWebsite(null);
+  };
+
+  const handleGiftClick = (website) => {
+    setSelectedWebsite(website);
+    setIsModalOpen(true);
+  };
+
+  const handleClockClick = (website) => {
+    setSelectedWebsite(website);
+    setSelectedMonths(website.highlightMonths || '1');
+    setIsHighlightModalOpen(true);
   };
 
   const handleEditClick = (websiteId) => {
@@ -142,6 +173,20 @@ const ApprovedList = () => {
                 <div className="text-xl md:text-2xl font-bold">€ {website.price}</div>
                 <div className="grid grid-cols-4 md:flex gap-2">
                   <button
+                    className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition-colors"
+                    onClick={() => handleGiftClick(website)}
+                    title="Package Discount"
+                  >
+                    <FaGift size={18} />
+                  </button>
+                  <button
+                    className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 hover:bg-emerald-200 transition-colors"
+                    onClick={() => handleClockClick(website)}
+                    title="Highlight Media"
+                  >
+                    <FaClock size={18} />
+                  </button>
+                  <button
                     className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-blue-200 transition-colors"
                     onClick={() => handleEditClick(website._id)}
                     title="Edit Website"
@@ -163,6 +208,26 @@ const ApprovedList = () => {
           </div>
         ))}
       </div>
+
+      {/* Modals */}
+      <PackageDiscountModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        websiteDomain={selectedWebsite?.webDomain}
+        websiteId={selectedWebsite?._id}
+        discountprop={selectedWebsite?.discount}
+        slotsprop={selectedWebsite?.slots}
+        pricePerPublicationprop={selectedWebsite?.pricePerPublication}
+      />
+
+      <HighlightMediaModal
+        isOpen={isHighlightModalOpen}
+        onClose={handleModalClose}
+        websiteDomain={selectedWebsite?.webDomain}
+        websiteId={selectedWebsite?._id}
+        selectedMonths={selectedMonths}
+        onMonthsChange={setSelectedMonths}
+      />
     </div>
   );
 };
