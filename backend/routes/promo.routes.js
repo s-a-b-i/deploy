@@ -4,7 +4,7 @@ import { createPromo, getPromos, getPromo, updatePromo, deletePromo } from '../c
 const router = express.Router();
 
 router.post('/', createPromo);
-router.post('/', getPromos);
+router.post('/getPromos', getPromos);
 router.get('/:id', getPromo);
 router.put('/:id', updatePromo);
 router.delete('/:id', deletePromo);

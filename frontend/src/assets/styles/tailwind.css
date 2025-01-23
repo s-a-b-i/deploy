@@ -37,3 +37,19 @@
       word-break: break-word;
     }
   }
+
+
+  .input-container {
+    position: relative;
+  }
+  
+  .input-container input {
+    padding-right: 30px; /* Adjust to create space for the icon */
+  }
+  
+  .input-container .icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+  }

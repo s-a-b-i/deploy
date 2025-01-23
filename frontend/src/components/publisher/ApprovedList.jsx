@@ -4,21 +4,14 @@ import { FaGift, FaClock, FaPen, FaChartBar, FaGlobe, FaBars } from 'react-icons
 import { websiteService } from '../../utils/services';
 import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
-import PackageDiscountModal from './PackageDiscountModal';
-import HighlightMediaModal from './HighlightMediaModal';
 
-const ToApproveList = () => {
+const ApprovedList = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const [websites, setWebsites] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isHighlightModalOpen, setIsHighlightModalOpen] = useState(false);
-  const [selectedWebsite, setSelectedWebsite] = useState(null);
-  const [selectedMonths, setSelectedMonths] = useState('1');
 
   useEffect(() => {
     if (user?._id) {
@@ -31,7 +24,7 @@ const ToApproveList = () => {
   const fetchWebsites = async () => {
     try {
       setIsLoading(true);
-      const response = await websiteService.getWebsitesNotApproved(user._id);
+      const response = await websiteService.getWebsitesApproved(user._id);
       setWebsites(response);
       setError(null);
     } catch (err) {
@@ -40,30 +33,6 @@ const ToApproveList = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleModalClose = (updatedData = null) => {
-    if (updatedData && selectedWebsite) {
-      setWebsites((prevWebsites) =>
-        prevWebsites.map((website) =>
-          website._id === selectedWebsite._id ? { ...website, ...updatedData } : website
-        )
-      );
-    }
-    setIsModalOpen(false);
-    setIsHighlightModalOpen(false);
-    setSelectedWebsite(null);
-  };
-
-  const handleGiftClick = (website) => {
-    setSelectedWebsite(website);
-    setIsModalOpen(true);
-  };
-
-  const handleClockClick = (website) => {
-    setSelectedWebsite(website);
-    setSelectedMonths(website.highlightMonths || '1');
-    setIsHighlightModalOpen(true);
   };
 
   const handleEditClick = (websiteId) => {
@@ -101,7 +70,7 @@ const ToApproveList = () => {
   if (websites.length === 0) {
     return (
       <div className="text-center text-gray-600 p-4">
-        No pending websites found.
+        No approved websites found.
       </div>
     );
   }
@@ -109,7 +78,7 @@ const ToApproveList = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl md:text-2xl font-bold">Websites Pending Approval</h2>
+        <h2 className="text-xl md:text-2xl font-bold">Approved Websites</h2>
         <button 
           className="md:hidden text-gray-600"
           onClick={toggleMobileMenu}
@@ -143,7 +112,7 @@ const ToApproveList = () => {
               {/* Content */}
               <div className="flex-grow w-full">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                   <h3 className="text-base md:text-lg font-semibold">{website.webDomain}</h3>
                 </div>
 
@@ -173,20 +142,6 @@ const ToApproveList = () => {
                 <div className="text-xl md:text-2xl font-bold">€ {website.price}</div>
                 <div className="grid grid-cols-4 md:flex gap-2">
                   <button
-                    className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition-colors"
-                    onClick={() => handleGiftClick(website)}
-                    title="Package Discount"
-                  >
-                    <FaGift size={18} />
-                  </button>
-                  <button
-                    className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 hover:bg-emerald-200 transition-colors"
-                    onClick={() => handleClockClick(website)}
-                    title="Highlight Media"
-                  >
-                    <FaClock size={18} />
-                  </button>
-                  <button
                     className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-blue-200 transition-colors"
                     onClick={() => handleEditClick(website._id)}
                     title="Edit Website"
@@ -202,34 +157,14 @@ const ToApproveList = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-4 text-xs md:text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
-              Status: Pending Approval
+            <div className="mt-4 text-xs md:text-sm text-green-600 bg-green-50 p-2 rounded">
+              Status: Approved
             </div>
           </div>
         ))}
       </div>
-
-      {/* Modals */}
-      <PackageDiscountModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        websiteDomain={selectedWebsite?.webDomain}
-        websiteId={selectedWebsite?._id}
-        discountprop={selectedWebsite?.discount}
-        slotsprop={selectedWebsite?.slots}
-        pricePerPublicationprop={selectedWebsite?.pricePerPublication}
-      />
-
-      <HighlightMediaModal
-        isOpen={isHighlightModalOpen}
-        onClose={handleModalClose}
-        websiteDomain={selectedWebsite?.webDomain}
-        websiteId={selectedWebsite?._id}
-        selectedMonths={selectedMonths}
-        onMonthsChange={setSelectedMonths}
-      />
     </div>
   );
 };
 
-export default ToApproveList;
+export default ApprovedList;

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ToApproveList from "../../components/publisher/ToApproveList";
+import ApprovedList from "../../components/publisher/ApprovedList"; // Import the ApprovedList component
 
 const Products = ({ toggleMode }) => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('approved');
+  const [activeTab, setActiveTab] = useState('approved'); // Default to "approved" tab
 
   const handleProductsClick = async () => {
     toggleMode();
@@ -15,6 +16,7 @@ const Products = ({ toggleMode }) => {
 
   return (
     <div className="space-y-6 px-4 md:px-8 lg:px-12">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <h1 className="text-2xl font-bold text-foundations-dark">Products</h1>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
@@ -33,6 +35,7 @@ const Products = ({ toggleMode }) => {
         </div>
       </div>
 
+      {/* Search */}
       <div className="w-full">
         <input
           type="text"
@@ -41,6 +44,7 @@ const Products = ({ toggleMode }) => {
         />
       </div>
 
+      {/* Tabs */}
       <div className="flex flex-wrap gap-2 sm:gap-4">
         <button 
           className={`px-4 sm:px-6 py-2 rounded-lg flex-grow sm:flex-grow-0 ${
@@ -64,14 +68,14 @@ const Products = ({ toggleMode }) => {
         </button>
       </div>
 
+      {/* Tab Content */}
       {activeTab === 'approved' ? (
-        <div className="text-gray-500 py-8 text-center">
-          No products to show
-        </div>
+        <ApprovedList /> // Display the ApprovedList component here
       ) : (
-        <ToApproveList />
+        <ToApproveList /> // Display the ToApproveList component here
       )}
 
+      {/* Footer */}
       <div className="flex flex-wrap gap-2 text-[#3D52A0] justify-center sm:justify-start">
         <Link to="/terms" className="hover:underline">
           Terms and conditions
@@ -86,4 +90,3 @@ const Products = ({ toggleMode }) => {
 };
 
 export default Products;
-
