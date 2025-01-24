@@ -151,3 +151,88 @@ export const promoService = {
 
 
 };
+
+export const profileService = {
+  createProfile: async (profileData) => {
+    try {
+      const response = await api.post('/profile/create', profileData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  getProfile: async (userId) => {
+    try {
+      const response = await api.post('/profile/get', { userId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  updateProfile: async (id, profileData) => {
+    try {
+      const response = await api.put(`/profile/update/${id}`, profileData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  deleteProfile: async (id) => {
+    try {
+      const response = await api.delete(`/profile/delete/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+};
+
+export const invoiceAccountService = {
+  createInvoiceAccount: async (invoiceAccountData) => {
+    try {
+      const response = await api.post('/invoice-accounts/create', invoiceAccountData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  getInvoiceAccounts: async (userId) => {
+    try {
+      const response = await api.post('/invoice-accounts/get-all', { userId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  getInvoiceAccountById: async (id) => {
+    try {
+      const response = await api.get(`/invoice-accounts/get/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  updateInvoiceAccount: async (id, invoiceAccountData) => {
+    try {
+      const response = await api.put(`/invoice-accounts/update/${id}`, invoiceAccountData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  deleteInvoiceAccount: async (id) => {
+    try {
+      const response = await api.delete(`/invoice-accounts/delete/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+};
