@@ -193,7 +193,7 @@ export const profileService = {
 export const invoiceAccountService = {
   createInvoiceAccount: async (invoiceAccountData) => {
     try {
-      const response = await api.post('/invoice-accounts/create', invoiceAccountData);
+      const response = await api.post('/invoice-account/create', invoiceAccountData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -202,7 +202,7 @@ export const invoiceAccountService = {
 
   getInvoiceAccounts: async (userId) => {
     try {
-      const response = await api.post('/invoice-accounts/get-all', { userId });
+      const response = await api.post('/invoice-account/get-all', { userId });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -211,7 +211,7 @@ export const invoiceAccountService = {
 
   getInvoiceAccountById: async (id) => {
     try {
-      const response = await api.get(`/invoice-accounts/get/${id}`);
+      const response = await api.get(`/invoice-account/get/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -220,7 +220,7 @@ export const invoiceAccountService = {
 
   updateInvoiceAccount: async (id, invoiceAccountData) => {
     try {
-      const response = await api.put(`/invoice-accounts/update/${id}`, invoiceAccountData);
+      const response = await api.put(`/invoice-account/update/${id}`, invoiceAccountData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -229,7 +229,7 @@ export const invoiceAccountService = {
 
   deleteInvoiceAccount: async (id) => {
     try {
-      const response = await api.delete(`/invoice-accounts/delete/${id}`);
+      const response = await api.delete(`/invoice-account/delete/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;

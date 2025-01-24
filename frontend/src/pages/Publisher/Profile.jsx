@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
-import { profileService } from "../../utils/services";
+import { profileService, invoiceAccountService } from "../../utils/services";
 import ChangeEmailModal from "../../components/publisher/ChangeEmailModal";
 import EditInvoicingForm from "../../components/publisher/EditInvoicingForm";
 import { toast } from "react-hot-toast";
@@ -27,11 +27,13 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [isProfileCreated, setIsProfileCreated] = useState(false);
   const [profileId, setProfileId] = useState(null);
+  const [editingAccount, setEditingAccount] = useState(null);
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         if (userId) {
+          // Fetch profile data
           const profileData = await profileService.getProfile(userId);
           if (profileData) {
             setProfileId(profileData._id);
@@ -44,11 +46,12 @@ const Profile = () => {
               avatar: profileData.avatar || null,
             });
             setEmail(profileData.email || "");
-            setInvoicingAccounts(profileData.invoicingAccounts || []);
             setIsProfileCreated(true);
-          } else {
-            setIsProfileCreated(false);
           }
+
+          // Fetch invoicing accounts
+          const accounts = await invoiceAccountService.getInvoiceAccounts(userId);
+          setInvoicingAccounts(accounts);
         } else {
           setError("Invalid user ID");
         }
@@ -81,42 +84,63 @@ const Profile = () => {
     }
   };
 
-  const handleAvatarUpload = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      try {
-        const formData = new FormData();
-        formData.append("avatar", file);
-        formData.append("userId", userId);
-
-        const uploadResponse = await profileService.uploadAvatar(formData);
-        setFormData((prev) => ({ ...prev, avatar: uploadResponse.avatarUrl }));
-        toast.success("Avatar uploaded successfully!");
-      } catch (error) {
-        console.error("Avatar upload failed:", error);
-        toast.error("Failed to upload avatar");
+  const handleSaveInvoicingAccount = async (accountData) => {
+    try {
+      if (editingAccount) {
+        // Update existing account
+        const updatedAccount = await invoiceAccountService.updateInvoiceAccount(
+          editingAccount._id, 
+          { ...accountData, userId }
+        );
+        const updatedAccounts = invoicingAccounts.map(account => 
+          account._id === editingAccount._id ? updatedAccount : account
+        );
+        setInvoicingAccounts(updatedAccounts);
+        toast.success("Invoicing account updated!");
+      } else {
+        // Create new account only if no existing account
+        const existingAccount = invoicingAccounts.find(
+          account => account.organizationName === accountData.organizationName ||
+                     (account.firstName === accountData.firstName && 
+                      account.lastName === accountData.lastName)
+        );
+  
+        if (!existingAccount) {
+          const newAccount = await invoiceAccountService.createInvoiceAccount({
+            ...accountData,
+            userId
+          });
+          setInvoicingAccounts([...invoicingAccounts, newAccount]);
+          toast.success("Invoicing account added!");
+        } else {
+          toast.error("Account already exists");
+        }
       }
+      
+      setShowEditForm(false);
+      setIsEditingOrAdding(false);
+      setEditingAccount(null);
+    } catch (error) {
+      console.error("Error saving invoicing account:", error);
+      toast.error("Failed to save invoicing account");
     }
   };
 
-  const handleSaveInvoicingAccount = (accountData) => {
-    if (isEditingOrAdding) {
-      const updatedAccounts = invoicingAccounts.map((account, index) =>
-        index === accountData.index ? accountData : account
-      );
-      setInvoicingAccounts(updatedAccounts);
-      toast.success("Invoicing account updated!");
-    } else {
-      setInvoicingAccounts([...invoicingAccounts, accountData]);
-      toast.success("Invoicing account added!");
+  const handleRemoveInvoicingAccount = async (accountId) => {
+    try {
+      await invoiceAccountService.deleteInvoiceAccount(accountId);
+      setInvoicingAccounts(invoicingAccounts.filter(account => account._id !== accountId));
+      toast.success("Invoicing account removed!");
+    } catch (error) {
+      console.error("Error removing invoicing account:", error);
+      toast.error("Failed to remove invoicing account");
     }
-    setShowEditForm(false);
-    setIsEditingOrAdding(false);
   };
 
-  const handleEmailChange = (newEmail) => {
-    setEmail(newEmail);
-    setShowEmailModal(false);
+  const handleEditInvoicingAccount = (account) => {
+    setEditingAccount(account);
+    setShowEditForm(true);
+    setIsEditingOrAdding(true);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -223,45 +247,51 @@ const Profile = () => {
           </button>
         </div>
 
-        {invoicingAccounts.map((account, index) => (
+        {invoicingAccounts.length === 0 ? (
+        <div className="text-gray-500 text-center py-4">
+          No invoicing accounts found
+        </div>
+      ) : (
+        invoicingAccounts.map((account) => (
           <div
-            key={index}
+            key={account._id}
             className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
           >
-            <span>{account.name}</span>
-            <span>{account.address}</span>
+            <div>
+              <span>{account.accountType === 'business' ? account.organizationName : `${account.firstName} ${account.lastName}`}</span>
+              <div className="text-gray-500 text-sm">{account.address}</div>
+            </div>
             <div className="flex gap-2">
               <button
                 type="button"
                 className="text-yellow-500"
-                onClick={() => {
-                  setShowEditForm(true);
-                  setIsEditingOrAdding(true); // <-- SET STATE WHEN EDITING
-                }}
+                onClick={() => handleEditInvoicingAccount(account)}
               >
                 ✏️
               </button>
               <button
                 type="button"
                 className="text-red-500"
-                onClick={() => removeInvoicingAccount(index)}
+                onClick={() => handleRemoveInvoicingAccount(account._id)}
               >
                 ✖️
               </button>
             </div>
           </div>
-        ))}
+        ))
+      )}
 
-<button
-          type="button"
-          className="mt-4 flex items-center gap-2 text-gray-700"
-          onClick={() => {
-            setShowEditForm(true);
-            setIsEditingOrAdding(true); // <-- SET STATE WHEN ADDING
-          }}
-        >
-          <span>+</span> Add Invoicing Account
-        </button>
+      <button
+        type="button"
+        className="mt-4 flex items-center gap-2 text-gray-700"
+        onClick={() => {
+          setShowEditForm(true);
+          setIsEditingOrAdding(true);
+          setEditingAccount(null);
+        }}
+      >
+        <span>+</span> Add Invoicing Account
+      </button>
 
          {!isEditingOrAdding && (
           <div className="flex justify-end">
@@ -286,22 +316,18 @@ const Profile = () => {
 
       {/* Edit Invoicing Form */}
       {showEditForm && (
-        <div className="mt-4  ">
+        <div className="mt-4">
           <EditInvoicingForm
             onCancel={() => {
               setShowEditForm(false);
-              setIsEditingOrAdding(false); // <-- RESET STATE ON CANCEL
+              setIsEditingOrAdding(false);
+              setEditingAccount(null);
             }}
             onSave={handleSaveInvoicingAccount}
-            initialData={{
-              firstName: "Vsl Teviškẹs",
-              lastName: "Alkas",
-              address: "Rygos g. 26-66, Vilnius",
-              city: "Vilnius",
-              zip: "01100",
-              country: "Latvia",
-              province: "vilnius",
-            }}
+            initialData={editingAccount || {}}
+            userId={userId}
+            editMode={!!editingAccount}
+            accountId={editingAccount?._id}
           />
         </div>
       )}
