@@ -236,3 +236,27 @@ export const invoiceAccountService = {
     }
   },
 };
+
+export const emailChangeService = {
+  requestEmailChange: async (userId, newEmail) => {
+    try {
+      const response = await api.post('/email-change/request-email-change', { userId, newEmail });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  verifyEmailChange: async (userId, verificationToken, newEmail) => {
+    try {
+      const response = await api.post('/email-change/verify-email-change', { 
+        userId, 
+        verificationToken, 
+        newEmail 
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+};

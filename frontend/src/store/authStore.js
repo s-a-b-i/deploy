@@ -25,11 +25,25 @@ export const useAuthStore = create((set) => ({
         user: response.data.user,
         isAuthenticated: true,
         isLoading: false,
+        message: "User created successfully. Please verify your email."
       });
       return response.data;
     } catch (error) {
+      let errorMessage = "Sign up failed";
+      if (error.response) {
+        switch (error.response.data.msg) {
+          case "Please enter all fields":
+            errorMessage = "Please fill in all required fields";
+            break;
+          case "User already exists with this email":
+            errorMessage = "An account with this email already exists";
+            break;
+          default:
+            errorMessage = error.response.data.msg || "Sign up failed";
+        }
+      }
       set({
-        error: error.response?.data?.message || "Error signing up",
+        error: errorMessage,
         isLoading: false,
       });
       throw error;
@@ -48,11 +62,28 @@ export const useAuthStore = create((set) => ({
         isAuthenticated: true,
         error: null,
         isLoading: false,
+        message: "Login successful"
       });
       return response.data;
     } catch (error) {
+      let errorMessage = "Login failed";
+      if (error.response) {
+        switch (error.response.data.msg) {
+          case "Please enter all fields":
+            errorMessage = "Please provide both email and password";
+            break;
+          case "Invalid email or password":
+            errorMessage = "Incorrect email or password";
+            break;
+          case "Please verify your email to login":
+            errorMessage = "Please verify your email before logging in";
+            break;
+          default:
+            errorMessage = error.response.data.msg || "Login failed";
+        }
+      }
       set({
-        error: error.response?.data?.message || "Error signing up",
+        error: errorMessage,
         isLoading: false,
       });
       throw error;
@@ -67,11 +98,12 @@ export const useAuthStore = create((set) => ({
         user: null,
         isAuthenticated: false,
         isLoading: false,
+        message: "Logged out successfully"
       });
       return response.data;
     } catch (error) {
       set({
-        error: "Error logging out",
+        error: "Logout failed. Please try again.",
         isLoading: false,
       });
       throw error;
@@ -86,11 +118,22 @@ export const useAuthStore = create((set) => ({
         user: response.data.user,
         isAuthenticated: true,
         isLoading: false,
+        message: "Email verified successfully"
       });
       return response.data;
     } catch (error) {
+      let errorMessage = "Email verification failed";
+      if (error.response) {
+        switch (error.response.data.msg) {
+          case "Invalid verification code":
+            errorMessage = "The verification code is invalid or has expired";
+            break;
+          default:
+            errorMessage = error.response.data.msg || "Email verification failed";
+        }
+      }
       set({
-        error: error.response?.data?.message || "Error verifying email",
+        error: errorMessage,
         isLoading: false,
       });
       throw error;
@@ -124,13 +167,23 @@ export const useAuthStore = create((set) => ({
       });
       set({
         isLoading: false,
-        message: response.data.message,
+        message: "Password reset email sent successfully",
       });
       return response.data;
     } catch (error) {
+      let errorMessage = "Failed to send password reset email";
+      if (error.response) {
+        switch (error.response.data.msg) {
+          case "User not found":
+            errorMessage = "No account found with this email address";
+            break;
+          default:
+            errorMessage = error.response.data.msg || "Failed to send password reset email";
+        }
+      }
       set({
         isLoading: false,
-        error: error.response?.data?.message || "Error sending password reset email",
+        error: errorMessage,
       });
       throw error;
     }
@@ -140,12 +193,25 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(`${API_URL}/reset-password/${token}`, { password });
-      set({ message: response.data.msg, isLoading: false });
+      set({ 
+        message: "Password reset successfully", 
+        isLoading: false 
+      });
       return response.data;
     } catch (error) {
+      let errorMessage = "Failed to reset password";
+      if (error.response) {
+        switch (error.response.data.msg) {
+          case "Invalid or expired reset token":
+            errorMessage = "The password reset link is invalid or has expired";
+            break;
+          default:
+            errorMessage = error.response.data.msg || "Failed to reset password";
+        }
+      }
       set({
         isLoading: false,
-        error: error.response?.data?.msg || "Error resetting password",
+        error: errorMessage,
       });
       throw error;
     }
