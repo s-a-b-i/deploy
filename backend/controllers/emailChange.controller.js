@@ -10,6 +10,11 @@ export const requestEmailChange = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const emailExists = await User.findOne({ email: newEmail });
+    if (emailExists) {
+      return res.status(400).json({ message: 'Email address is already in use' });
+    }
+
     // Generate verification token (6-digit code)
     const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 

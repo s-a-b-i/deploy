@@ -19,7 +19,7 @@ export const signup = async (req, res) => {
         const userAlreadyExists = await User.findOne({ email });
 
         if (userAlreadyExists) {
-            return res.status(400).json({ success: false, msg: "User already exists" });
+            return res.status(400).json({ success: false, msg: "User already exists with this email" });
         }
 
         // Hash password
@@ -116,6 +116,24 @@ export const login = async (req, res) => {
 
         if (!isMatch) {
             return res.status(400).json({ success: false, msg: "Invalid email or password" });
+        }
+
+        if (!user.isVerified) {
+
+            // generate verification token
+            const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+            user.verificationToken = verificationToken;
+            
+            user.verificationTokenExpireAt = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
+            await user.save();
+
+            // send verification email
+            await sendVerificationEmail(user.email, verificationToken);
+
+            return res.status(400).json({ success: false, msg: "Please verify your email to login" ,user : {
+                ...user._doc,
+                password: undefined
+            }});
         }
 
         generateTokenAndSetCookie(user._id, res);
