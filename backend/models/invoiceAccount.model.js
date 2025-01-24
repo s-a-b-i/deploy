@@ -1,13 +1,26 @@
 import mongoose from 'mongoose';
 
 const invoiceAccountSchema = new mongoose.Schema({
+  accountType: {
+    type: String,
+    enum: ['personal', 'business'],
+    required: true
+  },
   firstName: {
     type: String,
-    required: true
+    required: function() { return this.accountType === 'personal'; }
   },
   lastName: {
     type: String,
-    required: true
+    required: function() { return this.accountType === 'personal'; }
+  },
+  vatNumber: {
+    type: String,
+    required: function() { return this.accountType === 'business'; }
+  },
+  organizationName: {
+    type: String,
+    required: function() { return this.accountType === 'business'; }
   },
   address: {
     type: String,
