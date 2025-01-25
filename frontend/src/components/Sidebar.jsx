@@ -157,7 +157,7 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
 
       <NavigationLinks />
 
-      <div className="mt-auto pt-6 border-t border-[#3158D3]/20">
+      {/* <div className="mt-auto pt-6 border-t border-[#3158D3]/20">
         <div className="flex items-center gap-3 text-gray-200">
           <div
                           className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-foundations-primary shadow-sm"
@@ -171,10 +171,10 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
                         />
           <div>
             <p className="font-medium">{user?.name || "Guest"}</p>
-            <p className="text-sm opacity-75">Free Account</p>
+            <p className="text-xs opacity-75">{user?.email || "Guest"}</p>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 
