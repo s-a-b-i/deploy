@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 import Logo from "../assets/Logo.svg";
 import { 
   MdDashboard, 
@@ -22,6 +23,7 @@ import {
 const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user } = useAuthStore(); // Get user from auth store
 
   const links = {
     Publisher: [
@@ -157,13 +159,18 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
 
       <div className="mt-auto pt-6 border-t border-[#3158D3]/20">
         <div className="flex items-center gap-3 text-gray-200">
-          <img
-            src="/user-avatar.svg"
-            alt="User"
-            className="w-10 h-10 rounded-full bg-white"
-          />
+          <div
+                          className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-foundations-primary shadow-sm"
+                          style={{
+                            backgroundImage: user?.profileImage
+                              ? `url(${user.profileImage})`
+                              : `url(${img})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                          }}
+                        />
           <div>
-            <p className="font-medium">{userName}</p>
+            <p className="font-medium">{user?.name || "Guest"}</p>
             <p className="text-sm opacity-75">Free Account</p>
           </div>
         </div>
