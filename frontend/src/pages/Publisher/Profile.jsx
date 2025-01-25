@@ -110,10 +110,14 @@ const Profile = () => {
       if (isProfileCreated) {
         await profileService.updateProfile(profileId, formDataToSend);
         toast.success("Profile updated successfully!");
+
+        useAuthStore.getState().setUserProfileImage(avatarPreview);
       } else {
         await profileService.createProfile(formDataToSend);
         setIsProfileCreated(true);
         toast.success("Profile created successfully!");
+
+        useAuthStore.getState().setUserProfileImage(avatarPreview);
       }
     } catch (error) {
       console.error("Error saving profile:", error);

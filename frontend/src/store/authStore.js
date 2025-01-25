@@ -230,5 +230,16 @@ export const useAuthStore = create((set) => ({
       });
       throw error;
     }
-  }
+  },
+
+  setUserProfileImage: (profileImage) => {
+    set(state => ({
+      user: {
+        ...state.user,
+        profileImage
+      }
+    }));
+  },
+  
+
 }));
