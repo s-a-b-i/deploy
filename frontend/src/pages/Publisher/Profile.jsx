@@ -1,4 +1,3 @@
-// export default Profile;
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
@@ -24,6 +23,8 @@ const Profile = () => {
     avatar: null,
   });
 
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [isEditingOrAdding, setIsEditingOrAdding] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -35,7 +36,6 @@ const Profile = () => {
   const [profileId, setProfileId] = useState(null);
   const [editingAccount, setEditingAccount] = useState(null);
   
-  // New state for section toggles
   const [isProfileSectionOpen, setIsProfileSectionOpen] = useState(true);
   const [isInvoicingSectionOpen, setIsInvoicingSectionOpen] = useState(true);
 
@@ -43,7 +43,6 @@ const Profile = () => {
     const fetchProfileData = async () => {
       try {
         if (userId) {
-          // Fetch profile data
           const profileData = await profileService.getProfile(userId);
           if (profileData) {
             setProfileId(profileData._id);
@@ -56,13 +55,11 @@ const Profile = () => {
               avatar: profileData.avatar || null,
             });
             setEmail(profileData.email || "");
+            setAvatarPreview(profileData.avatar || null);
             setIsProfileCreated(true);
           }
 
-          // Fetch invoicing accounts
-          const accounts = await invoiceAccountService.getInvoiceAccounts(
-            userId
-          );
+          const accounts = await invoiceAccountService.getInvoiceAccounts(userId);
           setInvoicingAccounts(accounts);
         } else {
           setError("Invalid user ID");
@@ -78,17 +75,43 @@ const Profile = () => {
     fetchProfileData();
   }, [userId]);
 
-  
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const profileData = { ...formData, email };
+      const formDataToSend = new FormData();
+      
+      // Append text fields
+      Object.keys(formData).forEach(key => {
+        if (formData[key] !== null && formData[key] !== undefined) {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+      
+      // Append email
+      formDataToSend.append('email', email);
+      
+      // Append avatar file if selected
+      if (avatarFile) {
+        formDataToSend.append('avatar', avatarFile);
+      }
+
       if (isProfileCreated) {
-        await profileService.updateProfile(profileId, profileData);
+        await profileService.updateProfile(profileId, formDataToSend);
         toast.success("Profile updated successfully!");
       } else {
-        await profileService.createProfile({ ...profileData, userId });
+        await profileService.createProfile(formDataToSend);
         setIsProfileCreated(true);
         toast.success("Profile created successfully!");
       }
@@ -97,6 +120,7 @@ const Profile = () => {
       toast.error("Failed to save profile");
     }
   };
+
 
   const handleSaveInvoicingAccount = async (accountData) => {
     try {
@@ -254,14 +278,33 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 mb-2">Avatar</label>
-              <div className="flex items-center gap-4">
+            <label className="block text-gray-700 mb-2">Avatar</label>
+            <input 
+              type="file" 
+              accept="image/*"
+              onChange={handleAvatarChange}
+              className="hidden" 
+              id="avatarUpload"
+            />
+            <div className="flex items-center gap-4">
+              {avatarPreview ? (
+                <img 
+                  src={avatarPreview} 
+                  alt="Avatar preview" 
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              ) : (
                 <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-                <button type="button" className="text-gray-600">
-                  Change
-                </button>
-              </div>
+              )}
+              <label 
+                htmlFor="avatarUpload" 
+                className="text-gray-600 cursor-pointer"
+              >
+                Change
+              </label>
             </div>
+          </div>
+
 
             <div>
               <label className="block text-gray-700 mb-2">Email Language</label>

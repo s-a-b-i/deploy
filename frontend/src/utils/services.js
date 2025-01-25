@@ -173,7 +173,11 @@ export const profileService = {
 
   updateProfile: async (id, profileData) => {
     try {
-      const response = await api.put(`/profile/update/${id}`, profileData);
+      const response = await api.put(`/profile/update/${id}`, profileData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
