@@ -1,5 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MdMenu, MdKeyboardArrowDown, MdPerson, MdLogout } from "react-icons/md";
+import {
+  MdMenu,
+  MdKeyboardArrowDown,
+  MdPerson,
+  MdLogout,
+} from "react-icons/md";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import img from "../assets/profile.jpeg";
 import { useAuthStore } from "../store/authStore";
@@ -8,16 +13,17 @@ const NavbarPublisher = ({ userName }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { logout , user } = useAuthStore();
+  const { logout, user } = useAuthStore();
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     console.log("Full User Object:", user);
-  console.log("Avatar URL:", user?.avatar);
+    console.log("Avatar URL:", user?.avatar);
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsProfileDropdownOpen(false);
-      }[user]
+      }
+      [user];
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -76,16 +82,16 @@ const NavbarPublisher = ({ userName }) => {
               className="flex items-center gap-3 cursor-pointer"
               onClick={toggleProfileDropdown}
             >
-               <div
-  className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden border-2 border-foundations-primary shadow-sm"
-  style={{
-    backgroundImage: user?.profileImage 
-      ? `url(${user.profileImage})` 
-      : `url(${img})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-  }}
-/>
+              <div
+                className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden border-2 border-foundations-primary shadow-sm"
+                style={{
+                  backgroundImage: user?.profileImage
+                    ? `url(${user.profileImage})`
+                    : `url(${img})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
               <MdKeyboardArrowDown
                 className={`w-5 h-5 text-gray-600 transition-transform ${
                   isProfileDropdownOpen ? "rotate-180" : ""
@@ -116,16 +122,16 @@ const NavbarPublisher = ({ userName }) => {
 
         {/* Mobile User Avatar */}
         <div className="lg:hidden">
-        <div
-  className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden border-2 border-foundations-primary shadow-sm"
-  style={{
-    backgroundImage: user?.profileImage 
-      ? `url(${user.profileImage})` 
-      : `url(${img})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-  }}
-/>
+          <div
+            className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden border-2 border-foundations-primary shadow-sm"
+            style={{
+              backgroundImage: user?.profileImage
+                ? `url(${user.profileImage})`
+                : `url(${img})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
         </div>
       </div>
 

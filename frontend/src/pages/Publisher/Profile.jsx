@@ -6,9 +6,12 @@ import {
   invoiceAccountService,
   emailChangeService,
 } from "../../utils/services";
+import ProfileSection from "../../components/publisher/ProfileSection";
+import InvoicingAccountsSection from "../../components/publisher/InvoicingAccountsSection";
 import ChangeEmailModal from "../../components/publisher/ChangeEmailModal";
 import EditInvoicingForm from "../../components/publisher/EditInvoicingForm";
 import { toast } from "react-hot-toast";
+import Loader from "../../components/Loader";
 
 const Profile = () => {
   const user = useAuthStore((state) => state.user);
@@ -41,6 +44,7 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchProfileData = async () => {
+      setLoading(true); // Start loading
       try {
         if (userId) {
           const profileData = await profileService.getProfile(userId);
@@ -68,7 +72,7 @@ const Profile = () => {
         setError("Failed to load profile data");
         console.error("Error fetching profile data:", err);
       } finally {
-        setLoading(false);
+        setLoading(false); // End loading
       }
     };
 
@@ -89,20 +93,18 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading
     try {
       const formDataToSend = new FormData();
       
-      // Append text fields
       Object.keys(formData).forEach(key => {
         if (formData[key] !== null && formData[key] !== undefined) {
           formDataToSend.append(key, formData[key]);
         }
       });
       
-      // Append email
       formDataToSend.append('email', email);
       
-      // Append avatar file if selected
       if (avatarFile) {
         formDataToSend.append('avatar', avatarFile);
       }
@@ -110,26 +112,25 @@ const Profile = () => {
       if (isProfileCreated) {
         await profileService.updateProfile(profileId, formDataToSend);
         toast.success("Profile updated successfully!");
-
         useAuthStore.getState().setUserProfileImage(avatarPreview);
       } else {
         await profileService.createProfile(formDataToSend);
         setIsProfileCreated(true);
         toast.success("Profile created successfully!");
-
         useAuthStore.getState().setUserProfileImage(avatarPreview);
       }
     } catch (error) {
       console.error("Error saving profile:", error);
       toast.error("Failed to save profile");
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
-
   const handleSaveInvoicingAccount = async (accountData) => {
+    setLoading(true); // Start loading
     try {
       if (editingAccount) {
-        // Update existing account
         const updatedAccount = await invoiceAccountService.updateInvoiceAccount(
           editingAccount._id,
           { ...accountData, userId }
@@ -140,7 +141,6 @@ const Profile = () => {
         setInvoicingAccounts(updatedAccounts);
         toast.success("Invoicing account updated!");
       } else {
-        // Create new account only if no existing account
         const existingAccount = invoicingAccounts.find(
           (account) =>
             account.organizationName === accountData.organizationName ||
@@ -166,10 +166,13 @@ const Profile = () => {
     } catch (error) {
       console.error("Error saving invoicing account:", error);
       toast.error("Failed to save invoicing account");
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
   const handleRemoveInvoicingAccount = async (accountId) => {
+    setLoading(true); // Start loading
     try {
       await invoiceAccountService.deleteInvoiceAccount(accountId);
       setInvoicingAccounts(
@@ -179,6 +182,8 @@ const Profile = () => {
     } catch (error) {
       console.error("Error removing invoicing account:", error);
       toast.error("Failed to remove invoicing account");
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -189,6 +194,7 @@ const Profile = () => {
   };
 
   const handleEmailChange = async (newEmail) => {
+    setLoading(true); // Start loading
     try {
       const lastLogin = useAuthStore.getState().lastLogin;
       const now = new Date();
@@ -221,226 +227,41 @@ const Profile = () => {
       }
     } catch (error) {
       toast.error(error.message || "Failed to change email");
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loader />;
   if (error) return <div>{error}</div>;
 
   return (
     <div className="space-y-6 px-4 md:px-8 lg:px-12">
       <h1 className="text-2xl font-bold">Profile Settings</h1>
 
-      {/* Profile Section */}
-      <div 
-        className="bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white p-4 rounded-lg cursor-pointer flex justify-between items-center"
-        onClick={() => setIsProfileSectionOpen(!isProfileSectionOpen)}
-      >
-        <h2 className="font-medium">
-          {isProfileSectionOpen ? '▼' : '►'} Profile
-        </h2>
-        <span>{isProfileSectionOpen ? 'Close' : 'Open'}</span>
-      </div>
+      <ProfileSection
+        isOpen={isProfileSectionOpen}
+        toggleSection={() => setIsProfileSectionOpen(!isProfileSectionOpen)}
+        formData={formData}
+        setFormData={setFormData}
+        handleSubmit={handleSubmit}
+        handleAvatarChange={handleAvatarChange}
+        avatarPreview={avatarPreview}
+        email={email}
+        setShowEmailModal={setShowEmailModal}
+      />
 
-      {isProfileSectionOpen && (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-gray-700 mb-2">First name</label>
-              <input
-                type="text"
-                value={formData.firstName}
-                onChange={(e) =>
-                  setFormData({ ...formData, firstName: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg"
-              />
-            </div>
+      <InvoicingAccountsSection
+        isOpen={isInvoicingSectionOpen}
+        toggleSection={() => setIsInvoicingSectionOpen(!isInvoicingSectionOpen)}
+        invoicingAccounts={invoicingAccounts}
+        handleEditInvoicingAccount={handleEditInvoicingAccount}
+        handleRemoveInvoicingAccount={handleRemoveInvoicingAccount}
+        setShowEditForm={setShowEditForm}
+        setIsEditingOrAdding={setIsEditingOrAdding}
+        setEditingAccount={setEditingAccount}
+      />
 
-            <div>
-              <label className="block text-gray-700 mb-2">Last name</label>
-              <input
-                type="text"
-                value={formData.lastName}
-                onChange={(e) =>
-                  setFormData({ ...formData, lastName: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 mb-2">Phone</label>
-              <input
-                type="text"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg"
-              />
-            </div>
-
-            <div>
-            <label className="block text-gray-700 mb-2">Avatar</label>
-            <input 
-              type="file" 
-              accept="image/*"
-              onChange={handleAvatarChange}
-              className="hidden" 
-              id="avatarUpload"
-            />
-            <div className="flex items-center gap-4">
-              {avatarPreview ? (
-                <img 
-                  src={avatarPreview} 
-                  alt="Avatar preview" 
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-              )}
-              <label 
-                htmlFor="avatarUpload" 
-                className="text-gray-600 cursor-pointer"
-              >
-                Change
-              </label>
-            </div>
-          </div>
-
-
-            <div>
-              <label className="block text-gray-700 mb-2">Email Language</label>
-              <select
-                value={formData.emailLanguage}
-                onChange={(e) =>
-                  setFormData({ ...formData, emailLanguage: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg"
-              >
-                <option value="EN">EN</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-gray-700 mb-2">
-                Publisher company name <span className="text-blue-500">ⓘ</span>
-              </label>
-              <input
-                type="text"
-                value={formData.publisherCompanyName}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    publisherCompanyName: e.target.value,
-                  })
-                }
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg"
-              />
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="button"
-              className="px-4 py-2 bg-foundations-primary text-white rounded-lg hover:bg-blue-100 transition-colors"
-              onClick={() => setShowEmailModal(true)}
-            >
-              Click here to Change Email
-            </button>
-          </div>
-
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="bg-foundations-primary text-white px-6 py-2 rounded-lg hover:opacity-90"
-            >
-              Save Profile
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* Invoicing Accounts Section */}
-      <div 
-        className="bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white p-4 rounded-lg cursor-pointer flex justify-between items-center mt-6"
-        onClick={() => setIsInvoicingSectionOpen(!isInvoicingSectionOpen)}
-      >
-        <h2 className="font-medium">
-          {isInvoicingSectionOpen ? '▼' : '►'} Invoicing Accounts
-        </h2>
-        <span>{isInvoicingSectionOpen ? 'Close' : 'Open'}</span>
-      </div>
-
-      {isInvoicingSectionOpen && (
-        <div>
-          {invoicingAccounts.length === 0 ? (
-            <div className="text-gray-500 text-center py-4">
-              No invoicing accounts found
-            </div>
-          ) : (
-            invoicingAccounts.map((account) => (
-              <div
-                key={account._id}
-                className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow mb-2"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-lg ${
-                        account.accountType === 'business'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-green-100 text-green-700'
-                      }`}
-                    >
-                      {account.accountType === 'business' ? 'Business' : 'Personal'}
-                    </span>
-                    <span className="text-lg font-bold text-gray-700">
-                      {account.accountType === 'business'
-                        ? account.organizationName
-                        : `${account.firstName} ${account.lastName}`}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-500 mt-1">{account.address}</div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    className="text-yellow-500 hover:text-yellow-600"
-                    onClick={() => handleEditInvoicingAccount(account)}
-                    title="Edit"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    type="button"
-                    className="text-red-500 hover:text-red-600"
-                    onClick={() => handleRemoveInvoicingAccount(account._id)}
-                    title="Remove"
-                  >
-                    ✖️
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-
-          <button
-            type="button"
-            className="mt-4 flex items-center gap-2 text-white bg-foundations-primary px-4 py-2 rounded-lg"
-            onClick={() => {
-              setShowEditForm(true);
-              setIsEditingOrAdding(true);
-              setEditingAccount(null);
-            }}
-          >
-            <span>+</span> Add Invoicing Account
-          </button>
-        </div>
-      )}
-
-      {/* Change Email Modal */}
       {showEmailModal && (
         <ChangeEmailModal
           currentEmail={email}
@@ -450,7 +271,6 @@ const Profile = () => {
         />
       )}
 
-      {/* Edit Invoicing Form */}
       {showEditForm && (
         <div className="mt-4">
           <EditInvoicingForm

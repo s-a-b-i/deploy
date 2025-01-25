@@ -58,14 +58,20 @@ export const useAuthStore = create((set) => ({
         email,
         password,
       });
+      const profileData = await profileService.getProfile(response.data.user._id);
+      
       set({
-        user: response.data.user,
+        user: {
+          ...response.data.user,
+          profileImage: profileData.avatar || null
+        },
         isAuthenticated: true,
         error: null,
         isLoading: false,
         message: "Login successful"
       });
       return response.data;
+
     } catch (error) {
       let errorMessage = "Login failed";
       if (error.response) {
@@ -91,30 +97,27 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  login: async (email, password) => {
+   logout: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/login`, {
-        email,
-        password,
-      });
-      const profileData = await profileService.getProfile(response.data.user._id);
-      
+      const response = await axios.post(`${API_URL}/logout`);
       set({
-        user: {
-          ...response.data.user,
-          profileImage: profileData.avatar || null
-        },
-        isAuthenticated: true,
-        error: null,
+        user: null,
+        isAuthenticated: false,
         isLoading: false,
-        message: "Login successful"
+        message: "Logged out successfully"
       });
       return response.data;
     } catch (error) {
-      // ... existing error handling
+      set({
+        error: "Logout failed. Please try again.",
+        isLoading: false,
+      });
+      throw error;
     }
   },
+
+
 
   verifyEmail: async (code) => {
     set({ isLoading: true, error: null });
