@@ -11,21 +11,21 @@ cloudinary.config({
 // Create a new profile
 export async function createProfile(req, res) {
   try {
-    const userId = req.body.userId;
-
-    if(!userId){
-        return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    const { avatar } = req.body;
+    const { file } = req;
     let avatarUrl = '';
 
-    if (avatar) {
-      const result = await cloudinary.v2.uploader.upload(avatar);
+    if (file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.v2.uploader.upload_stream((error, result) => {
+          if (error) reject(error);
+          resolve(result);
+        });
+        stream.end(file.buffer);
+      });
       avatarUrl = result.secure_url;
     }
 
-    const newProfile = new Profile({ ...req.body, avatar: avatarUrl});
+    const newProfile = new Profile({ ...req.body, avatar: avatarUrl });
     const savedProfile = await newProfile.save();
     res.status(201).json(savedProfile);
   } catch (error) {
@@ -67,11 +67,17 @@ export async function getProfile(req, res) {
 // Update a profile by ID
 export async function updateProfile(req, res) {
   try {
-    const { avatar } = req.body;
+    const { file } = req;
     let avatarUrl = '';
 
-    if (avatar) {
-      const result = await cloudinary.v2.uploader.upload(avatar);
+    if (file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.v2.uploader.upload_stream((error, result) => {
+          if (error) reject(error);
+          resolve(result);
+        });
+        stream.end(file.buffer);
+      });
       avatarUrl = result.secure_url;
     }
 
