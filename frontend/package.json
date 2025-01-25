@@ -17,6 +17,7 @@
     "date-fns": "^4.1.0",
     "dom": "^0.0.3",
     "framer-motion": "^11.18.1",
+    "link-preview-js": "^3.0.13",
     "lodash": "^4.17.21",
     "lucide-react": "^0.473.0",
     "quill": "^2.0.3",

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
+import { profileService } from "../utils/services";
 
 const API_URL = "http://localhost:5000/api/auth";
 
@@ -90,23 +91,28 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  logout: async () => {
+  login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/logout`);
+      const response = await axios.post(`${API_URL}/login`, {
+        email,
+        password,
+      });
+      const profileData = await profileService.getProfile(response.data.user._id);
+      
       set({
-        user: null,
-        isAuthenticated: false,
+        user: {
+          ...response.data.user,
+          profileImage: profileData.avatar || null
+        },
+        isAuthenticated: true,
+        error: null,
         isLoading: false,
-        message: "Logged out successfully"
+        message: "Login successful"
       });
       return response.data;
     } catch (error) {
-      set({
-        error: "Logout failed. Please try again.",
-        isLoading: false,
-      });
-      throw error;
+      // ... existing error handling
     }
   },
 
@@ -144,8 +150,16 @@ export const useAuthStore = create((set) => ({
     set({ isCheckingAuth: true, error: null });
     try {
       const response = await axios.get(`${API_URL}/check-auth`);
+      const userId = response.data.user._id;
+      
+      // Fetch profile separately
+      const profileData = await profileService.getProfile(userId);
+      
       set({
-        user: response.data.user,
+        user: {
+          ...response.data.user,
+          profileImage: profileData.avatar || null // Use avatar from profile
+        },
         isAuthenticated: true,
         isCheckingAuth: false,
       });
@@ -158,6 +172,7 @@ export const useAuthStore = create((set) => ({
       });
     }
   },
+
 
   forgotPassword: async (email) => {
     set({ isLoading: true, error: null });
