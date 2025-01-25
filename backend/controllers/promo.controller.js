@@ -1,5 +1,16 @@
 import Promo from '../models/promo.model.js';
 
+// get all promos
+export async function getAllPromos(req, res) {
+  try {
+    const promos = await Promo.find();
+    res.status(200).json(promos);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching promos', error: error.message });
+  }
+}
+
+
 // Create a new promo
 export async function createPromo(req, res) {
   try {
@@ -18,7 +29,7 @@ export async function createPromo(req, res) {
   }
 }
 
-// Get all promos
+// Get all promos for a user
 export async function getPromos(req, res) {
   try {
 

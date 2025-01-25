@@ -14,6 +14,10 @@ import {
     getWebsitesForUserApproved
 } from '../controllers/websiteController.js';
 
+
+// Get all websites
+router.get('/get-all', getWebsites);
+
 // Place specific routes before dynamic routes
 router.post('/notApproved', getWebsitesForUserNotApproved);
 router.post('/approved', getWebsitesForUserApproved);
@@ -22,7 +26,6 @@ router.put('/discount/:id', discount);
 router.put('/highlight/:id', highlightMedia);
 
 // Generic CRUD routes
-router.get('/', getWebsites);
 router.get('/:id', getWebsite);
 router.post('/', createWebsite);
 router.put('/:id', updateWebsite);

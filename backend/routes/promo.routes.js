@@ -1,7 +1,9 @@
 import express from 'express';
-import { createPromo, getPromos, getPromo, updatePromo, deletePromo } from '../controllers/promo.controller.js';
+import { getAllPromos,createPromo, getPromos, getPromo, updatePromo, deletePromo } from '../controllers/promo.controller.js';
 
 const router = express.Router();
+
+router.get('/get-all', getAllPromos);
 
 router.post('/', createPromo);
 router.post('/getPromos', getPromos);
