@@ -4,6 +4,7 @@ const router = Router();
 // Import each function separately
 import { 
     getWebsites,
+    getRecentlyCreatedWebsites,
     getWebsite,
     createWebsite,
     updateWebsite,
@@ -15,8 +16,9 @@ import {
 } from '../controllers/websiteController.js';
 
 
-// Get all websites
+// for advertisers
 router.get('/get-all', getWebsites);
+router.get('/recently-created', getRecentlyCreatedWebsites);
 
 // Place specific routes before dynamic routes
 router.post('/notApproved', getWebsitesForUserNotApproved);

@@ -3,7 +3,18 @@ import Website  from '../models/website.model.js';
 // Get all websites
 export async function getWebsites(req, res) {
   try {
-    const websites = await Website.find();
+    const websites = await Website.find({approved : true});
+    res.status(200).json(websites);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching websites', error: error.message });
+  }
+}
+
+
+// get recently created 5 websites
+export async function getRecentlyCreatedWebsites(req, res) {
+  try {
+    const websites = await Website.find({approved : true}).sort({ createdAt: -1 }).limit(5);
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching websites', error: error.message });
