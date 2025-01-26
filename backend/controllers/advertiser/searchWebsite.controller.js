@@ -60,7 +60,8 @@ export async function searchWebsites(req, res) {
       filters.googleNews = googleNews === 'true';
     }
 
-    const websites = await Website.find(filters);
+    // fetch websites with filters and approved true
+    const websites = await Website.find({ ...filters, approved: true });
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error searching websites', error: error.message });
