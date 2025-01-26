@@ -46,21 +46,30 @@ import ProductDetails from "./components/Product/ProductDetails";
 const ProtectedRoutes = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
+  console.log("ProtectedRoutes - isAuthenticated:", isAuthenticated);
+  console.log("ProtectedRoutes - user:", user);
+
   if (!isAuthenticated) {
+    console.log("User  is not authenticated. Redirecting to home.");
     return <Navigate to="/" replace />;
   }
 
   if (!user.isVerified) {
+    console.log("User  is not verified. Redirecting to verification page.");
     return <Navigate to="/verify-email" replace />;
   }
 
   return children;
 };
 
-const RedirectAuthenticatedUser = ({ children }) => {
+const RedirectAuthenticatedUser  = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
+  console.log("RedirectAuthenticatedUser  - isAuthenticated:", isAuthenticated);
+  console.log("RedirectAuthenticatedUser  - user:", user);
+
   if (isAuthenticated && user.isVerified) {
+    console.log("User  is authenticated and verified. Redirecting to dashboard.");
     return <Navigate to="/publisher/dashboard" replace />;
   }
 
