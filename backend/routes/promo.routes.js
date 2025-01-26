@@ -5,7 +5,7 @@ const router = express.Router();
 
 // for advertisers
 router.get('/get-all', getAllPromos);
-router.get('/recently-created', getRecentlyCreatedPromos);
+router.get('/recently-created/:limit', getRecentlyCreatedPromos);
 
 router.post('/', createPromo);
 router.post('/getPromos', getPromos);

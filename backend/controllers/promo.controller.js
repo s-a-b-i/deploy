@@ -14,7 +14,7 @@ export async function getAllPromos(req, res) {
 // get recently created 5 promos
 export async function getRecentlyCreatedPromos(req, res) {
   try {
-    const promos = await Promo.find().sort({ createdAt: -1 }).limit(5);
+    const promos = await Promo.find().sort({ createdAt: -1 }).limit(req.params.limit || 5);
     res.status(200).json(promos);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching promos', error: error.message });
