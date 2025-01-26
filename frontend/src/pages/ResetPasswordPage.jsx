@@ -115,6 +115,7 @@ import { motion } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate, useParams } from "react-router-dom";
 import Input from "../components/Inputs";
+import PasswordStrength from "../components/PasswordStrenght";
 import { Lock } from "lucide-react";
 import toast from "react-hot-toast";
 import Logo from "../assets/Logo.svg";
@@ -128,7 +129,6 @@ const ResetPasswordPage = () => {
   const { token } = useParams();
   const navigate = useNavigate();
 
-  // Log when component mounts or token changes
   useEffect(() => {
     console.log("ResetPasswordPage loaded");
     console.log("Token from URL:", token);
@@ -189,6 +189,8 @@ const ResetPasswordPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+
+              <PasswordStrength password={password} />
 
               <Input
                 icon={Lock}
