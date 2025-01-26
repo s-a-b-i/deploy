@@ -59,19 +59,18 @@ export const useAuthStore = create((set) => ({
         password,
       });
       const profileData = await profileService.getProfile(response.data.user._id);
-      
+  
       set({
         user: {
           ...response.data.user,
-          profileImage: profileData.avatar || null
+          profileImage: profileData.avatar || null,
         },
         isAuthenticated: true,
         error: null,
         isLoading: false,
-        message: "Login successful"
+        message: "Login successful",
       });
       return response.data;
-
     } catch (error) {
       let errorMessage = "Login failed";
       if (error.response) {
@@ -84,6 +83,16 @@ export const useAuthStore = create((set) => ({
             break;
           case "Please verify your email to login":
             errorMessage = "Please verify your email before logging in";
+            // Update state for email verification case
+            if (error.response.data.user) {
+              set({
+                user: error.response.data.user,
+                isAuthenticated: true, // Mark authenticated
+                error: null, // No error as verification is pending
+                isLoading: false,
+                message: errorMessage, // Inform user to verify their email
+              });
+            }
             break;
           default:
             errorMessage = error.response.data.msg || "Login failed";
@@ -96,6 +105,7 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+  
 
    logout: async () => {
     set({ isLoading: true, error: null });
