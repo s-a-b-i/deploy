@@ -14,13 +14,14 @@ export const useAuthStore = create((set) => ({
   isCheckingAuth: true,
   message: null,
 
-  signUp: async (name, email, password) => {
+  signUp: async (name, email, password, captchaToken) => {
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(`${API_URL}/signup`, {
         name,
         email,
         password,
+        captchaToken
       });
       set({
         user: response.data.user,
@@ -51,12 +52,13 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  login: async (email, password) => {
+  login: async (email, password , captchaToken) => {
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(`${API_URL}/login`, {
         email,
         password,
+        captchaToken
       });
   
       let profileData = {};

@@ -1,64 +1,77 @@
 import { User } from "../models/user.model.js";
-import {generateTokenAndSetCookie} from "../utils/generateTokenAndSetCookie.js";
-import {sendPasswordResetEmail, sendVerificationEmail } from "../mailtrap/emails.js";
-import {sendPasswordChangedEmail} from "../mailtrap/emails.js";
-import {sendWelcomeEmail} from "../mailtrap/emails.js";
+import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
+import { sendPasswordResetEmail, sendVerificationEmail } from "../mailtrap/emails.js";
+import { sendPasswordChangedEmail } from "../mailtrap/emails.js";
+import { sendWelcomeEmail } from "../mailtrap/emails.js";
 import bcryptjs from 'bcryptjs';
 import crypto from 'crypto';
 
+
+// ReCAPTCHA verification function
+const verifyRecaptcha = async (token) => {
+    try {
+        const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+        const response = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`, {
+            method: 'POST',
+        });
+        const verifyResponse = await response.json();
+        return verifyResponse.success;
+    } catch (error) {
+        console.error('ReCAPTCHA verification error:', error);
+        return false;
+    }
+};
+
 export const signup = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, captchaToken } = req.body;
 
     try {
+        // Verify reCAPTCHA
+        const captchaVerified = await verifyRecaptcha(captchaToken);
+        if (!captchaVerified) {
+            return res.status(400).json({ success: false, msg: "ReCAPTCHA verification failed" });
+        }
+
         // Check if all fields are present
         if (!name || !email || !password) {
             return res.status(400).json({ msg: "Please enter all fields" });
         }
 
-        // Check if user already exists with findOne
+        // Check if user already exists
         const userAlreadyExists = await User.findOne({ email });
-
         if (userAlreadyExists) {
-            return res.status(400).json({ success: false, msg: "User already exists with this email" });
+            return res.status(400).json({ success: false, msg: "User  already exists with this email" });
         }
 
-        // Hash password
         const hashedPassword = await bcryptjs.hash(password, 10);
-
-        // Generate verification token (6-digit code)
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Create new user
-        const newUser = new User({
+        const newUser  = new User({
             name,
             email,
             password: hashedPassword,
             verificationToken,
-            verificationTokenExpireAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+            verificationTokenExpireAt: Date.now() + (24 * 60 * 60 * 1000)
         });
 
-        // Save user in the database
-        await newUser.save();
+        await newUser .save();
+        generateTokenAndSetCookie(newUser ._id, res);
+        await sendVerificationEmail(newUser .email, verificationToken);
 
-        // Generate token and set it in the cookie
-        generateTokenAndSetCookie(newUser._id, res);
-
-
-        // Send verification email
-        await sendVerificationEmail(newUser.email, verificationToken);
-
-
-        res.status(201).json({ success: true, msg: "User created successfully", user: {
-            ...newUser._doc,
-            password: undefined
-        } });
+        res.status(201).json({
+            success: true,
+            msg: "User  created successfully",
+            user: {
+                ...newUser ._doc,
+                password: undefined
+            }
+        });
 
     } catch (error) {
-        console.error(error);  // Log the actual error
+        console.error(error);
         res.status(500).json({ success: false, message: "Server error. Please try again later." });
     }
 }
-
 
 export const veifyEmail = async (req, res) => {
     const { code } = req.body;
@@ -94,46 +107,48 @@ export const veifyEmail = async (req, res) => {
 }
 
 
-
 export const login = async (req, res) => {
-    const {email , password} = req.body;
+    const { email, password, captchaToken } = req.body;
 
     try {
+        // Verify reCAPTCHA
+        const captchaVerified = await verifyRecaptcha(captchaToken);
+        if (!captchaVerified) {
+            return res.status(400).json({ success: false, msg: "ReCAPTCHA verification failed" });
+        }
 
         // Check if email and password are present
         if (!email || !password) {
             return res.status(400).json({ success: false, msg: "Please enter all fields" });
         }
 
-        // Check if user exists with findOne
+        // Check if user exists
         const user = await User.findOne({ email });
-
         if (!user) {
             return res.status(400).json({ success: false, msg: "Invalid email or password" });
         }
 
         const isMatch = await bcryptjs.compare(password, user.password);
-
         if (!isMatch) {
             return res.status(400).json({ success: false, msg: "Invalid email or password" });
         }
 
         if (!user.isVerified) {
-
-            // generate verification token
             const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
             user.verificationToken = verificationToken;
-            
-            user.verificationTokenExpireAt = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
+            user.verificationTokenExpireAt = Date.now() + (24 * 60 * 60 * 1000);
             await user.save();
 
-            // send verification email
             await sendVerificationEmail(user.email, verificationToken);
 
-            return res.status(400).json({ success: false, msg: "Please verify your email to login" ,user : {
-                ...user._doc,
-                password: undefined
-            }});
+            return res.status(400).json({
+                success: false,
+                msg: "Please verify your email to login",
+                user: {
+                    ...user._doc,
+                    password: undefined
+                }
+            });
         }
 
         generateTokenAndSetCookie(user._id, res);
@@ -141,20 +156,20 @@ export const login = async (req, res) => {
         user.lastLogin = new Date();
         await user.save();
 
-        // sending welcome email
-        await sendWelcomeEmail(user.email, user.name ?? "User");
+        await sendWelcomeEmail(user.email, user.name ?? "User ");
 
-        res.status(200).json({ success: true, msg: "User logged in successfully", user: {
-            ...user._doc,
-            password: undefined
-        } });
+        res.status(200).json({
+            success: true,
+            msg: "User  logged in successfully",
+            user: {
+                ...user._doc,
+                password: undefined
+            }
+        });
 
-
-        
     } catch (error) {
-
-        res.status(500).json({ success: false, msg: "error.message" });
-        
+        console.error("Login error:", error);
+        res.status(500).json({ success: false, msg: error.message });
     }
 }
 
