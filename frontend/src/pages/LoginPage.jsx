@@ -101,10 +101,11 @@ import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 import Logo from '../assets/Logo.svg';
 import Typing from '../assets/Typing.webp';
-
+import { useNavigate } from 'react-router-dom';
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
   
   const { login, isLoading, error } = useAuthStore();
 
@@ -116,6 +117,11 @@ const LoginPage = () => {
       toast.success("Login successful");
     } catch (error) {
       console.log(error);
+      
+      // Check if the error is related to email verification
+      if (error.response && error.response.data.msg === "Please verify your email to login") {
+        navigate('/verify-email', { state: { email } });
+      }
     }
   };
 
