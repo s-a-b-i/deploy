@@ -93,9 +93,12 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
       const formDataToSend = new FormData();
+      
+      // Add userId explicitly
+      formDataToSend.append('userId', userId);
       
       Object.keys(formData).forEach(key => {
         if (formData[key] !== null && formData[key] !== undefined) {
@@ -108,7 +111,7 @@ const Profile = () => {
       if (avatarFile) {
         formDataToSend.append('avatar', avatarFile);
       }
-
+  
       if (isProfileCreated) {
         await profileService.updateProfile(profileId, formDataToSend);
         toast.success("Profile updated successfully!");
@@ -123,7 +126,7 @@ const Profile = () => {
       console.error("Error saving profile:", error);
       toast.error("Failed to save profile");
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
 

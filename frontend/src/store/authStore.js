@@ -14,14 +14,14 @@ export const useAuthStore = create((set) => ({
   isCheckingAuth: true,
   message: null,
 
-  signUp: async (name, email, password, captchaToken) => {
+  signUp: async (name, email, password , captcha) => {
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(`${API_URL}/signup`, {
         name,
         email,
         password,
-        captchaToken
+        captcha
       });
       set({
         user: response.data.user,
@@ -52,33 +52,35 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  login: async (email, password , captchaToken) => {
+  login: async (email, password, captcha) => {
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(`${API_URL}/login`, {
         email,
         password,
-        captchaToken
+        captcha
       });
-  
-      let profileData = {};
+      
+      let profileImage = null;
       try {
-        profileData = await profileService.getProfile(response.data.user._id);
-      } catch (err) {
-        console.error("Error fetching profile:", err);
+        const profileData = await profileService.getProfile(response.data.user._id);
+        profileImage = profileData?.avatar || null;
+      } catch (profileError) {
+        console.error("Profile fetch error:", profileError);
       }
-  
+      
       set({
         user: {
           ...response.data.user,
-          profileImage: profileData?.avatar || null,
+          profileImage
         },
         isAuthenticated: true,
         error: null,
         isLoading: false,
-        message: "Login successful",
+        message: "Login successful"
       });
       return response.data;
+  
     } catch (error) {
       let errorMessage = "Login failed";
       if (error.response) {
@@ -103,8 +105,6 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
-  
-  
 
    logout: async () => {
     set({ isLoading: true, error: null });
@@ -164,13 +164,18 @@ export const useAuthStore = create((set) => ({
       const response = await axios.get(`${API_URL}/check-auth`);
       const userId = response.data.user._id;
       
-      // Fetch profile separately
-      const profileData = await profileService.getProfile(userId);
+      let profileImage = null;
+      try {
+        const profileData = await profileService.getProfile(userId);
+        profileImage = profileData?.avatar || null;
+      } catch (profileError) {
+        console.error("Profile fetch error:", profileError);
+      }
       
       set({
         user: {
           ...response.data.user,
-          profileImage: profileData.avatar || null // Use avatar from profile
+          profileImage
         },
         isAuthenticated: true,
         isCheckingAuth: false,
@@ -178,10 +183,11 @@ export const useAuthStore = create((set) => ({
       return response.data;
     } catch (error) {
       set({
-        error: null,
-        isCheckingAuth: false,
+        user: null,
         isAuthenticated: false,
+        isCheckingAuth: false,
       });
+      return null;
     }
   },
 
