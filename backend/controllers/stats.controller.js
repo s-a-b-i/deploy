@@ -7,54 +7,63 @@ const getDaysInMonth = (year, month) => {
 
 // Create or Update Stats
 export const createOrUpdateStats = async (req, res) => {
-    try {
-      const { userId, year, month, day, field, value } = req.body;
-      if (!userId || !year || !month || !day || !field || value === undefined) {
-        return res.status(400).json({ error: 'All fields are required' });
-      }
-  
-      let stats = await Stats.findOne({ userId });
-      if (!stats) {
-        stats = new Stats({ userId, years: [] });
-      }
-  
-      let yearData = stats.years.find(y => y.year === year);
-      if (!yearData) {
-        yearData = { year, impressions: [], clicks: [], revenues: [], sales: [], addToCarts: [], positions: [], favourites: [] };
-        stats.years.push(yearData);
-      }
-  
-      const fieldData = yearData[field];
-      let monthData = fieldData.find(m => m.month === month);
-      if (!monthData) {
-        const daysInMonth = getDaysInMonth(year, month);
-        monthData = { month, days: Array.from({ length: daysInMonth }, (_, i) => ({ day: i + 1, value: 0 })) };
-        fieldData.push(monthData);
-      }
-  
-      const dayData = monthData.days.find(d => d.day === day);
-      if (dayData) {
-        dayData.value += value; // Increment the value
-      } else {
-        monthData.days.push({ day, value });
-      }
-  
-      await stats.save();
-      res.status(200).json(stats);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  try {
+    const { userId, websiteId, year, month, day, field, value } = req.body;
+    if (!userId || !websiteId || !year || !month || !day || !field || value === undefined) {
+      return res.status(400).json({ error: 'All fields are required' });
     }
-  };
+
+    let stats = await Stats.findOne({ userId, websiteId });
+    if (!stats) {
+      stats = new Stats({ userId, websiteId, years: [] });
+    }
+
+    let yearData = stats.years.find(y => y.year === year);
+    if (!yearData) {
+      yearData = { year, impressions: [], clicks: [], revenues: [], sales: [], addToCarts: [], positions: [], favourites: [] };
+      stats.years.push(yearData);
+    }
+
+    // Ensure the field is initialized as an array
+    if (!yearData[field]) {
+      yearData[field] = [];
+    }
+
+    const fieldData = yearData[field];
+    let monthData = fieldData.find(m => m.month === month);
+    if (!monthData) {
+      const daysInMonth = getDaysInMonth(year, month);
+      monthData = { month, days: Array.from({ length: daysInMonth }, (_, i) => ({ day: i + 1, value: 0 })) };
+      fieldData.push(monthData);
+    }
+
+    const dayData = monthData.days.find(d => d.day === day);
+    if (dayData) {
+      dayData.value += value; // Increment the value
+    } else {
+      monthData.days.push({ day, value });
+    }
+
+    // Update the yearData in the stats object
+    const yearIndex = stats.years.findIndex(y => y.year === year);
+    stats.years[yearIndex] = yearData;
+
+    await stats.save();
+    res.status(200).json(stats);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // Get Stats by Year and Month
 export const getStatsByYearAndMonth = async (req, res) => {
   try {
-    const { userId, year, month } = req.body;
-    if (!userId || !year || !month) {
-      return res.status(400).json({ error: 'User ID, Year, and Month are required' });
+    const { userId, websiteId, year, month } = req.body;
+    if (!userId || !websiteId || !year || !month) {
+      return res.status(400).json({ error: 'User ID, Website ID, Year, and Month are required' });
     }
 
-    const stats = await Stats.findOne({ userId });
+    const stats = await Stats.findOne({ userId, websiteId });
     if (!stats) {
       return res.status(404).json({ error: 'Stats not found' });
     }
@@ -79,12 +88,12 @@ export const getStatsByYearAndMonth = async (req, res) => {
 // Get Last 30 Days Stats
 export const getLast30DaysStats = async (req, res) => {
   try {
-    const { userId } = req.body;
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID is required' });
+    const { userId, websiteId } = req.body;
+    if (!userId || !websiteId) {
+      return res.status(400).json({ error: 'User ID and Website ID are required' });
     }
 
-    const stats = await Stats.findOne({ userId });
+    const stats = await Stats.findOne({ userId, websiteId });
     if (!stats) {
       return res.status(404).json({ error: 'Stats not found' });
     }

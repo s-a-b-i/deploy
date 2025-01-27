@@ -20,7 +20,7 @@ import {
 // for advertisers
 router.get('/get-all', getWebsites);
 router.get('/recently-created/:limit', getRecentlyCreatedWebsites);
-router.get('/view/:id', viewWebsite);
+router.post('/view/:id', viewWebsite);
 
 // Place specific routes before dynamic routes
 router.post('/notApproved', getWebsitesForUserNotApproved);

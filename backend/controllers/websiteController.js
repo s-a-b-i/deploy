@@ -1,4 +1,5 @@
 import Website  from '../models/website.model.js';
+import { createOrUpdateStats } from '../utils/stats.js';
 
 // Get all websites
 export async function getWebsites(req, res) {
@@ -13,12 +14,37 @@ export async function getWebsites(req, res) {
 // view a single website
 export async function viewWebsite(req, res) {
   try {
+
+    const userId = req.body.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
     const website = await Website.findById(req.params.id);
     if (!website) {
       return res.status(404).json({ message: 'Website not found' });
     }
+
+    // Update stats
+    // const today = new Date();
+    // const year = today.getFullYear();
+    // const month = today.getMonth() + 1; // Months are 0-based in JavaScript
+    // const day = today.getDate();
+
+    // await createOrUpdateStats({
+    //   userId,
+    //   websiteId : req.params.id,
+    //   year,
+    //   month,
+    //   day,
+    //   field: 'clicks',
+    //   value: 1
+    // });
+
     res.status(200).json(website);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: 'Error fetching website', error: error.message });
   }
 }

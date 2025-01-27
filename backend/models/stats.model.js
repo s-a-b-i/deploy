@@ -23,6 +23,7 @@ const yearSchema = new mongoose.Schema({
 
 const statsSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  websiteId: { type: mongoose.Schema.Types.ObjectId, ref: 'Website', required: true },
   years: [yearSchema]
 });
 
