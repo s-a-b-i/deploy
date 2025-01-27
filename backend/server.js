@@ -10,6 +10,8 @@ import profileRoutes from './routes/profile.routes.js';
 import invoiceAccountRoutes from './routes/invoiceAccount.routes.js';
 import emailChangeRoutes from './routes/emailChange.routes.js';
 import searchWebsites from './routes/advertiser/searchWebsite.routes.js';
+import favourite from './routes/advertiser/favourite.routes.js';
+import cart from './routes/advertiser/cart.routes.js';
 
 
 dotenv.config();
@@ -45,6 +47,8 @@ app.use('/api/email-change', emailChangeRoutes);
 
 // advertiser routes
 app.use('/api/advertiser', searchWebsites);
+app.use('/api/advertiser', favourite);
+app.use('/api/advertiser', cart);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
