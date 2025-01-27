@@ -12,7 +12,7 @@ import emailChangeRoutes from './routes/emailChange.routes.js';
 import searchWebsites from './routes/advertiser/searchWebsite.routes.js';
 import favourite from './routes/advertiser/favourite.routes.js';
 import cart from './routes/advertiser/cart.routes.js';
-
+import stats from './routes/stats.routes.js';
 
 dotenv.config();
 
@@ -43,6 +43,9 @@ app.use('/api/promos', promoRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/invoice-account', invoiceAccountRoutes);
 app.use('/api/email-change', emailChangeRoutes);
+
+// stats routes
+app.use('/api/stats', stats);
 
 
 // advertiser routes
