@@ -124,3 +124,43 @@ export const getLast30DaysStats = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
+// Get Last 12 Months Stats
+export const getLast12MonthsStats = async (req, res) => {
+    try {
+      const { userId, websiteId } = req.body;
+      if (!userId || !websiteId) {
+        return res.status(400).json({ error: 'User ID and Website ID are required' });
+      }
+  
+      const stats = await Stats.findOne({ userId, websiteId });
+      if (!stats) {
+        return res.status(404).json({ error: 'Stats not found' });
+      }
+  
+      const result = {};
+      const today = new Date();
+      const last12Months = Array.from({ length: 12 }, (_, i) => {
+        const date = new Date(today);
+        date.setMonth(today.getMonth() - i);
+        return date;
+      }).reverse();
+  
+      ['impressions', 'clicks', 'revenues', 'sales', 'addToCarts', 'positions', 'favourites'].forEach(field => {
+        result[field] = last12Months.map(date => {
+          const yearData = stats.years.find(y => y.year === date.getFullYear());
+          if (!yearData) return { month: date.getMonth() + 1, value: 0 };
+  
+          const monthData = yearData[field].find(m => m.month === date.getMonth() + 1);
+          const monthValue = monthData ? monthData.days.reduce((sum, day) => sum + day.value, 0) : 0;
+          return { month: date.getMonth() + 1, value: monthValue };
+        });
+      });
+  
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
