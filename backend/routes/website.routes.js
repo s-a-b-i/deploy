@@ -5,6 +5,7 @@ const router = Router();
 import { 
     getWebsites,
     getRecentlyCreatedWebsites,
+    viewWebsite,
     getWebsite,
     createWebsite,
     updateWebsite,
@@ -19,6 +20,7 @@ import {
 // for advertisers
 router.get('/get-all', getWebsites);
 router.get('/recently-created/:limit', getRecentlyCreatedWebsites);
+router.get('/view/:id', viewWebsite);
 
 // Place specific routes before dynamic routes
 router.post('/notApproved', getWebsitesForUserNotApproved);

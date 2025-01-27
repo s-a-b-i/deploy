@@ -10,6 +10,19 @@ export async function getWebsites(req, res) {
   }
 }
 
+// view a single website
+export async function viewWebsite(req, res) {
+  try {
+    const website = await Website.findById(req.params.id);
+    if (!website) {
+      return res.status(404).json({ message: 'Website not found' });
+    }
+    res.status(200).json(website);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching website', error: error.message });
+  }
+}
+
 
 // get recently created 5 websites
 export async function getRecentlyCreatedWebsites(req, res) {
