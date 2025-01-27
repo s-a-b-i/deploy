@@ -1,5 +1,18 @@
 import Cart from '../../models/cart.model.js';
 
+// get all carts for a user
+export const getCarts = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ error: 'User ID is required' });
+
+    const carts = await Cart.find({ userId });
+    res.status(200).json(carts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Create Cart
 export const createCart = async (req, res) => {
   try {

@@ -1,5 +1,18 @@
 import Favourite from '../../models/favourite.model.js';
 
+// get all favourites for a user
+export const getFavourites = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ error: 'User ID is required' });
+
+    const favourites = await Favourite.find({ userId });
+    res.status(200).json(favourites);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Create Favourite
 export const createFavourite = async (req, res) => {
   try {
