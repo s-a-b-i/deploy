@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FaAngleDown, FaAngleUp, FaStar } from 'react-icons/fa';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { websiteService } from '../../utils/services';
+import { websiteService ,cartService } from '../../utils/services';
+import { toast } from 'react-hot-toast';
+
+
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -97,6 +100,23 @@ const ProductDetails = () => {
     }
   }, [id, userId]);
 
+
+   // Step 3: Handle add to cart
+   const handleAddToCart = async () => {
+    try {
+      // Call the API to add the product to the cart
+      await cartService.createCart(userId, id);
+
+      // Display success toast
+      toast.success('Item added to cart successfully! 🛒');
+    } catch (err) {
+      // Display error toast
+      console.error('Error adding to cart:', err);
+      toast.error(err?.message || 'Failed to add item to cart. 🚨');
+    }
+  };
+
+
   useEffect(() => {
     console.log('Loading state:', loading);
   }, [loading]);
@@ -181,7 +201,10 @@ const ProductDetails = () => {
         </div>
         <div className="flex items-center gap-4">
           <span className="text-xl font-bold">{productData.price.toFixed(2)} €</span>
-          <button className="bg-red-500 text-white px-6 py-3 rounded-full hover:bg-red-600 transition-colors duration-300 font-bold">
+          <button
+            onClick={handleAddToCart} // Step 5: Add API call to button
+            className="bg-red-500 text-white px-6 py-3 rounded-full hover:bg-red-600 transition-colors duration-300 font-bold"
+          >
             + Add to cart
           </button>
         </div>

@@ -1,99 +1,109 @@
-// import React from 'react';
-
-// const RankisterPromo = ({ isLoading, rankisterPromo }) => {
-//     return (
-//       <div className="bg-gray-100 p-4 rounded-lg shadow-sm mt-6">
-//         <h3 className="text-2xl font-bold mb-6">Rankister Promo</h3>
-//         {isLoading ? (
-//           <div className="text-center py-4">Loading...</div>
-//         ) : (
-//           <div className="space-y-4">
-//             {rankisterPromo.map((promo, index) => (
-//               <div
-//                 key={index}
-//                 className="flex justify-between items-center p-4 bg-white rounded-md shadow-sm border border-gray-200"
-//               >
-//                 <div>
-//                   <p className="text-lg font-semibold text-gray-600">
-//                     {promo.webDomain}
-//                   </p>
-//                   <span className="text-sm text-red-500 font-semibold">
-//                     DISCOUNT AVAILABLE
-//                   </span>
-//                 </div>
-//                 {promo.price && (
-//                   <div className="text-right">
-//                     <p className="line-through text-gray-500">{promo.price}</p>
-//                     <p className="text-orange-500 font-bold">{promo.discountPrice}</p>
-//                     <p className="text-gray-500 text-sm">(-{promo.discount})</p>
-//                   </div>
-//                 )}
-//               </div>
-//             ))}
-//           </div>
-//         )}
-//       </div>
-//     );
-//   };
-
-// export default RankisterPromo;
 import React from 'react';
+import { FaShoppingCart } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
+import { cartService } from '../../../utils/services';
+import useCartStore from '../../../store/cartStore';
 
-const RankisterPromo = ({ isLoading, rankisterPromo }) => {
-  // Calculate totals for original price and discounted price
-  const totalOriginalPrice = rankisterPromo.reduce((acc, promo) => acc + parseFloat(promo.price.replace('€', '').replace(',', '.')), 0);
-  const totalDiscountedPrice = rankisterPromo.reduce((acc, promo) => acc + parseFloat(promo.discountPrice.replace('€', '').replace(',', '.')), 0);
+const RankisterPromo = ({ isLoading, rankisterPromo, onViewProduct, onAddAllToCart }) => {
+  const { updateCartCount } = useCartStore();
 
-  // Calculate the overall discount percentage
-  const overallDiscount = totalOriginalPrice > 0 ? ((totalOriginalPrice - totalDiscountedPrice) / totalOriginalPrice) * 100 : 0;
+  // Handle add all items to cart
+  const handleAddAllToCart = async () => {
+    try {
+      // Add all items to cart
+      for (const promo of rankisterPromo) {
+        for (const website of promo.websites) {
+          await cartService.createCart(promo.userId, website.id);
+          updateCartCount(promo.userId);
+        }
+      }
+      
+      // Show success notification
+      toast.success("All items added to cart! 🛒");
+    } catch (error) {
+      // Show error notification
+      toast.error(error?.message || "Failed to add items to cart. 🚨");
+    }
+  };
+
+  const totalOriginalPrice = rankisterPromo.reduce((acc, promo) =>
+    acc + promo.websites.reduce((sum, site) => sum + site.originalPrice, 0), 0);
+  
+  const totalDiscountedPrice = rankisterPromo.reduce((acc, promo) =>
+    acc + promo.websites.reduce((sum, site) => sum + site.discountedPrice, 0), 0);
+  
+  const overallDiscount = 
+    ((totalOriginalPrice - totalDiscountedPrice) / totalOriginalPrice) * 100;
+
+  if (isLoading) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-4">Rankister Promo</h2>
+        <div className="animate-pulse">
+          <div className="space-y-4">
+            {[...Array(3)].map((_, index) => (
+              <div key={index} className="h-16 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 ">
-      {/* Heading outside the box */}
-      <h2 className="text-2xl font-bold mb-4">Rankister Promo</h2>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Rankister Promo</h2>
+      </div>
 
       <div className="bg-white p-6 rounded-lg shadow">
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex justify-between items-center mb-4">
           <span className="bg-red-500 text-white px-3 py-1 rounded text-sm">
             DISCOUNT
           </span>
+          <button
+            onClick={handleAddAllToCart}
+            className="flex items-center justify-center w-12 h-12 bg-foundations-primary text-white rounded-full hover:bg-blue-600 transition-colors"
+          >
+            <FaShoppingCart className="text-xl" />
+          </button>
         </div>
 
-        {isLoading ? (
-          <div className="text-center py-4">Loading...</div>
-        ) : (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="text-xl">Generalisti</h3>
-              {rankisterPromo.map((promo, index) => (
-                <div key={index} className="space-y-2">
-                  <a 
-                    href={promo.webDomain}
-                    className="block text-blue-600 underline"
-                  >
-                    {promo.webDomain}
-                  </a>
+        <div className="space-y-4">
+          {rankisterPromo.map((promo, index) => (
+            <div key={index} className="p-4">
+              <div className="flex justify-between items-center">
+                <div className="flex-grow">
+                  {promo.websites.map((website, idx) => (
+                    <div key={idx} className="flex justify-between items-center mb-2">
+                      <span
+                        className="text-black cursor-pointer hover:underline text-lg"
+                        onClick={() => onViewProduct(website.id, promo.userId)}
+                      >
+                        {website.webDomain}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
+          ))}
+        </div>
 
-            {/* Unified Calculation */}
-            <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold">Total Original Price</span>
-                <span className="text-gray-500">€ {totalOriginalPrice.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold">Total Discounted Price</span>
-                <span className="text-orange-500">€ {totalDiscountedPrice.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between items-center mt-2">
-                <span className="text-lg font-semibold">Total Discount</span>
-                <span className="text-green-500">(-{overallDiscount.toFixed(2)}%)</span>
-              </div>
-            </div>
+        <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+          <div className="flex justify-between items-center">
+            <span className="text-xl font-semibold">Total Original Price</span>
+            <span className="text-gray-500 text-xl">€ {totalOriginalPrice.toFixed(2)}</span>
           </div>
-        )}
+          <div className="flex justify-between items-center">
+            <span className="text-xl font-semibold">Total Discounted Price</span>
+            <span className="text-orange-500 text-xl">€ {totalDiscountedPrice.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-xl font-semibold">Total Discount</span>
+            <span className="text-green-500 text-xl">(-{overallDiscount.toFixed(2)}%)</span>
+          </div>
+        </div>
       </div>
     </div>
   );

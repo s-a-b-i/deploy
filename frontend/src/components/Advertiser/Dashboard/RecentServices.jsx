@@ -1,9 +1,9 @@
 import React from 'react';
 
-const RecentServices = ({ isLoading, recentServices }) => {
+const RecentServices = ({ isLoading, recentServices, onViewProduct }) => {
   return (
     <div className="mt-6 mx-auto">
-      <h3 className="text-2xl font-bold mb-6 text-gray-800 ">
+      <h3 className="text-2xl font-bold mb-6 text-gray-800">
         Recently Added Services
       </h3>
       {isLoading ? (
@@ -34,7 +34,14 @@ const RecentServices = ({ isLoading, recentServices }) => {
                       <span>{service.type}</span>
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-gray-600">{service.name}</td>
+                  <td className="px-5 py-3 text-gray-600">
+                    <span 
+                      className="cursor-pointer hover:underline"
+                      onClick={() => onViewProduct(service.id, service.userId)}
+                    >
+                      {service.name}
+                    </span>
+                  </td>
                   <td className="px-5 py-3 text-right font-semibold text-gray-600">
                     {service.price}
                   </td>

@@ -9,13 +9,22 @@ import {
 import img from "../assets/profile.jpeg";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
+import useCartStore from '../store/cartStore';
+
 
 const NavbarAdvertiser = ({ userName }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const { cartCount, updateCartCount } = useCartStore();
   const dropdownRef = useRef(null);
-  const { logout } = useAuthStore();
+  const { logout , user } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?._id) {
+      updateCartCount(user._id);
+    }
+  }, [user, updateCartCount]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -41,6 +50,10 @@ const NavbarAdvertiser = ({ userName }) => {
   const handleNavigateToProfile = () => {
     navigate("/advertiser/profile");
     setIsProfileDropdownOpen(false);
+  };
+
+  const handleNavigateToCart = () => {
+    navigate("/advertiser/cart");
   };
 
   const toggleProfileDropdown = () => {
@@ -74,12 +87,12 @@ const NavbarAdvertiser = ({ userName }) => {
             € 0.00 / 0.00
           </div>
 
-          <div className="relative cursor-pointer">
-    <MdShoppingCart className="w-6 h-6 text-gray-700" />
-    <span className="absolute -top-1 -right-1 bg-foundations-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-      0
-    </span>
-  </div>
+          <div className="relative cursor-pointer" onClick={handleNavigateToCart}>
+            <MdShoppingCart className="w-6 h-6 text-gray-700" />
+            <span className="absolute -top-1 -right-1 bg-foundations-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+            {cartCount}
+            </span>
+          </div>
 
           <div className="relative" ref={dropdownRef}>
             <div
@@ -124,7 +137,7 @@ const NavbarAdvertiser = ({ userName }) => {
 
         {/* Mobile User Avatar and Cart */}
         <div className="lg:hidden flex items-center gap-3">
-          <div className="relative cursor-pointer">
+          <div className="relative cursor-pointer" onClick={handleNavigateToCart}>
             <MdShoppingCart className="w-6 h-6 text-gray-700" />
             <span className="absolute -top-1 -right-1 bg-foundations-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
               0

@@ -345,3 +345,50 @@ export const searchService = {
     }
   },
 };
+
+export const cartService = {
+  getCarts: async (userId) => {
+    try {
+      const response = await api.post('/advertiser/carts/get-all', { userId });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  createCart: async (userId, websiteId) => {
+    try {
+      const response = await api.post('/advertiser/carts', { userId, websiteId });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  getCartById: async (userId, cartId) => {
+    try {
+      const response = await api.get(`/advertiser/carts/${cartId}`, { params: { userId } });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  updateCart: async (userId, cartId, websiteId) => {
+    try {
+      const response = await api.put(`/advertiser/carts/${cartId}`, { userId, websiteId });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  deleteCart: async (userId, cartId) => {
+    try {
+      const response = await api.delete(`/advertiser/carts/${cartId}`, { data: { userId } });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+};
