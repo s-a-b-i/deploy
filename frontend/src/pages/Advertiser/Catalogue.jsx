@@ -891,8 +891,8 @@ const Catalog = () => {
                           <button
                             className={`p-2 rounded-full ${
                               favorites.has(item._id)
-                                ? "bg-foundations-primary text-white"
-                                : "bg-foundations-tertiary text-foundations-dark"
+                                ? " bg-foundations-tertiary text-foundations-dark  "
+                                : "bg-foundations-primary text-white"
                             } hover:bg-foundations-secondary transition-colors`}
                             onClick={() => toggleFavorite(item._id)}
                           >
