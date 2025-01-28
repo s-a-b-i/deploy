@@ -713,8 +713,8 @@ const Catalog = () => {
     }));
   };
 
-  const handleViewProduct = (id) => {
-    navigate(`/advertiser/products/view/${id}`);
+  const handleViewProduct = (id,userId) => {
+    navigate(`/advertiser/products/view/${id}?action=${userId}`);
   };
 
   const ColumnModal = () => {
@@ -881,7 +881,7 @@ const Catalog = () => {
                         <div className="flex gap-2">
                           <button
                             className="p-2 bg-foundations-primary rounded-full text-white hover:bg-foundations-secondary transition-colors"
-                            onClick={() => handleViewProduct(item._id)}
+                            onClick={() => handleViewProduct(item._id,item.userId)}
                           >
                             <FaEye />
                           </button>
