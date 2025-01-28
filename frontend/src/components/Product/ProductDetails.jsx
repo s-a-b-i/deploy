@@ -145,7 +145,7 @@ const ProductDetails = () => {
 
   const DataRow = ({ label, value }) => (
     <div className="flex justify-between py-2 border-b last:border-b-0">
-      <span className="text-gray-700">{label}</span>
+      <span className="text-gray-700"><strong>{label}</strong></span>
       <span className="text-gray-900">
         {React.isValidElement(value) ? value : String(value ?? '')}
       </span>
@@ -167,15 +167,21 @@ const ProductDetails = () => {
   return (
     <div className="space-y-6 px-4 md:px-8 lg:px-12">
       <div className="flex justify-between items-center mb-6">
-        <button 
-          onClick={() => navigate('/advertiser/catalogue')}
-          className="text-blue-600 hover:underline"
-        >
-          ← Back to catalog
-        </button>
+        <div>
+          <button 
+            onClick={() => navigate('/advertiser/catalogue')}
+            className="text-blue-600 hover:underline font-bold text-lg"
+          >
+            ← Back to catalog
+          </button>
+          <div className="mt-2 text-xl font-bold flex items-center">
+            {productData.mediaData.name}
+            <FaStar className="text-yellow-400 ml-2" />
+          </div>
+        </div>
         <div className="flex items-center gap-4">
           <span className="text-xl font-bold">{productData.price.toFixed(2)} €</span>
-          <button className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition-colors duration-300">
+          <button className="bg-red-500 text-white px-6 py-3 rounded-full hover:bg-red-600 transition-colors duration-300 font-bold">
             + Add to cart
           </button>
         </div>
@@ -284,4 +290,4 @@ const ProductDetails = () => {
   );
 };
 
-export default ProductDetails
+export default ProductDetails;
