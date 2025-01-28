@@ -20,8 +20,6 @@ export const websiteService = {
     }
   },
 
-  
-
   getWebsites: async () => {
     try {
       const response = await api.get('/websites');
@@ -34,6 +32,24 @@ export const websiteService = {
   getWebsiteById: async (id) => {
     try {
       const response = await api.get(`/websites/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  getAllWebsites: async () => {
+    try {
+      const response = await api.get('/websites/get-all');
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  getRecentlyCreatedWebsites: async (limit = 5) => {
+    try {
+      const response = await api.get(`/websites/recently-created/${limit}`);
       return response.data;
     } catch (error) {
       throw error.response.data;
@@ -58,7 +74,6 @@ export const websiteService = {
     }
   },
 
-  // New discount endpoint
   applyDiscount: async (id, discountData) => {
     try {
       const response = await api.put(`/websites/discount/${id}`, discountData);
@@ -68,7 +83,6 @@ export const websiteService = {
     }
   },
 
-  // New highlight media endpoint
   highlightMedia: async (id, highlightData) => {
     try {
       const response = await api.put(`/websites/highlight/${id}`, highlightData);
@@ -86,9 +100,8 @@ export const websiteService = {
       console.error('Error:', error.response?.data || error);
       throw error.response?.data || error;
     }
-},
-  
-  
+  },
+
   getWebsitesApproved: async (userId) => {
     try {
       const response = await api.post('/websites/approved', { userId });
@@ -97,10 +110,8 @@ export const websiteService = {
       throw error.response?.data || error;
     }
   },
-
-  
- 
 };
+
 
 export const promoService = {
   createPromo: async (promoData) => {
@@ -112,8 +123,7 @@ export const promoService = {
     }
   },
 
-  
- getPromos: async (userId) => {
+  getPromos: async (userId) => {
     try {
       const response = await api.post('/promos/getPromos', { userId });
       return response.data;
@@ -125,6 +135,24 @@ export const promoService = {
   getPromoById: async (id) => {
     try {
       const response = await api.get(`/promos/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  getAllPromos: async () => {
+    try {
+      const response = await api.get('/promos/get-all');
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  getRecentlyCreatedPromos: async (limit = 5) => {
+    try {
+      const response = await api.get(`/promos/recently-created/${limit}`);
       return response.data;
     } catch (error) {
       throw error.response.data;
@@ -148,9 +176,8 @@ export const promoService = {
       throw error.response.data;
     }
   },
-
-
 };
+
 
 export const profileService = {
   createProfile: async (profileData) => {
@@ -263,4 +290,49 @@ export const emailChangeService = {
       throw error.response?.data || error;
     }
   }
+};
+
+export const searchService = {
+  searchWebsites: async ({
+    searchQuery,
+    minPrice,
+    maxPrice,
+    da,
+    ascore,
+    mediaType,
+    category,
+    country,
+    gambling,
+    cbd,
+    adult,
+    trading,
+    googleNews,
+    page = 1, // Default page number
+    limit = 10, // Default limit per page
+  }) => {
+    try {
+      const response = await api.get('/advertiser/search-websites', {
+        params: {
+          searchQuery,
+          minPrice,
+          maxPrice,
+          da,
+          ascore,
+          mediaType,
+          category,
+          country,
+          gambling,
+          cbd,
+          adult,
+          trading,
+          googleNews,
+          page, // Added for pagination
+          limit, // Added for pagination
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
 };

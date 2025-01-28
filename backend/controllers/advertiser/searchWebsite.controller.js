@@ -42,19 +42,19 @@ export async function searchWebsites(req, res) {
       filters.category = { $in: [category] };
     }
     if (country) {
-      filters.country = country;
+      filters.language = country;
     }
-    if (gambling === 'true') {
-      filters.sensitiveTopics = { $in: ['gambling'] };
+    if (gambling ) {
+      filters.sensitiveTopics = { $in: ['Gambling'] };
     }
-    if (cbd === 'true') {
-      filters.sensitiveTopics = { $in: ['cbd'] };
+    if (cbd ) {
+      filters.sensitiveTopics = { $in: ['CBD'] };
     }
-    if (adult === 'true') {
-      filters.sensitiveTopics = { $in: ['adult'] };
+    if (adult ) {
+      filters.sensitiveTopics = { $in: ['Adult'] };
     }
-    if (trading === 'true') {
-      filters.sensitiveTopics = { $in: ['trading'] };
+    if (trading ) {
+      filters.sensitiveTopics = { $in: ['Trading'] };
     }
     if (googleNews) {
       filters.googleNews = googleNews === 'true';

@@ -35,8 +35,8 @@ const DashboardLayout = ({ mode, toggleMode }) => {
         </div>
 
         {/* Main Content Area */}
-        <main className="flex-1 p-4 md:p-6 overflow-x-hidden overflow-y-auto">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 p-2 md:p-6   overflow-y-auto">
+          <div className="max-w-6xl mx-auto">
             <Outlet />
           </div>
         </main>
