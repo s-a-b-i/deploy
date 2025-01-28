@@ -601,18 +601,64 @@ const Catalog = () => {
   useEffect(() => {
     const handleInitialLoad = async () => {
       const params = new URLSearchParams(location.search);
+      
+      // Handle all possible URL parameters
       const queryFromURL = params.get('query');
       const minPriceFromURL = params.get('minPrice');
       const maxPriceFromURL = params.get('maxPrice');
+      const daFromURL = params.get('da');
+      const ascoreFromURL = params.get('ascore');
+      const mediaTypeFromURL = params.get('mediaType');
+      const categoryFromURL = params.get('category');
+      const countryFromURL = params.get('country');
+      const googleNewsFromURL = params.get('googleNews');
+      const sensitiveTopicsFromURL = params.getAll('sensitiveTopics');
   
       // Set initial states from URL if they exist
-      if (queryFromURL || minPriceFromURL || maxPriceFromURL) {
+      if (queryFromURL || minPriceFromURL || maxPriceFromURL || daFromURL || 
+          ascoreFromURL || mediaTypeFromURL || categoryFromURL || countryFromURL || 
+          googleNewsFromURL || sensitiveTopicsFromURL.length > 0) {
+        
+        // Set all states based on URL parameters
         if (queryFromURL) setSearchQuery(queryFromURL);
         if (minPriceFromURL || maxPriceFromURL) {
           setPriceRange({
             min: parseInt(minPriceFromURL) || 0,
             max: parseInt(maxPriceFromURL) || 50000,
           });
+        }
+        if (daFromURL) setDa(parseInt(daFromURL));
+        if (ascoreFromURL) setAscore(parseInt(ascoreFromURL));
+        if (mediaTypeFromURL) setMediaType(mediaTypeFromURL);
+        if (categoryFromURL) setCategory(categoryFromURL);
+        if (countryFromURL) setCountry(countryFromURL);
+        if (googleNewsFromURL) setGoogleNews(googleNewsFromURL);
+        if (sensitiveTopicsFromURL.length > 0) {
+          setSensitiveTopics(sensitiveTopicsFromURL);
+        }
+  
+        // Perform search with all parameters
+        const searchParams = {};
+        if (queryFromURL) searchParams.searchQuery = queryFromURL.toLowerCase();
+        if (minPriceFromURL) searchParams.minPrice = parseInt(minPriceFromURL);
+        if (maxPriceFromURL) searchParams.maxPrice = parseInt(maxPriceFromURL);
+        if (daFromURL) searchParams.da = parseInt(daFromURL);
+        if (ascoreFromURL) searchParams.ascore = parseInt(ascoreFromURL);
+        if (mediaTypeFromURL) searchParams.mediaType = mediaTypeFromURL;
+        if (categoryFromURL) searchParams.category = categoryFromURL;
+        if (countryFromURL) searchParams.country = countryFromURL;
+        if (googleNewsFromURL) searchParams.googleNews = googleNewsFromURL === "Yes";
+        if (sensitiveTopicsFromURL.length > 0) {
+          sensitiveTopicsFromURL.forEach((topic) => {
+            searchParams[topic.toLowerCase()] = true;
+          });
+        }
+  
+        try {
+          const data = await searchService.searchWebsites(searchParams);
+          setWebsites(data);
+        } catch (error) {
+          console.error("Error searching websites:", error);
         }
       } else {
         // If no search parameters, fetch all websites
@@ -626,7 +672,7 @@ const Catalog = () => {
     };
   
     handleInitialLoad();
-  }, []); // Only run on component mount
+  }, [location.search]); // Add location.search as dependency
 
   const handleReset = async () => {
     // First reset all states
