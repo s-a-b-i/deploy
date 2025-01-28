@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { FaAngleDown, FaAngleUp, FaStar } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { websiteService } from '../../utils/services';
 
-const ProductDetails = ({ productId = 'li5V2G3JzawIfZVAhQpp' }) => {
+const ProductDetails = () => {
+  const { id } = useParams();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const userId = searchParams.get('action');
+
   const [expandedSections, setExpandedSections] = useState({
     mediaData: true,
     metrics: true,
@@ -16,69 +22,88 @@ const ProductDetails = ({ productId = 'li5V2G3JzawIfZVAhQpp' }) => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [productData, setProductData] = useState({
-    mediaData: {
-      country: 'Italy',
-      name: 'NewsCucina.it',
-      addedDate: '29/05/2023',
-      categories: 'Food & Beverages',
-      googleNews: 'Yes',
-      link: 'https://newscucina.it/',
-      onlyNofollow: 'No'
-    },
-    metrics: {
-      domainAuthority: 16,
-      ascore: 8,
-      zoomAuthority: 15
-    },
-    backlinks: {
-      total: 4849,
-      dofollow: 4783,
-      nofollow: 66
-    },
-    sensitiveTopic: {
-      gambling: false,
-      trading: false,
-      adult: false,
-      cbd: false
-    },
-    publicationGuidelines: {
-      duration: 'Permanent',
-      avgPublicationTime: 'Max 24h',
-      guidelines: 'Fino a due link DOFOLLOW ad articolo. Non ci sono limiti sulla lunghezza del testo.'
-    },
-    availableExtras: {
-      notification: {
-        name: 'Notifica 50k utenti',
-        price: '€30.00'
-      }
-    },
-    screenshot: {
-      url: '/screenshots/newscucina.jpg'
-    },
-    reviews: {
-      total: 6,
-      averageRating: 4
-    },
-    price: 50.00
-  });
+  const [productData, setProductData] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('ID:', id);
+    console.log('User ID:', userId);
+
     const fetchProductData = async () => {
       try {
         setLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('Fetching product data...');
+        const data = await websiteService.viewWebsite(id, userId);
+        console.log('API Response:', data);
+
+        const transformedData = {
+          mediaData: {
+            country: data.language,
+            name: data.webDomain,
+            addedDate: new Date(data.createdAt).toLocaleDateString(),
+            categories: data.category.join(', '),
+            googleNews: data.googleNews ? 'Yes' : 'No',
+            link: data.webDomain.startsWith('http') ? data.webDomain : `https://${data.webDomain}`,
+            onlyNofollow: data.onlyNofollow ? 'Yes' : 'No'
+          },
+          metrics: {
+            domainAuthority: data.domainAuthority || '-',
+            ascore: data.ascore || '-',
+            zoomAuthority: data.zoomAuthority || '-'
+          },
+          backlinks: {
+            total: data.backlinks?.total || 0,
+            dofollow: data.backlinks?.dofollow || 0,
+            nofollow: data.backlinks?.nofollow || 0
+          },
+          sensitiveTopic: {
+            gambling: data.sensitiveTopics?.includes('Gambling') || false,
+            trading: data.sensitiveTopics?.includes('Trading') || false,
+            adult: data.sensitiveTopics?.includes('Adult') || false,
+            cbd: data.sensitiveTopics?.includes('CBD') || false
+          },
+          publicationGuidelines: {
+            duration: data.publicationDuration || 'Permanent',
+            avgPublicationTime: data.publicationTime || 'Max 24h',
+            guidelines: data.guidelines || 'No specific guidelines provided'
+          },
+          availableExtras: data.extras || {},
+          screenshot: {
+            url: data.screenshot || '/placeholder-screenshot.jpg'
+          },
+          reviews: {
+            total: data.reviews?.length || 0,
+            averageRating: data.averageRating || 0
+          },
+          price: data.price || 0
+        };
+
+        setProductData(transformedData);
         setLoading(false);
       } catch (err) {
-        setError(err.message);
+        console.error('Error fetching product data:', err);
+        setError(err.message || 'Failed to fetch product details');
         setLoading(false);
       }
     };
 
-    fetchProductData();
-  }, [productId]);
+    if (id && userId) {
+      fetchProductData();
+    } else {
+      console.error('ID or User ID is missing');
+      setError('ID or User ID is missing');
+      setLoading(false);
+    }
+  }, [id, userId]);
+
+  useEffect(() => {
+    console.log('Loading state:', loading);
+  }, [loading]);
+
+  useEffect(() => {
+    console.log('Product data:', productData);
+  }, [productData]);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -89,17 +114,17 @@ const ProductDetails = ({ productId = 'li5V2G3JzawIfZVAhQpp' }) => {
 
   const SectionHeader = ({ title, section }) => (
     <div 
-      className="flex justify-between items-center bg-foundations-primary text-white p-3 cursor-pointer"
+      className="flex justify-between items-center bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white p-3 cursor-pointer rounded-t-lg"
       onClick={() => toggleSection(section)}
     >
       <h2 className="font-semibold">{title}</h2>
-      {expandedSections[section] ? <FaAngleUp /> : <FaAngleDown />}
+      {expandedSections[section] ? <FaAngleUp className="transition-transform duration-300" /> : <FaAngleDown className="transition-transform duration-300" />}
     </div>
   );
 
   const TransitionSection = ({ isExpanded, children }) => (
     <div 
-      className={`overflow-hidden transition-all duration-300 ${
+      className={`overflow-hidden transition-all duration-300 ease-in-out ${
         isExpanded 
           ? 'max-h-[1000px] opacity-100' 
           : 'max-h-0 opacity-0'
@@ -110,7 +135,7 @@ const ProductDetails = ({ productId = 'li5V2G3JzawIfZVAhQpp' }) => {
   );
 
   const Section = ({ title, section, children }) => (
-    <div className="border rounded-lg shadow-sm">
+    <div className="border rounded-lg shadow-sm mb-4">
       <SectionHeader title={title} section={section} />
       <TransitionSection isExpanded={expandedSections[section]}>
         {children}
@@ -135,6 +160,10 @@ const ProductDetails = ({ productId = 'li5V2G3JzawIfZVAhQpp' }) => {
     return <div className="text-red-500 text-center">Error: {error}</div>;
   }
 
+  if (!productData) {
+    return <div className="text-center">No product data available.</div>;
+  }
+
   return (
     <div className="space-y-6 px-4 md:px-8 lg:px-12">
       <div className="flex justify-between items-center mb-6">
@@ -146,7 +175,7 @@ const ProductDetails = ({ productId = 'li5V2G3JzawIfZVAhQpp' }) => {
         </button>
         <div className="flex items-center gap-4">
           <span className="text-xl font-bold">{productData.price.toFixed(2)} €</span>
-          <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+          <button className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition-colors duration-300">
             + Add to cart
           </button>
         </div>
@@ -212,10 +241,14 @@ const ProductDetails = ({ productId = 'li5V2G3JzawIfZVAhQpp' }) => {
 
           <Section title="Available extras" section="availableExtras">
             <div className="p-4">
-              <div className="flex justify-between items-center">
-                <span>{productData.availableExtras.notification.name}</span>
-                <span>{productData.availableExtras.notification.price}</span>
-              </div>
+              {productData.availableExtras?.notification ? (
+                <div className="flex justify-between items-center">
+                  <span>{productData.availableExtras.notification.name}</span>
+                  <span>{productData.availableExtras.notification.price}</span>
+                </div>
+              ) : (
+                <div className="text-gray-500">No extras available</div>
+              )}
             </div>
           </Section>
 
@@ -238,7 +271,7 @@ const ProductDetails = ({ productId = 'li5V2G3JzawIfZVAhQpp' }) => {
                   {[...Array(5)].map((_, index) => (
                     <FaStar 
                       key={index}
-                      className={index < productData.reviews.averageRating ? 'text-yellow-400' : 'text-gray-300'}
+                      className={`transition-colors duration-300 ${index < productData.reviews.averageRating ? 'text-yellow-400' : 'text-gray-300'}`}
                     />
                   ))}
                 </div>
@@ -251,4 +284,4 @@ const ProductDetails = ({ productId = 'li5V2G3JzawIfZVAhQpp' }) => {
   );
 };
 
-export default ProductDetails;
+export default ProductDetails

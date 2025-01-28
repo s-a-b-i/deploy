@@ -110,6 +110,15 @@ export const websiteService = {
       throw error.response?.data || error;
     }
   },
+
+  viewWebsite: async (id, userId) => {
+    try {
+      const response = await api.post(`/websites/view/${id}`, { userId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
 };
 
 
