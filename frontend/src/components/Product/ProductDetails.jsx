@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaAngleDown, FaAngleUp, FaStar } from 'react-icons/fa';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { websiteService ,cartService } from '../../utils/services';
+import { websiteService, cartService, favouriteService } from '../../utils/services';
 import { toast } from 'react-hot-toast';
-
-
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -26,19 +24,20 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [productData, setProductData] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('ID:', id);
-    console.log('User ID:', userId);
-
     const fetchProductData = async () => {
       try {
         setLoading(true);
-        console.log('Fetching product data...');
         const data = await websiteService.viewWebsite(id, userId);
-        console.log('API Response:', data);
+
+        // Fetch favorites to check if this item is favorited
+        const userFavorites = await favouriteService.getFavourites(userId);
+        const isItemFavorite = userFavorites.some(fav => fav.websiteId === id);
+        setIsFavorite(isItemFavorite);
 
         const transformedData = {
           mediaData: {
@@ -100,30 +99,15 @@ const ProductDetails = () => {
     }
   }, [id, userId]);
 
-
-   // Step 3: Handle add to cart
-   const handleAddToCart = async () => {
+  const handleAddToCart = async () => {
     try {
-      // Call the API to add the product to the cart
       await cartService.createCart(userId, id);
-
-      // Display success toast
       toast.success('Item added to cart successfully! 🛒');
     } catch (err) {
-      // Display error toast
       console.error('Error adding to cart:', err);
       toast.error(err?.message || 'Failed to add item to cart. 🚨');
     }
   };
-
-
-  useEffect(() => {
-    console.log('Loading state:', loading);
-  }, [loading]);
-
-  useEffect(() => {
-    console.log('Product data:', productData);
-  }, [productData]);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -183,32 +167,31 @@ const ProductDetails = () => {
   if (!productData) {
     return <div className="text-center">No product data available.</div>;
   }
-
   return (
     <div className="space-y-6 px-4 md:px-8 lg:px-12">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <button 
-            onClick={() => navigate('/advertiser/catalogue')}
-            className="text-blue-600 hover:underline font-bold text-lg"
-          >
-            ← Back to catalog
-          </button>
-          <div className="mt-2 text-xl font-bold flex items-center">
-            {productData.mediaData.name}
-            <FaStar className="text-yellow-400 ml-2" />
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-xl font-bold">{productData.price.toFixed(2)} €</span>
-          <button
-            onClick={handleAddToCart} // Step 5: Add API call to button
-            className="bg-red-500 text-white px-6 py-3 rounded-full hover:bg-red-600 transition-colors duration-300 font-bold"
-          >
-            + Add to cart
-          </button>
-        </div>
-      </div>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+  <div>
+    <button 
+      onClick={() => navigate('/advertiser/catalogue')}
+      className="text-blue-600 hover:underline font-bold text-lg"
+    >
+      ← Back to catalog
+    </button>
+    <div className="mt-2 text-xl font-bold flex items-center">
+      {productData.mediaData.name}
+      {isFavorite && <FaStar className="text-foundations-primary ml-2" />}
+    </div>
+  </div>
+  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <span className="text-xl font-bold">{productData.price.toFixed(2)} €</span>
+    <button
+      onClick={handleAddToCart}
+      className="w-full sm:w-auto bg-red-500 text-white px-4 py-3 rounded-md hover:bg-red-600 transition-colors duration-300 font-bold"
+    >
+      + Add to cart
+    </button>
+  </div>
+</div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-4">
