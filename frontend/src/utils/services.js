@@ -392,3 +392,57 @@ export const cartService = {
     }
   },
 };
+
+export const favouriteService = {
+  getFavourites: async (userId) => {
+    try {
+      const response = await api.post('/advertiser/favourites/get-all', { userId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  createFavourite: async (userId, websiteId) => {
+    try {
+      const response = await api.post('/advertiser/favourites', { userId, websiteId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  getFavouriteById: async (favouriteId, userId) => {
+    try {
+      const response = await api.get(`/advertiser/favourites/${favouriteId}`, {
+        data: { userId }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  updateFavourite: async (favouriteId, userId, websiteId) => {
+    try {
+      const response = await api.put(`/advertiser/favourites/${favouriteId}`, {
+        userId,
+        websiteId
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  deleteFavourite: async (favouriteId, userId) => {
+    try {
+      const response = await api.delete(`/advertiser/favourites/${favouriteId}`, {
+        data: { userId }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+};
