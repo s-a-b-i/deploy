@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import useCartStore from '../store/cartStore';
 
 
+
 const NavbarAdvertiser = ({ userName }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -100,13 +101,15 @@ const NavbarAdvertiser = ({ userName }) => {
               onClick={toggleProfileDropdown}
             >
               <div
-                className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden border-2 border-foundations-primary shadow-sm"
-                style={{
-                  backgroundImage: `url(${img})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
-              />
+                              className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden border-2 border-foundations-primary shadow-sm"
+                              style={{
+                                backgroundImage: user?.profileImage
+                                  ? `url(${user.profileImage})`
+                                  : `url(${img})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                              }}
+                            />
               <MdKeyboardArrowDown
                 className={`w-5 h-5 text-gray-600 transition-transform ${
                   isProfileDropdownOpen ? "rotate-180" : ""
@@ -144,14 +147,15 @@ const NavbarAdvertiser = ({ userName }) => {
             </span>
           </div>
           <div
-            className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden border-2 border-foundations-primary shadow-sm cursor-pointer"
-            style={{
-              backgroundImage: `url(${img})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-            onClick={toggleProfileDropdown}
-          />
+                      className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden border-2 border-foundations-primary shadow-sm"
+                      style={{
+                        backgroundImage: user?.profileImage
+                          ? `url(${user.profileImage})`
+                          : `url(${img})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    />
         </div>
       </div>
 

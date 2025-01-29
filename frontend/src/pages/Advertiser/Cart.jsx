@@ -1,89 +1,134 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuthStore } from '../../store/authStore';
-import { cartService, websiteService } from '../../utils/services';
-import { FaTrashAlt } from 'react-icons/fa';
-import useCartStore from '../../store/cartStore';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuthStore } from "../../store/authStore";
+import { cartService, websiteService } from "../../utils/services";
+import { FaTrashAlt } from "react-icons/fa";
+import useCartStore from "../../store/cartStore";
+import ProductCard from "../../components/Advertiser/ProductCard";
+import { toast } from "react-hot-toast";
 
 const Cart = () => {
   const { user } = useAuthStore();
-const { updateCartCount } = useCartStore();
+  const { updateCartCount } = useCartStore();
   const [cartItems, setCartItems] = useState([]);
+  const [similarProducts, setSimilarProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      try {
-        setLoading(true);
-        const carts = await cartService.getCarts(user._id);
+  const fetchCartItems = async () => {
+    try {
+      setLoading(true);
+      const carts = await cartService.getCarts(user._id);
 
-        const enhancedCarts = await Promise.all(
-          carts.map(async (item) => {
-            try {
-              const websiteDetails = await websiteService.getWebsiteById(item.websiteId);
-              return {
-                ...item,
-                websiteDetails,
-              };
-            } catch (err) {
-              console.error(`Failed to fetch website details for item ${item._id}:`, err);
-              return {
-                ...item,
-                websiteDetails: null,
-              };
-            }
-          })
-        );
+      const enhancedCarts = await Promise.all(
+        carts.map(async (item) => {
+          try {
+            const websiteDetails = await websiteService.getWebsiteById(item.websiteId);
+            return { ...item, websiteDetails };
+          } catch (err) {
+            console.error(`Failed to fetch website details for ${item._id}:`, err);
+            return { ...item, websiteDetails: null };
+          }
+        })
+      );
 
-        console.log('Enhanced Carts:', enhancedCarts); // Debug log
-        setCartItems(enhancedCarts);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message || 'Failed to fetch cart items');
-        setLoading(false);
+      setCartItems(enhancedCarts);
+
+      // Only fetch similar products if cart has items
+      if (enhancedCarts.length > 0) {
+        const categories = enhancedCarts.map((item) => item.websiteDetails?.category).flat();
+        const uniqueCategories = [...new Set(categories)];
+
+        const allWebsites = await websiteService.getAllWebsites();
+
+        const similarItems = allWebsites
+          .filter(
+            (website) =>
+              website.category.some((cat) => uniqueCategories.includes(cat)) &&
+              !enhancedCarts.some((cartItem) => cartItem.websiteId === website._id)
+          )
+          .slice(0, 6);
+
+        setSimilarProducts(similarItems);
+      } else {
+        // Clear similar products if cart is empty
+        setSimilarProducts([]);
       }
-    };
 
-    if (user?._id) {
-      fetchCartItems();
+      setLoading(false);
+    } catch (err) {
+      setError(err.message || "Failed to fetch cart items");
+      setLoading(false);
     }
-  }, [user]);
+  };
 
   const handleDelete = async (cartId) => {
     try {
       await cartService.deleteCart(user._id, cartId);
-      setCartItems((prevItems) => prevItems.filter((item) => item._id !== cartId));
-      updateCartCount(user._id); // Update cart count after deletion
+      const updatedCartItems = cartItems.filter((item) => item._id !== cartId);
+      setCartItems(updatedCartItems);
+      updateCartCount(user._id);
+      
+      // Clear similar products if this was the last item
+      if (updatedCartItems.length === 0) {
+        setSimilarProducts([]);
+      } else {
+        // Add the deleted item back to similar products if it matches the category
+        const deletedItem = cartItems.find(item => item._id === cartId);
+        if (deletedItem?.websiteDetails) {
+          setSimilarProducts(prev => [...prev, deletedItem.websiteDetails].slice(0, 6));
+        }
+      }
+      
+      toast.success("Item removed from cart");
     } catch (err) {
-      console.error('Failed to delete item:', err);
-      setError(err.message || 'Failed to delete item');
+      console.error("Failed to delete item:", err);
+      toast.error(err.message || "Failed to delete item");
     }
   };
 
+  const handleAddToCart = async (websiteId) => {
+    try {
+      const response = await cartService.createCart(user._id, websiteId);
+      updateCartCount(user._id);
+      setSimilarProducts((prev) => prev.filter((item) => item._id !== websiteId));
+      toast.success("Item added to cart");
+
+      const websiteDetails = await websiteService.getWebsiteById(websiteId);
+      
+      setCartItems((prev) => [...prev, { 
+        _id: response._id,
+        websiteId, 
+        websiteDetails,
+        userId: user._id
+      }]);
+    } catch (err) {
+      console.error("Failed to add item to cart:", err);
+      toast.error(err.message || "Failed to add item to cart");
+    }
+  };
+
+  useEffect(() => {
+    fetchCartItems();
+  }, [user._id]);
+
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => {
-      const price = item.websiteDetails?.price 
-        ? typeof item.websiteDetails.price === 'object' 
-          ? parseFloat(item.websiteDetails.price.$numberInt) 
+      const price = item.websiteDetails?.price
+        ? typeof item.websiteDetails.price === "object"
+          ? parseFloat(item.websiteDetails.price.$numberInt)
           : parseFloat(item.websiteDetails.price)
         : 0;
       return total + price;
     }, 0);
   };
 
-  const getItemPrice = (item) => {
-    if (!item.websiteDetails?.price) return 0;
-    
-    const price = typeof item.websiteDetails.price === 'object'
-      ? parseFloat(item.websiteDetails.price.$numberInt)
-      : parseFloat(item.websiteDetails.price);
-      
-    return isNaN(price) ? 0 : price;
-  };
-
   if (loading) {
-    return <div className="text-center py-6">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-foundations-primary"></div>
+      </div>
+    );
   }
 
   if (error) {
@@ -91,82 +136,83 @@ const { updateCartCount } = useCartStore();
   }
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-6 px-4 md:px-8 lg:px-12 py-8">
-      <h1 className="text-3xl font-bold mb-4 text-foundations-dark">Shopping Cart</h1>
-      
-      {/* Info Messages */}
-      <div className="space-y-2 mb-6">
-        <p className="text-emerald-500">
-          You will be able to fill all the needed information after checkout in the Orders section.
-        </p>
-        <p className="text-red-500">
-          Orders must be posted within 3 months of the order date.
-        </p>
-      </div>
+    <div className="container mx-auto max-w-7xl px-6 py-10">
+    <h1 className="text-3xl font-bold text-foundations-dark mb-6">Shopping Cart</h1>
 
-      {/* Cart Items */}
-      {cartItems.length > 0 ? (
-        <div className="space-y-6">
-          {cartItems.map((item) => (
-            <div
-              key={item._id}
-              className="bg-foundations-light border border-foundations-hover rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="flex justify-between items-center">
-                {/* Domain Name */}
-                <div className="space-y-2 flex-1">
-                  <h2 className="font-bold text-xl text-foundations-dark">
-                    {item.websiteDetails?.webDomain || 'Unknown Domain'}
-                  </h2>
-                  <div className="text-sm text-foundations-secondary">
-                    {item.websiteDetails?.mediaName || 'Unknown Media'}
-                  </div>
-                </div>
+    <div className="border-b pb-4 mb-6">
+      <p className="text-emerald-500">
+        You will be able to fill all the needed information after checkout in the Orders section.
+      </p>
+      <p className="text-red-500">Orders must be posted within 3 months of the order date.</p>
+    </div>
 
-                {/* Price and Delete Button */}
-                <div className="flex items-center space-x-4">
-                  <span className="text-2xl font-bold text-foundations-primary">
-                    {getItemPrice(item).toFixed(2)} €
-                  </span>
-                  <button
-                    onClick={() => handleDelete(item._id)}
-                    className="text-foundations-secondary hover:text-foundations-primary transition-colors p-2"
-                    aria-label="Delete item"
-                  >
-                    <FaTrashAlt size={20} />
-                  </button>
-                </div>
-              </div>
+    {cartItems.length > 0 ? (
+      <>
+        {cartItems.map((item) => (
+          <div
+            key={item._id}
+            className="bg-foundations-light shadow rounded-lg p-6 flex justify-between items-center border border-foundations-hover mb-4"
+          >
+            <div>
+              <h2 className="font-bold text-lg text-foundations-dark">
+                {item.websiteDetails?.webDomain || "Unknown Domain"}
+              </h2>
+              <p className="text-sm text-foundations-secondary">
+                {item.websiteDetails?.mediaType || "Unknown Media"}
+              </p>
             </div>
-          ))}
-
-          {/* Cart Total */}
-          <div className="border-t border-foundations-hover pt-4 mt-6">
-            <div className="flex justify-between items-center">
-              <span className="text-xl font-bold text-foundations-dark">Total:</span>
-              <span className="text-2xl font-bold text-foundations-primary">
-                {calculateTotal().toFixed(2)} €
+            <div className="flex items-center space-x-6">
+              <span className="text-xl font-semibold text-foundations-primary">
+                {parseFloat(item.websiteDetails?.price || 0).toFixed(2)} €
               </span>
+              <button
+                onClick={() => handleDelete(item._id)}
+                className="text-red-500 hover:text-red-700 transition-colors"
+              >
+                <FaTrashAlt size={20} />
+              </button>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="text-center text-gray-600 py-12">
-          Your cart is empty
-        </div>
-      )}
-
-      {/* Footer Links */}
-      <div className="text-sm text-foundations-secondary pt-8">
-        <Link to="/terms" className="hover:underline">
-          Terms and conditions
-        </Link>
-        <span className="mx-2">•</span>
-        <Link to="/" className="hover:underline">
-          Rankister.com
-        </Link>
+        ))}
+      </>
+    ) : (
+      <div className="text-center text-gray-600 py-12 bg-foundations-light rounded-lg">
+        Your cart is empty
       </div>
+    )}
+
+    {similarProducts.length > 0 && (
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold text-foundations-dark mb-4">Similar Products</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+          {similarProducts.map((product) => (
+            <ProductCard key={product._id} product={product} onAddToCart={handleAddToCart} />
+          ))}
+        </div>
+      </div>
+    )}
+
+    {cartItems.length > 0 && (
+      <div className="mt-8 border-t pt-4">
+        <div className="flex justify-between items-center">
+          <span className="text-lg font-bold text-foundations-dark">Total:</span>
+          <span className="text-2xl font-bold text-foundations-primary">
+            {calculateTotal().toFixed(2)} €
+          </span>
+        </div>
+      </div>
+    )}
+
+    <div className="text-sm text-foundations-secondary pt-8">
+      <Link to="/terms" className="hover:underline">
+        Terms and conditions
+      </Link>
+      <span className="mx-2">•</span>
+      <Link to="/" className="hover:underline">
+        Rankister.com
+      </Link>
     </div>
+  </div>
   );
 };
 
