@@ -70,26 +70,30 @@ const ProtectedRoutes = ({ children }) => {
     return <Navigate to="/verify-email" replace />;
   }
 
+  if (user?.isAdmin) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
   return children;
 };
 
-// const AdminProtectedRoutes = ({ children }) => {
-//   const { isAuthenticated, user } = useAuthStore();
+const AdminProtectedRoutes = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
 
-//   if (!isAuthenticated) {
-//     return <Navigate to="/" replace />;
-//   }
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
-//   if (!user.isVerified) {
-//     return <Navigate to="/verify-email" replace />;
-//   }
+  if (!user.isVerified) {
+    return <Navigate to="/verify-email" replace />;
+  }
 
-//   if (!user.isAdmin) {
-//     return <Navigate to="/" replace />;
-//   }
+  if (!user?.isAdmin) {
+    return <Navigate to="/publisher/dashboard" replace />;
+  }
 
-//   return children;
-// };
+  return children;
+};
 
 
 const RedirectAuthenticatedUser  = ({ children }) => {
@@ -164,9 +168,9 @@ const App = () => {
           {/* Admin Routes */}
           <Route
           element={
-            // <AdminProtectedRoutes>
+            <AdminProtectedRoutes>
               <AdminLayout />
-            // </AdminProtectedRoutes>
+             </AdminProtectedRoutes>
           }
         >
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
