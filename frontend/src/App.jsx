@@ -111,14 +111,25 @@ const RedirectAuthenticatedUser  = ({ children }) => {
 };
 
 const App = () => {
-  const [mode, setMode] = useState("Publisher");
+  const [mode, setMode] = useState(() => localStorage.getItem('mode') || 'Publisher');
   const { checkAuth, isCheckingAuth, setIsAuthenticated } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  const toggleMode = () => setMode((prev) => (prev === "Publisher" ? "Advertiser" : "Publisher"));
+  const toggleMode = () => {
+    setMode((prev) => {
+      const newMode = prev === 'Publisher' ? 'Advertiser' : 'Publisher';
+      localStorage.setItem('mode', newMode);
+      return newMode;
+    });
+  };
+
+  useEffect(() => {
+    // Keep localStorage in sync if reloaded or navigated
+    localStorage.setItem('mode', mode);
+  }, [mode]);
 
   if (isCheckingAuth) {
     return <LoadingSpinner />;
