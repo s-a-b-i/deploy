@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { MdClose, MdDashboard, MdPeople, MdContentPaste, MdPayments, MdMessage, MdAnalytics, MdSettings } from "react-icons/md";
+import { MdClose, MdDashboard, MdPeople, MdContentPaste, MdPayments, MdMessage, MdAnalytics, MdSettings   } from "react-icons/md";
 import Logo from "../../assets/Logo.svg";
 
 const AdminSidebar = ({ isOpen, onClose }) => {
@@ -11,16 +11,17 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     { name: "User Management", path: "/admin/users", icon: <MdPeople size={24} /> },
     { name: "Content Moderation", path: "/admin/content", icon: <MdContentPaste size={24} /> },
     { name: "Transactions", path: "/admin/transactions", icon: <MdPayments size={24} /> },
-    { name: "Chatbot", path: "/admin/chatbot", icon: <MdMessage size={24} /> },
+    { name: "Faq", path: "/admin/faq", icon: <MdMessage size={24} /> },
     { name: "Reports", path: "/admin/reports", icon: <MdAnalytics size={24} /> },
     { name: "Settings", path: "/admin/settings", icon: <MdSettings size={24} /> },
+    {name:"Profile", path:"/admin/profile", icon:<MdPeople size={24}/>},
   ];
 
   const isActiveLink = (path) => location.pathname === path;
 
   return (
     <aside
-      className={`fixed left-0 top-0 w-64 h-screen bg-gradient-to-b from-foundations-primary to-foundations-secondary overflow-y-auto transition-transform duration-300 ease-in-out ${
+      className={`fixed left-0 top-0 w-64 h-screen z-[9999] bg-gradient-to-b from-foundations-primary to-foundations-secondary overflow-y-auto transition-transform duration-300 ease-in-out ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       } lg:translate-x-0`}
     >
