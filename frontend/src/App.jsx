@@ -5,6 +5,7 @@ import { useAuthStore } from "./store/authStore";
 
 // Layout
 import DashboardLayout from "./layouts/DashboardLayout";
+import AdminLayout from "./layouts/AdminLayout.jsx";
 import FloatingShape from "./components/FloatingShape";
 import LoadingSpinner from "./components/LoadingSpinner";
 
@@ -43,6 +44,16 @@ import AdvertiserBalance from "./pages/Advertiser/Balance";
 import CreateProject from "./components/Forms/CreateProject";
 import ProductDetails from "./components/Product/ProductDetails";
 
+// Admin Pages
+import AdminDashboard from "./pages/Admin/Dashboard";
+import AdminUsers from "./pages/Admin/Users";
+import AdminContent from "./pages/Admin/Content";
+import AdminTransactions from "./pages/Admin/Transactions";
+import AdminChatbot from "./pages/Admin/Chatbot";
+import AdminReports from "./pages/Admin/Reports";
+import AdminSettings from "./pages/Admin/Settings";
+import AdminProfile from "./pages/Admin/Profile";
+
 const ProtectedRoutes = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
@@ -61,6 +72,25 @@ const ProtectedRoutes = ({ children }) => {
 
   return children;
 };
+
+// const AdminProtectedRoutes = ({ children }) => {
+//   const { isAuthenticated, user } = useAuthStore();
+
+//   if (!isAuthenticated) {
+//     return <Navigate to="/" replace />;
+//   }
+
+//   if (!user.isVerified) {
+//     return <Navigate to="/verify-email" replace />;
+//   }
+
+//   if (!user.isAdmin) {
+//     return <Navigate to="/" replace />;
+//   }
+
+//   return children;
+// };
+
 
 const RedirectAuthenticatedUser  = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -130,6 +160,25 @@ const App = () => {
           }
         />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+
+          {/* Admin Routes */}
+          <Route
+          element={
+            // <AdminProtectedRoutes>
+              <AdminLayout />
+            // </AdminProtectedRoutes>
+          }
+        >
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/content" element={<AdminContent />} />
+          <Route path="/admin/transactions" element={<AdminTransactions />} />
+          <Route path="/admin/chatbot" element={<AdminChatbot />} />
+          <Route path="/admin/reports" element={<AdminReports />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/profile" element={<AdminProfile />} />
+        </Route>
+
 
         {/* Protected Dashboard Routes */}
         <Route

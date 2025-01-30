@@ -23,12 +23,12 @@ const DashboardLayout = ({ mode, toggleMode }) => {
         <div className="sticky top-0 z-10 bg-white border-b w-full">
           {mode === "Publisher" ? (
             <NavbarPublisher 
-              userName="Michael Smyth"
+              // userName="Michael Smyth"
               onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
             />
           ) : (
             <NavbarAdvertiser 
-              userName="Michael Smyth"
+              // userName="Michael Smyth"
               onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
             />
           )}
