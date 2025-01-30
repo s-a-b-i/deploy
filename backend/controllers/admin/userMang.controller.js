@@ -68,7 +68,7 @@ export const getUsersByStatus = async (req, res) => {
       return res.status(403).json({ error: 'Admin privileges required' });
     }
 
-    const users = await User.find({ status: !!active }).lean();
+    const users = await User.find({ status: !!active,isAdmin : false }).lean();
     return res.status(200).json(users);
   } catch (error) {
     return res.status(500).json({ error: error.message });
