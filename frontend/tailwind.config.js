@@ -16,6 +16,9 @@ export default {
         'foundations-hover': '#ADBBDA',
         'foundations-light': '#EDE8F5',
         'foundations-dark': '#1E2838',
+        primary: '#4F46E5', // Indigo-600
+        secondary: '#10B981', // Emerald-500
+        accent: '#F59E0B', // Amber-500
       },
     },
   },

@@ -49,7 +49,7 @@ import AdminDashboard from "./pages/Admin/Dashboard";
 import AdminUsers from "./pages/Admin/Users";
 import AdminContent from "./pages/Admin/Content";
 import AdminTransactions from "./pages/Admin/Transactions";
-import AdminChatbot from "./pages/Admin/Chatbot";
+import AdminChatbot from "./pages/Admin/Faq";
 import AdminReports from "./pages/Admin/Reports";
 import AdminSettings from "./pages/Admin/Settings";
 import AdminProfile from "./pages/Admin/Profile";
@@ -188,7 +188,7 @@ const App = () => {
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/content" element={<AdminContent />} />
           <Route path="/admin/transactions" element={<AdminTransactions />} />
-          <Route path="/admin/chatbot" element={<AdminChatbot />} />
+          <Route path="/admin/faq" element={<AdminChatbot />} />
           <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/profile" element={<AdminProfile />} />
