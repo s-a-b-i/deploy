@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BiSpreadsheet, BiGridAlt } from 'react-icons/bi';
-import { HiMenuAlt3 } from 'react-icons/hi';
 import { FaEye, FaShoppingCart, FaStar } from "react-icons/fa";
 import { favouriteService, websiteService, cartService } from '../../utils/services';
 import { toast } from 'react-hot-toast';
@@ -76,6 +75,10 @@ const Favorite = () => {
   };
 
   const handleAddToCart = async (websiteId) => {
+    if (!user?._id) {
+      toast.error("Please login to add items to cart");
+      return;
+    }
     try {
       await cartService.createCart(user._id, websiteId);
       updateCartCount(user._id);
@@ -85,8 +88,8 @@ const Favorite = () => {
     }
   };
 
-  const handleViewProduct = (id, userId) => {
-    navigate(`/advertiser/products/view/${id}?action=${userId}`);
+  const handleViewProduct = (id) => {
+    navigate(`/advertiser/products/view/${id}`);
   };
 
   const toggleColumn = (columnName) => {
@@ -182,7 +185,7 @@ const Favorite = () => {
                     <div className="flex gap-2">
                       <button
                         className="p-2 bg-foundations-primary rounded-full text-white hover:bg-foundations-secondary transition-colors"
-                        onClick={() => handleViewProduct(website._id, website.userId)}
+                        onClick={() => handleViewProduct(website._id)}
                       >
                         <FaEye />
                       </button>
@@ -289,7 +292,7 @@ const Favorite = () => {
             <div className="flex gap-3 mt-2 sm:mt-0">
               <button 
                 className="p-3 bg-foundations-primary rounded-full text-white hover:bg-foundations-secondary transition-colors"
-                onClick={() => handleViewProduct(website._id, website.userId)}
+                onClick={() => handleViewProduct(website._id)}
               >
                 <FaEye className="w-5 h-5" />
               </button>
@@ -301,7 +304,7 @@ const Favorite = () => {
               </button>
               <button 
                 className="px-4 py-2 bg-foundations-primary rounded-lg text-white hover:bg-foundations-secondary transition-colors flex items-center gap-2 font-semibold"
-                onClick={() => handleAddToCart(website.userId, website._id)}
+                onClick={() => handleAddToCart(website._id)}
               >
                 Add to Cart
               </button>
@@ -332,8 +335,7 @@ const Favorite = () => {
       ))}
     </div>
   );
-  
-  
+
   return (
     <div className="space-y-6 px-4 md:px-8 lg:px-12">
       <div className="flex justify-between items-center mb-8">

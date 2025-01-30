@@ -3,13 +3,14 @@ import { FaAngleDown, FaAngleUp, FaStar } from 'react-icons/fa';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { websiteService, cartService, favouriteService } from '../../utils/services';
 import { toast } from 'react-hot-toast';
+import { useAuthStore } from '../../store/authStore';
+import useCartStore from '../../store/cartStore';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const userId = searchParams.get('action');
-
+  const { user } = useAuthStore(); // Get user from auth store
+  const { updateCartCount } = useCartStore(); // Get updateCartCount from cart store
   const [expandedSections, setExpandedSections] = useState({
     mediaData: true,
     metrics: true,
@@ -32,10 +33,10 @@ const ProductDetails = () => {
     const fetchProductData = async () => {
       try {
         setLoading(true);
-        const data = await websiteService.viewWebsite(id, userId);
+        const data = await websiteService.viewWebsite(id, user._id); // Use user._id
 
         // Fetch favorites to check if this item is favorited
-        const userFavorites = await favouriteService.getFavourites(userId);
+        const userFavorites = await favouriteService.getFavourites(user._id); // Use user._id
         const isItemFavorite = userFavorites.some(fav => fav.websiteId === id);
         setIsFavorite(isItemFavorite);
 
@@ -90,19 +91,36 @@ const ProductDetails = () => {
       }
     };
 
-    if (id && userId) {
+    if (id && user?._id) { // Ensure user is logged in
       fetchProductData();
     } else {
       console.error('ID or User ID is missing');
       setError('ID or User ID is missing');
       setLoading(false);
     }
-  }, [id, userId]);
+  }, [id, user]);
 
   const handleAddToCart = async () => {
+    if (!user?._id) {
+      toast.error("Please login to add items to cart");
+      return;
+    }
     try {
-      await cartService.createCart(userId, id);
+      const response = await cartService.createCart(user._id, id); // Use user._id
+      updateCartCount(user._id); // Update cart count
       toast.success('Item added to cart successfully! 🛒');
+
+      // Optionally, you can also update the cart items state if needed
+      const websiteDetails = await websiteService.getWebsiteById(id);
+      setProductData(prev => ({
+        ...prev,
+        cartItem: {
+          _id: response._id,
+          websiteId: id,
+          websiteDetails,
+          userId: user._id
+        }
+      }));
     } catch (err) {
       console.error('Error adding to cart:', err);
       toast.error(err?.message || 'Failed to add item to cart. 🚨');
@@ -167,31 +185,32 @@ const ProductDetails = () => {
   if (!productData) {
     return <div className="text-center">No product data available.</div>;
   }
+  
   return (
     <div className="space-y-6 px-4 md:px-8 lg:px-12">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-  <div>
-    <button 
-      onClick={() => navigate('/advertiser/catalogue')}
-      className="text-blue-600 hover:underline font-bold text-lg"
-    >
-      ← Back to catalog
-    </button>
-    <div className="mt-2 text-xl font-bold flex items-center">
-      {productData.mediaData.name}
-      {isFavorite && <FaStar className="text-foundations-primary ml-2" />}
-    </div>
-  </div>
-  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-    <span className="text-xl font-bold">{productData.price.toFixed(2)} €</span>
-    <button
-      onClick={handleAddToCart}
-      className="w-full sm:w-auto bg-red-500 text-white px-4 py-3 rounded-md hover:bg-red-600 transition-colors duration-300 font-bold"
-    >
-      + Add to cart
-    </button>
-  </div>
-</div>
+        <div>
+          <button 
+            onClick={() => navigate('/advertiser/catalogue')}
+            className="text-blue-600 hover:underline font-bold text-lg"
+          >
+            ← Back to catalog
+          </button>
+          <div className="mt-2 text-xl font-bold flex items-center">
+            {productData.mediaData.name}
+            {isFavorite && <FaStar className="text-foundations-primary ml-2" />}
+          </div>
+        </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <span className="text-xl font-bold">{productData.price.toFixed(2)} €</span>
+          <button
+            onClick={handleAddToCart}
+            className="w-full sm:w-auto bg-red-500 text-white px-4 py-3 rounded-md hover:bg-red-600 transition-colors duration-300 font-bold"
+          >
+            + Add to cart
+          </button>
+        </div>
+      </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-4">

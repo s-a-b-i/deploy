@@ -16,6 +16,8 @@ const Cart = () => {
   const [error, setError] = useState(null);
 
   const fetchCartItems = async () => {
+    if (!user?._id) return; // Ensure user is logged in
+
     try {
       setLoading(true);
       const carts = await cartService.getCarts(user._id);
@@ -88,6 +90,10 @@ const Cart = () => {
   };
 
   const handleAddToCart = async (websiteId) => {
+    if (!user?._id) {
+      toast.error("Please login to add items to cart");
+      return;
+    }
     try {
       const response = await cartService.createCart(user._id, websiteId);
       updateCartCount(user._id);
@@ -137,82 +143,82 @@ const Cart = () => {
 
   return (
     <div className="container mx-auto max-w-7xl px-6 py-10">
-    <h1 className="text-3xl font-bold text-foundations-dark mb-6">Shopping Cart</h1>
+      <h1 className="text-3xl font-bold text-foundations-dark mb-6">Shopping Cart</h1>
 
-    <div className="border-b pb-4 mb-6">
-      <p className="text-emerald-500">
-        You will be able to fill all the needed information after checkout in the Orders section.
-      </p>
-      <p className="text-red-500">Orders must be posted within 3 months of the order date.</p>
-    </div>
-
-    {cartItems.length > 0 ? (
-      <>
-        {cartItems.map((item) => (
-          <div
-            key={item._id}
-            className="bg-foundations-light shadow rounded-lg p-6 flex justify-between items-center border border-foundations-hover mb-4"
-          >
-            <div>
-              <h2 className="font-bold text-lg text-foundations-dark">
-                {item.websiteDetails?.webDomain || "Unknown Domain"}
-              </h2>
-              <p className="text-sm text-foundations-secondary">
-                {item.websiteDetails?.mediaType || "Unknown Media"}
-              </p>
-            </div>
-            <div className="flex items-center space-x-6">
-              <span className="text-xl font-semibold text-foundations-primary">
-                {parseFloat(item.websiteDetails?.price || 0).toFixed(2)} €
-              </span>
-              <button
-                onClick={() => handleDelete(item._id)}
-                className="text-red-500 hover:text-red-700 transition-colors"
-              >
-                <FaTrashAlt size={20} />
-              </button>
-            </div>
-          </div>
-        ))}
-      </>
-    ) : (
-      <div className="text-center text-gray-600 py-12 bg-foundations-light rounded-lg">
-        Your cart is empty
+      <div className="border-b pb-4 mb-6">
+        <p className="text-emerald-500">
+          You will be able to fill all the needed information after checkout in the Orders section.
+        </p>
+        <p className="text-red-500">Orders must be posted within 3 months of the order date.</p>
       </div>
-    )}
 
-    {similarProducts.length > 0 && (
-      <div className="mt-12">
-        <h2 className="text-2xl font-bold text-foundations-dark mb-4">Similar Products</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-          {similarProducts.map((product) => (
-            <ProductCard key={product._id} product={product} onAddToCart={handleAddToCart} />
+      {cartItems.length > 0 ? (
+        <>
+          {cartItems.map((item) => (
+            <div
+              key={item._id}
+              className="bg-foundations-light shadow rounded-lg p-6 flex justify-between items-center border border-foundations-hover mb-4"
+            >
+              <div>
+                <h2 className="font-bold text-lg text-foundations-dark">
+                  {item.websiteDetails?.webDomain || "Unknown Domain"}
+                </h2>
+                <p className="text-sm text-foundations-secondary">
+                  {item.websiteDetails?.mediaType || "Unknown Media"}
+                </p>
+              </div>
+              <div className="flex items-center space-x-6">
+                <span className="text-xl font-semibold text-foundations-primary">
+                  {parseFloat(item.websiteDetails?.price || 0).toFixed(2)} €
+                </span>
+                <button
+                  onClick={() => handleDelete(item._id)}
+                  className="text-red-500 hover:text-red-700 transition-colors"
+                >
+                  <FaTrashAlt size={20} />
+                </button>
+              </div>
+            </div>
           ))}
+        </>
+      ) : (
+        <div className="text-center text-gray-600 py-12 bg-foundations-light rounded-lg">
+          Your cart is empty
         </div>
-      </div>
-    )}
+      )}
 
-    {cartItems.length > 0 && (
-      <div className="mt-8 border-t pt-4">
-        <div className="flex justify-between items-center">
-          <span className="text-lg font-bold text-foundations-dark">Total:</span>
-          <span className="text-2xl font-bold text-foundations-primary">
-            {calculateTotal().toFixed(2)} €
-          </span>
+      {similarProducts.length > 0 && (
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-foundations-dark mb-4">Similar Products</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+            {similarProducts.map((product) => (
+              <ProductCard key={product._id} product={product} onAddToCart={handleAddToCart} />
+            ))}
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
-    <div className="text-sm text-foundations-secondary pt-8">
-      <Link to="/terms" className="hover:underline">
-        Terms and conditions
-      </Link>
-      <span className="mx-2">•</span>
-      <Link to="/" className="hover:underline">
-        Rankister.com
-      </Link>
+      {cartItems.length > 0 && (
+        <div className="mt-8 border-t pt-4">
+          <div className="flex justify-between items-center">
+            <span className="text-lg font-bold text-foundations-dark">Total:</span>
+            <span className="text-2xl font-bold text-foundations-primary">
+              {calculateTotal().toFixed(2)} €
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className="text-sm text-foundations-secondary pt-8">
+        <Link to="/terms" className="hover:underline">
+          Terms and conditions
+        </Link>
+        <span className="mx-2">•</span>
+        <Link to="/" className="hover:underline">
+          Rankister.com
+        </Link>
+      </div>
     </div>
-  </div>
   );
 };
 

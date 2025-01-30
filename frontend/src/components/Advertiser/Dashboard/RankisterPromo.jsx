@@ -3,18 +3,25 @@ import { FaShoppingCart } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import { cartService } from '../../../utils/services';
 import useCartStore from '../../../store/cartStore';
+import { useAuthStore } from '../../../store/authStore';
 
-const RankisterPromo = ({ isLoading, rankisterPromo, onViewProduct, onAddAllToCart }) => {
+const RankisterPromo = ({ isLoading, rankisterPromo, onViewProduct }) => {
   const { updateCartCount } = useCartStore();
+  const { user } = useAuthStore(); // Get user from auth store
 
   // Handle add all items to cart
   const handleAddAllToCart = async () => {
+    if (!user?._id) {
+      toast.error("Please login to add items to cart");
+      return;
+    }
+
     try {
       // Add all items to cart
       for (const promo of rankisterPromo) {
         for (const website of promo.websites) {
-          await cartService.createCart(promo.userId, website.id);
-          updateCartCount(promo.userId);
+          await cartService.createCart(user._id, website.id); // Use user._id
+          updateCartCount(user._id); // Update cart count
         }
       }
       
@@ -78,7 +85,7 @@ const RankisterPromo = ({ isLoading, rankisterPromo, onViewProduct, onAddAllToCa
                     <div key={idx} className="flex justify-between items-center mb-2">
                       <span
                         className="text-black cursor-pointer hover:underline text-lg"
-                        onClick={() => onViewProduct(website.id, promo.userId)}
+                        onClick={() => onViewProduct(website.id, user._id)} // Use user._id
                       >
                         {website.webDomain}
                       </span>
