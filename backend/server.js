@@ -13,6 +13,7 @@ import searchWebsites from './routes/advertiser/searchWebsite.routes.js';
 import favourite from './routes/advertiser/favourite.routes.js';
 import cart from './routes/advertiser/cart.routes.js';
 import stats from './routes/stats.routes.js';
+import usersMangAdmin from './routes/admin/userMang.routes.js';
 
 dotenv.config();
 
@@ -52,6 +53,10 @@ app.use('/api/stats', stats);
 app.use('/api/advertiser', searchWebsites);
 app.use('/api/advertiser', favourite);
 app.use('/api/advertiser', cart);
+
+
+// admin routes
+app.use('/api/admin', usersMangAdmin);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
