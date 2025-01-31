@@ -145,3 +145,44 @@ export const changeFAQStatus = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+/**
+ * Get FAQs by category
+ */
+export const getFAQsByCategory = async (req, res) => {
+    try {
+      const { adminId, categoryId } = req.body;
+      await checkAdmin(adminId);
+  
+      const faqs = await FAQ.find({ category: categoryId }).lean();
+      return res.status(200).json(faqs);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  };
+
+
+  /**
+ * Public API: Get all categories
+ */
+export const getAllCategoriesPublic = async (req, res) => {
+    try {
+      const categories = await Category.find().lean();
+      return res.status(200).json(categories);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  };
+  
+  /**
+   * Public API: Get FAQs by category
+   */
+  export const getFAQsByCategoryPublic = async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+      const faqs = await FAQ.find({ category: categoryId }).lean();
+      return res.status(200).json(faqs);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  };

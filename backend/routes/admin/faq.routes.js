@@ -6,11 +6,15 @@ import {
   createFAQ,
   updateFAQ,
   deleteFAQ,
-  changeFAQStatus
+  changeFAQStatus,
+  getFAQsByCategory,
+  getAllCategoriesPublic,
+  getFAQsByCategoryPublic,
 } from '../../controllers/admin/faq.controller.js';
 
 const router = Router();
 
+// Admin routes
 router.post('/category/add', addCategory);
 router.post('/category/delete', deleteCategory);
 router.post('/category/all', getAllCategories);
@@ -18,5 +22,12 @@ router.post('/faq/create', createFAQ);
 router.post('/faq/update', updateFAQ);
 router.post('/faq/delete', deleteFAQ);
 router.post('/faq/change-status', changeFAQStatus);
+router.post('/faq/category', getFAQsByCategory);
+
+
+// Public routes
+router.get('/public/categories', getAllCategoriesPublic);
+router.get('/public/faqs/:categoryId', getFAQsByCategoryPublic);
+
 
 export default router;
