@@ -1,4 +1,8 @@
-import mongoose, { Mongoose, Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
+import Cart from './cart.model.js';
+import Favourite from './favourite.model.js';
+import Promo from './promo.model.js';
+import Stats from './stats.model.js';
 
 const websiteSchema = new Schema(
   {
@@ -103,5 +107,23 @@ const websiteSchema = new Schema(
   },
   { timestamps: true }
 );
+
+
+// Middleware to delete related documents when a website is deleted
+websiteSchema.pre('findOneAndDelete', async function(next) {
+  const websiteId = this.getQuery()._id;
+  try {
+    await Cart.deleteMany({ websiteId });
+    await Favourite.deleteMany({ websiteId });
+    await Promo.updateMany(
+      { products: websiteId },
+      { $pull: { products: websiteId } }
+    );
+    await Stats.deleteMany({ websiteId });
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default model("Website", websiteSchema);
