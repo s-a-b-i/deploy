@@ -573,10 +573,10 @@ const User = () => {
           </select>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white border rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full">
-            <thead className="bg-gray-50">
+            <thead className=" bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Name/Email
@@ -598,7 +598,7 @@ const User = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className=" border divide-y divide-gray-200">
               {isLoading ? (
                 [...Array(5)].map((_, index) => <SkeletonRow key={index} />)
               ) : filteredUsers.length === 0 ? (
