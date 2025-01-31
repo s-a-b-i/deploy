@@ -1,41 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+const Skeleton = ({ width, height }) => {
+  return (
+    <div
+      className="animate-pulse bg-gray-200 rounded"
+      style={{ width: width || '100%', height: height || '20px' }}
+    />
+  );
+};
 
 const Transactions = () => {
-  // Sample transaction data - would come from API in real app
-  const [transactions, setTransactions] = useState([
-    {
-      id: 1,
-      type: 'withdrawal',
-      amount: 1500.00,
-      publisher: 'Tech Media Group',
-      status: 'pending',
-      date: '2025-01-29',
-      description: 'Monthly earnings withdrawal'
-    },
-    {
-      id: 2,
-      type: 'sale',
-      amount: 2500.00,
-      publisher: 'Digital Marketing Pro',
-      advertiser: 'Brand Solutions Inc',
-      status: 'completed',
-      date: '2025-01-28',
-      description: 'Advertisement package purchase'
-    },
-    {
-      id: 3,
-      type: 'dispute',
-      amount: 750.00,
-      publisher: 'Content Creators Ltd',
-      advertiser: 'Global Ads Network',
-      status: 'disputed',
-      date: '2025-01-27',
-      description: 'Service delivery dispute'
-    }
-  ]);
-
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    // Simulate an API call
+    setTimeout(() => {
+      setTransactions([
+        {
+          id: 1,
+          type: 'withdrawal',
+          amount: 1500.00,
+          publisher: 'Tech Media Group',
+          status: 'pending',
+          date: '2025-01-29',
+          description: 'Monthly earnings withdrawal'
+        },
+        {
+          id: 2,
+          type: 'sale',
+          amount: 2500.00,
+          publisher: 'Digital Marketing Pro',
+          advertiser: 'Brand Solutions Inc',
+          status: 'completed',
+          date: '2025-01-28',
+          description: 'Advertisement package purchase'
+        },
+        {
+          id: 3,
+          type: 'dispute',
+          amount: 750.00,
+          publisher: 'Content Creators Ltd',
+          advertiser: 'Global Ads Network',
+          status: 'disputed',
+          date: '2025-01-27',
+          description: 'Service delivery dispute'
+        }
+      ]);
+      setLoading(false);
+    }, 2000); // Simulate a 2-second loading time
+  }, []);
 
   const handleApprove = (id) => {
     setTransactions(prevTransactions =>
@@ -62,7 +78,7 @@ const Transactions = () => {
   };
 
   return (
-    <div className="min-h-screen  p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -72,29 +88,40 @@ const Transactions = () => {
 
         {/* Statistics Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-700">Pending Withdrawals</h3>
-            <p className="text-3xl font-bold text-blue-600 mt-2">
-              {transactions.filter(t => t.type === 'withdrawal' && t.status === 'pending').length}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-700">Active Disputes</h3>
-            <p className="text-3xl font-bold text-red-600 mt-2">
-              {transactions.filter(t => t.type === 'dispute' && t.status === 'disputed').length}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-700">Today's Sales</h3>
-            <p className="text-3xl font-bold text-green-600 mt-2">
-              ${transactions.filter(t => t.type === 'sale' && t.date === '2025-01-30')
-                .reduce((acc, curr) => acc + curr.amount, 0).toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-700">Total Transactions</h3>
-            <p className="text-3xl font-bold text-purple-600 mt-2">{transactions.length}</p>
-          </div>
+          {loading ? (
+            <>
+              <Skeleton width="100%" height="80px" />
+              <Skeleton width="100%" height="80px" />
+              <Skeleton width="100%" height="80px" />
+              <Skeleton width="100%" height="80px" />
+            </>
+          ) : (
+            <>
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-700">Pending Withdrawals</h3>
+                <p className="text-3xl font-bold text-blue-600 mt-2">
+                  {transactions.filter(t => t.type === 'withdrawal' && t.status === 'pending').length}
+                </p>
+              </div>
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-700">Active Disputes</h3>
+                <p className="text-3xl font-bold text-red-600 mt-2">
+                  {transactions.filter(t => t.type === 'dispute' && t.status === 'disputed').length}
+                </p>
+              </div>
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-700">Today's Sales</h3>
+                <p className="text-3xl font-bold text-green-600 mt-2">
+                  ${transactions.filter(t => t.type === 'sale' && t.date === '2025-01-30')
+                    .reduce((acc, curr) => acc + curr.amount, 0).toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-gray-700">Total Transactions</h3>
+                <p className="text-3xl font-bold text-purple-600 mt-2">{transactions.length}</p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Filters */}
@@ -168,74 +195,102 @@ const Transactions = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {transactions.map((transaction) => (
-                <tr key={transaction.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">#{transaction.id}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                      ${transaction.type === 'withdrawal' ? 'bg-blue-100 text-blue-800' :
-                        transaction.type === 'sale' ? 'bg-green-100 text-green-800' :
-                          'bg-red-100 text-red-800'}`}>
-                      {transaction.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">${transaction.amount.toLocaleString()}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{transaction.publisher}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                      ${transaction.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        transaction.status === 'completed' ? 'bg-green-100 text-green-800' :
-                          transaction.status === 'disputed' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'}`}>
-                      {transaction.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{transaction.date}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {transaction.type === 'withdrawal' && transaction.status === 'pending' && (
-                      <>
+              {loading ? (
+                Array.from({ length: 3 }).map((_, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Skeleton width="50%" height="20px" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Skeleton width="30%" height="20px" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Skeleton width="30%" height="20px" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Skeleton width="40%" height="20px" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Skeleton width="30%" height="20px" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Skeleton width="30%" height="20px" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Skeleton width="50%" height="20px" />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                transactions.map((transaction) => (
+                  <tr key={transaction.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">#{transaction.id}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                        ${transaction.type === 'withdrawal' ? 'bg-blue-100 text-blue-800' :
+                          transaction.type === 'sale' ? 'bg-green-100 text-green-800' :
+                            'bg-red-100 text-red-800'}`}>
+                        {transaction.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">${transaction.amount.toLocaleString()}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{transaction.publisher}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                        ${transaction.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                          transaction.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            transaction.status === 'disputed' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'}`}>
+                        {transaction.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{transaction.date}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      {transaction.type === 'withdrawal' && transaction.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => handleApprove(transaction.id)}
+                            className="text-green-600 hover:text-green-900 mr-3"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleReject(transaction.id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+                      {transaction.type === 'dispute' && transaction.status === 'disputed' && (
                         <button
-                          onClick={() => handleApprove(transaction.id)}
-                          className="text-green-600 hover:text-green-900 mr-3"
+                          onClick={() => handleResolveDispute(transaction.id)}
+                          className="text-blue-600 hover:text-blue-900"
                         >
-                          Approve
+                          Resolve
                         </button>
-                        <button
-                          onClick={() => handleReject(transaction.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    {transaction.type === 'dispute' && transaction.status === 'disputed' && (
+                      )}
                       <button
-                        onClick={() => handleResolveDispute(transaction.id)}
-                        className="text-blue-600 hover:text-blue-900"
+                        onClick={() => {
+                          setSelectedTransaction(transaction);
+                          setIsModalOpen(true);
+                        }}
+                        className="text-gray-600 hover:text-gray-900 ml-3"
                       >
-                        Resolve
+                        Details
                       </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        setSelectedTransaction(transaction);
-                        setIsModalOpen(true);
-                      }}
-                      className="text-gray-600 hover:text-gray-900 ml-3"
-                    >
-                      Details
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

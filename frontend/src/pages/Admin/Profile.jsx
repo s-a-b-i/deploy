@@ -8,7 +8,15 @@ import {
 import ProfileSection from "../../components/publisher/ProfileSection";
 import ChangeEmailModal from "../../components/publisher/ChangeEmailModal";
 import { toast } from "react-hot-toast";
-import Loader from "../../components/Loader";
+
+const Skeleton = ({ width, height }) => {
+  return (
+    <div
+      className="animate-pulse bg-gray-200 rounded"
+      style={{ width: width || '100%', height: height || '20px' }}
+    />
+  );
+};
 
 const Profile = () => {
   const user = useAuthStore((state) => state.user);
@@ -156,7 +164,18 @@ const Profile = () => {
     }
   };
 
-  if (loading) return <Loader />;
+  if (loading) {
+    return (
+      <div className="space-y-6 px-4 md:px-8 lg:px-12">
+        <Skeleton width="200px" height="30px" />
+        <Skeleton width="100%" height="400px" />
+        <Skeleton width="100%" height="50px" />
+        <Skeleton width="100%" height="50px" />
+        <Skeleton width="100%" height="50px" />
+      </div>
+    );
+  }
+
   if (error) return <div>{error}</div>;
 
   return (

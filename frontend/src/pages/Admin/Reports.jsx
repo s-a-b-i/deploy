@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LineChart, 
   Line, 
-  BarChart, 
-  Bar, 
   PieChart, 
   Pie, 
   Cell, 
@@ -17,14 +15,23 @@ import {
 import { 
   DownloadIcon, 
   CalendarIcon, 
-  ChartPieIcon,
   ChartBarIcon,
   DocumentDownloadIcon 
 } from '@heroicons/react/outline';
 
+const Skeleton = ({ width, height }) => {
+  return (
+    <div
+      className="animate-pulse bg-gray-200 rounded"
+      style={{ width: width || '100%', height: height || '20px' }}
+    />
+  );
+};
+
 const Reports = () => {
   const [dateRange, setDateRange] = useState('last7days');
   const [selectedReport, setSelectedReport] = useState('revenue');
+  const [loading, setLoading] = useState(true);
 
   // Sample data - replace with actual data from your backend
   const revenueData = [
@@ -50,6 +57,15 @@ const Reports = () => {
     // Implement export logic here
     console.log(`Exporting data in ${format} format`);
   };
+
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000); // Simulate a 2-second loading time
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="p-6 bg-gray-50">
@@ -81,11 +97,11 @@ const Reports = () => {
             <select
               className="w-full pl-10 pr-4 py-2 border rounded-lg appearance-none"
               value={selectedReport}
-              onChange={(e) => setSelectedReport(e.target.value)}
+ onChange={(e) => setSelectedReport(e.target.value)}
             >
               <option value="revenue">Revenue Report</option>
               <option value="campaigns">Campaign Performance</option>
-              <option value="users">User Activity</option>
+              <option value="users">User  Activity</option>
             </select>
             <ChartBarIcon className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
           </div>
@@ -111,30 +127,41 @@ const Reports = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <SummaryCard
-            title="Total Revenue"
-            value="$36,700"
-            change="+12.5%"
-            isPositive={true}
-          />
-          <SummaryCard
-            title="Active Campaigns"
-            value="105"
-            change="+5.2%"
-            isPositive={true}
-          />
-          <SummaryCard
-            title="Conversion Rate"
-            value="3.2%"
-            change="-0.8%"
-            isPositive={false}
-          />
-          <SummaryCard
-            title="Active Users"
-            value="3,670"
-            change="+8.1%"
-            isPositive={true}
-          />
+          {loading ? (
+            <>
+              <Skeleton width="100%" height="80px" />
+              <Skeleton width="100%" height="80px" />
+              <Skeleton width="100%" height="80px" />
+              <Skeleton width="100%" height="80px" />
+            </>
+          ) : (
+            <>
+              <SummaryCard
+                title="Total Revenue"
+                value="$36,700"
+                change="+12.5%"
+                isPositive={true}
+              />
+              <SummaryCard
+                title="Active Campaigns"
+                value="105"
+                change="+5.2%"
+                isPositive={true}
+              />
+              <SummaryCard
+                title="Conversion Rate"
+                value="3.2%"
+                change="-0.8%"
+                isPositive={false}
+              />
+              <SummaryCard
+                title="Active Users"
+                value="3,670"
+                change="+8.1%"
+                isPositive={true}
+              />
+            </>
+          )}
         </div>
 
         {/* Charts Grid */}
@@ -143,21 +170,25 @@ const Reports = () => {
           <div className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">Revenue Trend</h2>
             <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="#4F46E5" 
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {loading ? (
+                <Skeleton width="100%" height="100%" />
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={revenueData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="revenue" 
+                      stroke="#4F46E5" 
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
@@ -165,26 +196,30 @@ const Reports = () => {
           <div className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">Campaign Distribution</h2>
             <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={campaignData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {campaignData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              {loading ? (
+                <Skeleton width="100%" height="100%" />
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={campaignData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {campaignData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
         </div>
@@ -196,7 +231,7 @@ const Reports = () => {
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 ">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
@@ -205,14 +240,33 @@ const Reports = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {revenueData.map((item, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.date}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.revenue}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.campaigns}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.users}</td>
-                  </tr>
-                ))}
+                {loading ? (
+                  Array.from({ length: 7 }).map((_, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Skeleton width="50%" height="20px" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Skeleton width="30%" height="20px" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Skeleton width="30%" height="20px" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Skeleton width="30%" height="20px" />
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  revenueData.map((item, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.date}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.revenue}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.campaigns}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.users}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
