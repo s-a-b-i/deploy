@@ -92,7 +92,9 @@ export const getUsersByVerification = async (req, res) => {
     }
 
     // Fetch users by isVerified
-    const users = await User.find({ isVerified: !!isVerified }).lean();
+    const users = await User.find({ isVerified: !!isVerified,isAdmin 
+      : false
+     }).lean();
     return res.status(200).json(users);
   } catch (error) {
     return res.status(500).json({ error: error.message });
