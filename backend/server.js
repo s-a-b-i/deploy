@@ -15,6 +15,7 @@ import cart from './routes/advertiser/cart.routes.js';
 import stats from './routes/stats.routes.js';
 import usersMangAdmin from './routes/admin/userMang.routes.js';
 import contentRoutesAdmin from './routes/admin/content.routes.js';
+import faqRoutes from './routes/admin/faq.routes.js';
 
 dotenv.config();
 
@@ -59,6 +60,7 @@ app.use('/api/advertiser', cart);
 // admin routes
 app.use('/api/admin', usersMangAdmin);
 app.use('/api/admin', contentRoutesAdmin);
+app.use('/api/admin', faqRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
