@@ -574,6 +574,7 @@ const User = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -700,6 +701,7 @@ const User = () => {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
       
