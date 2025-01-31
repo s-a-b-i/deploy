@@ -80,16 +80,16 @@ const ProtectedRoutes = ({ children }) => {
     logout();
 
     // Display a message in the center of the screen
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
-        <div className="text-center p-6 bg-white rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Account Blocked</h1>
-          <p className="text-gray-700">
-            You have been blocked by the site owner. Please contact support for further assistance.
-          </p>
-        </div>
-      </div>
-    );
+    // return (
+    //   <div className="flex items-center justify-center h-screen bg-gray-100">
+    //     <div className="text-center p-6 bg-white rounded-lg shadow-lg">
+    //       <h1 className="text-2xl font-bold text-red-600 mb-4">Account Blocked</h1>
+    //       <p className="text-gray-700">
+    //         You have been blocked by the site owner. Please contact support for further assistance.
+    //       </p>
+    //     </div>
+    //   </div>
+    // );
   }
 
   return children;
@@ -107,7 +107,7 @@ const AdminProtectedRoutes = ({ children }) => {
   }
 
   if (!user?.isAdmin) {
-    return <Navigate to="/publisher/dashboard" replace />;
+    return <Navigate to="/advertiser/dashboard" replace />;
   }
 
   return children;
@@ -129,7 +129,7 @@ const RedirectAuthenticatedUser  = ({ children }) => {
 };
 
 const App = () => {
-  const [mode, setMode] = useState(() => localStorage.getItem('mode') || 'Publisher');
+  const [mode, setMode] = useState(() => localStorage.getItem('mode') || 'Advertiser');
   const { checkAuth, isCheckingAuth, setIsAuthenticated } = useAuthStore();
 
   useEffect(() => {

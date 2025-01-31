@@ -178,3 +178,35 @@ export const sendPasswordChangedEmail = async (email) => {
         return false; // Indicate failure
     }
 }
+
+export const sendCustomEmail = async (email, subject, message) => {
+    const recipient = [{ email }];
+  
+    try {
+      const response = await Client.send({
+        from: sender,
+        to: recipient,
+        subject,
+        html: message,  // or use text if you want plain text
+        category: "Custom Email",
+      });
+  
+      console.log("Custom email sent successfully:", response);
+      return true; // Indicate success
+    } catch (error) {
+      if (error.response) {
+        console.error("Mailtrap API Error:", {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+          headers: error.response.headers,
+        });
+      } else if (error.request) {
+        console.error("No response received from Mailtrap API. Request details:", error.request);
+      } else {
+        console.error("Error setting up the request:", error.message);
+      }
+      console.error("Failed to send custom email. Detailed error:", error);
+      return false; // Indicate failure
+    }
+  };

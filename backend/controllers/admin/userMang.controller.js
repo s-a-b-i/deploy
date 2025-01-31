@@ -1,4 +1,5 @@
 import { User } from '../../models/user.model.js';
+import {sendCustomEmail} from '../../mailtrap/emails.js';
 
 /**
  * POST /api/admin/users/search
@@ -76,6 +77,29 @@ export const getUsersByStatus = async (req, res) => {
 };
 
 /**
+ * POST /api/admin/users/verification
+ * Body: { adminId, isVerified }
+ * Returns users filtered by verification status (true/false). Only an admin can perform this.
+ */
+export const getUsersByVerification = async (req, res) => {
+  try {
+    const { adminId, isVerified } = req.body;
+
+    // Check admin
+    const adminUser = await User.findById(adminId);
+    if (!adminUser || !adminUser.isAdmin) {
+      return res.status(403).json({ error: 'Admin privileges required' });
+    }
+
+    // Fetch users by isVerified
+    const users = await User.find({ isVerified: !!isVerified }).lean();
+    return res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+/**
  * POST /api/admin/users/change-status
  * Body: { adminId, userId, status }  // status should be boolean
  * Changes the status (active/inactive) of a user. Only an admin can perform this.
@@ -125,6 +149,40 @@ export const deleteUser = async (req, res) => {
       return res.status(404).json({ error: 'User not found.' });
     }
     return res.status(200).json({ message: 'User deleted successfully', user: deletedUser });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+/**
+ * POST /api/admin/users/send-email
+ * Body: { adminId, email, subject, message }
+ * Sends an email to the specified recipient. Only an admin can perform this.
+ */
+export const sendEmailByAdmin = async (req, res) => {
+  try {
+    const { adminId, email, subject, message } = req.body;
+
+    // Check admin
+    const adminUser = await User.findById(adminId);
+    if (!adminUser || !adminUser.isAdmin) {
+      return res.status(403).json({ error: 'Admin privileges required' });
+    }
+
+    // Validate email and fields
+    if (!email || !subject || !message) {
+      return res.status(400).json({ error: 'Missing email, subject, or message' });
+    }
+
+    // Send email using sendCustomEmail
+    const success = await sendCustomEmail(email, subject, message);
+    if (!success) {
+      return res.status(500).json({ error: 'Failed to send email' });
+    }
+
+    return res.status(200).json({ message: 'Email sent successfully' });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
