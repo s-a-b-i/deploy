@@ -1,4 +1,5 @@
 import Website  from '../models/website.model.js';
+import { User } from '../models/user.model.js';
 import { createOrUpdateStats } from '../utils/stats.js';
 
 // Get all websites
@@ -93,14 +94,25 @@ export async function createWebsite(req, res) {
 // Update website
 export async function updateWebsite(req, res) {
   try {
+    const { userId, ...updateData } = req.body;
+
+    // Perform user check
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(403).json({ message: 'User not found or not authorized' });
+    }
+
+    // Update the website and set status to pending
     const website = await Website.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      { ...updateData, status: 'pending' },
       { new: true, runValidators: true }
     );
+
     if (!website) {
       return res.status(404).json({ message: 'Website not found' });
     }
+
     res.status(200).json(website);
   } catch (error) {
     res.status(400).json({ message: 'Error updating website', error: error.message });
