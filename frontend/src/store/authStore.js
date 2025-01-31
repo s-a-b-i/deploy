@@ -58,9 +58,18 @@ export const useAuthStore = create((set) => ({
       const response = await axios.post(`${API_URL}/login`, {
         email,
         password,
-        captcha
+        captcha,
       });
-      
+  
+      // Check if the user is blocked
+      if (response.data.user.status === false) {
+        set({
+          isLoading: false,
+          error: "Your account has been blocked. Please contact support.",
+        });
+        return response.data; // Return the blocked user response
+      }
+  
       let profileImage = null;
       try {
         const profileData = await profileService.getProfile(response.data.user._id);
@@ -68,19 +77,18 @@ export const useAuthStore = create((set) => ({
       } catch (profileError) {
         console.error("Profile fetch error:", profileError);
       }
-      
+  
       set({
         user: {
           ...response.data.user,
-          profileImage
+          profileImage,
         },
         isAuthenticated: true,
         error: null,
         isLoading: false,
-        message: "Login successful"
+        message: "Login successful",
       });
       return response.data;
-  
     } catch (error) {
       let errorMessage = "Login failed";
       if (error.response) {

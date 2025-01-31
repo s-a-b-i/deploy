@@ -55,23 +55,41 @@ import AdminSettings from "./pages/Admin/Settings";
 import AdminProfile from "./pages/Admin/Profile";
 
 const ProtectedRoutes = ({ children }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuthStore();
 
   console.log("ProtectedRoutes - isAuthenticated:", isAuthenticated);
   console.log("ProtectedRoutes - user:", user);
 
   if (!isAuthenticated) {
-    console.log("User  is not authenticated. Redirecting to home.");
+    console.log("User is not authenticated. Redirecting to home.");
     return <Navigate to="/" replace />;
   }
 
   if (!user.isVerified) {
-    console.log("User  is not verified. Redirecting to verification page.");
+    console.log("User is not verified. Redirecting to verification page.");
     return <Navigate to="/verify-email" replace />;
   }
 
   if (user?.isAdmin) {
     return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  // Check if the user is blocked
+  if (user.status === false) {
+    // Logout the user
+    logout();
+
+    // Display a message in the center of the screen
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center p-6 bg-white rounded-lg shadow-lg">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Account Blocked</h1>
+          <p className="text-gray-700">
+            You have been blocked by the site owner. Please contact support for further assistance.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return children;
