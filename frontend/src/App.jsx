@@ -53,6 +53,7 @@ import AdminChatbot from "./pages/Admin/Faq";
 import AdminReports from "./pages/Admin/Reports";
 import AdminSettings from "./pages/Admin/Settings";
 import AdminProfile from "./pages/Admin/Profile";
+import { LogOutIcon, UserX } from "lucide-react";
 
 const ProtectedRoutes = ({ children }) => {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -76,20 +77,29 @@ const ProtectedRoutes = ({ children }) => {
 
   // Check if the user is blocked
   if (user.status === false) {
-    // Logout the user
-    logout();
-
     // Display a message in the center of the screen
-    // return (
-    //   <div className="flex items-center justify-center h-screen bg-gray-100">
-    //     <div className="text-center p-6 bg-white rounded-lg shadow-lg">
-    //       <h1 className="text-2xl font-bold text-red-600 mb-4">Account Blocked</h1>
-    //       <p className="text-gray-700">
-    //         You have been blocked by the site owner. Please contact support for further assistance.
-    //       </p>
-    //     </div>
-    //   </div>
-    // );
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+
+        <div className="text-center p-6 bg-white rounded-lg shadow-lg">
+        <div className="flex items-center justify-center">
+        <UserX className="size-44" />
+        </div>
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Account Blocked</h1>
+          <p className="text-gray-700">
+            You have been blocked by the site owner. Please contact support for further assistance.
+          </p>
+
+          <button
+            onClick={() => logout()}
+            className="mt-6 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+          >
+           <span className="flex flex-row gap-2 items-center"> <LogOutIcon className="size-8 ml-2" />
+           Logout</span>
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return children;
