@@ -446,3 +446,51 @@ export const favouriteService = {
     }
   }
 };
+
+
+export const userService = {
+  searchUsers: async (adminId, query) => {
+    try {
+      const response = await api.post('/admin/users/search', { adminId, query });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  getAllUsers: async (adminId) => {
+    try {
+      const response = await api.post('/admin/users/all', { adminId });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  getUsersByStatus: async (adminId, active) => {
+    try {
+      const response = await api.post('/admin/users/status', { adminId, active });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  changeUserStatus: async (adminId, userId, status) => {
+    try {
+      const response = await api.put('/admin/users/change-status', { adminId, userId, status });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  deleteUser: async (adminId, userId) => {
+    try {
+      const response = await api.delete('/admin/users/delete', { data: { adminId, userId } });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+};
