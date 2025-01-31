@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { XIcon } from "@heroicons/react/outline";
+import { userService } from "../../utils/services";
+import { useAuthStore } from "../../store/authStore";
+import { toast } from "react-toastify";
 
 const EmailModal = ({ userEmail, onClose }) => {
+  const { user } = useAuthStore();
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -11,28 +15,12 @@ const EmailModal = ({ userEmail, onClose }) => {
     setIsSending(true);
 
     try {
-      // Replace with your actual email sending logic
-      const response = await fetch("/api/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: userEmail,
-          subject,
-          message,
-        }),
-      });
-
-      if (response.ok) {
-        alert("Email sent successfully!");
-        onClose();
-      } else {
-        throw new Error("Failed to send email");
-      }
+      await userService.sendEmailByAdmin(user._id, userEmail, subject, message);
+      toast.success("Email sent successfully!");
+      onClose();
     } catch (error) {
+      toast.error("Failed to send email. Please try again.");
       console.error("Error sending email:", error);
-      alert("Failed to send email. Please try again.");
     } finally {
       setIsSending(false);
     }

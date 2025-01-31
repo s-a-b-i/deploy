@@ -493,4 +493,22 @@ export const userService = {
       throw error.response.data;
     }
   },
+
+  sendEmailByAdmin: async (adminId, email, subject, message) => {
+    try {
+      const response = await api.post('/admin/users/send-email', { adminId, email, subject, message });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  getUsersByVerification: async (adminId, isVerified) => {
+    try {
+      const response = await api.post('/admin/users/verification', { adminId, isVerified });
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
 };
