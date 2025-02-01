@@ -5,7 +5,24 @@ import { createOrUpdateStats } from '../utils/stats.js';
 // Get all websites
 export async function getWebsites(req, res) {
   try {
-    const websites = await Website.find({approved : true});
+    const userId = req.body.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    // Perform user check
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(403).json({ message: 'User not found or not authorized' });
+    }
+
+    // Perform block check
+    if (user.status === false) {
+      return res.status(403).json({ message: 'User is blocked' });
+    }
+
+    const websites = await Website.find({status : 'approved'});
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching websites', error: error.message });
@@ -20,6 +37,17 @@ export async function viewWebsite(req, res) {
 
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    // Perform user check
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(403).json({ message: 'User not found or not authorized' });
+    }
+
+    // Perform block check
+    if (user.status === false) {
+      return res.status(403).json({ message: 'User is blocked' });
     }
 
     const website = await Website.findById(req.params.id);
@@ -54,7 +82,26 @@ export async function viewWebsite(req, res) {
 // get recently created 5 websites
 export async function getRecentlyCreatedWebsites(req, res) {
   try {
-    const websites = await Website.find({approved : true}).sort({ createdAt: -1 }).limit(req.params.limit || 5);
+
+    const userId = req.body.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    // Perform user check
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(403).json({ message: 'User not found or not authorized' });
+    }
+
+    // Perform block check
+    if (user.status === false) {
+      return res.status(403).json({ message: 'User is blocked' });
+    }
+
+    const websites = await Website.find({status : 'approved'}).sort({ createdAt: -1 }).limit(req.params.limit || 5);
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching websites', error: error.message });
@@ -64,6 +111,24 @@ export async function getRecentlyCreatedWebsites(req, res) {
 // Get single website
 export async function getWebsite(req, res) {
   try {
+
+    const userId = req.body.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    // Perform user check
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(403).json({ message: 'User not found or not authorized' });
+    }
+
+    // Perform block check
+    if (user.status === false) {
+      return res.status(403).json({ message: 'User is blocked' });
+    }
+
     const foundwebsite = await Website.findById(req.params.id);
     if (!foundwebsite) {
       return res.status(404).json({ message: 'Website not found' });

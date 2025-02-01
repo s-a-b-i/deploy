@@ -3,6 +3,6 @@ import { searchWebsites } from '../../controllers/advertiser/searchWebsite.contr
 
 const router = express.Router();
 
-router.get('/search-websites', searchWebsites);
+router.post('/search-websites', searchWebsites);
 
 export default router;
