@@ -38,21 +38,22 @@ export const websiteService = {
     }
   },
 
-  getAllWebsites: async () => {
+  getAllWebsites: async (userId) => {
     try {
-      const response = await api.get('/websites/get-all');
+      const response = await api.post('/websites/get-all', { userId });
       return response.data;
     } catch (error) {
-      throw error.response.data;
+      throw error.response?.data || error;
     }
   },
 
-  getRecentlyCreatedWebsites: async (limit = 5) => {
+
+  getRecentlyCreatedWebsites: async (userId, limit = 5) => {
     try {
-      const response = await api.get(`/websites/recently-created/${limit}`);
+      const response = await api.post(`/websites/recently-created/${limit}`, { userId });
       return response.data;
     } catch (error) {
-      throw error.response.data;
+      throw error.response?.data || error;
     }
   },
 
@@ -305,6 +306,7 @@ export const emailChangeService = {
 
 export const searchService = {
   searchWebsites: async ({
+    userId, // Added userId parameter
     searchQuery,
     minPrice,
     maxPrice,
@@ -318,8 +320,8 @@ export const searchService = {
     adult,
     trading,
     googleNews,
-    page = 1, // Default page number
-    limit = 10, // Default limit per page
+    page = 1,
+    limit = 10,
   }) => {
     try {
       const response = await api.get('/advertiser/search-websites', {
@@ -337,9 +339,10 @@ export const searchService = {
           adult,
           trading,
           googleNews,
-          page, // Added for pagination
-          limit, // Added for pagination
+          page,
+          limit,
         },
+        data: { userId }, // Add userId in the request body
       });
       return response.data;
     } catch (error) {
