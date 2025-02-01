@@ -173,7 +173,7 @@ const Catalog = () => {
         }
 
         try {
-          const data = await searchService.searchWebsites(searchParams);
+          const data = await searchService.searchWebsites(user._id, searchParams);
           setWebsites(data);
         } catch (error) {
           console.error("Error searching websites:", error);
