@@ -147,6 +147,21 @@ export const changeFAQStatus = async (req, res) => {
 };
 
 /**
+ * Admin API: Search FAQs by question
+ */
+export const searchFAQsByQuestionAdmin = async (req, res) => {
+  try {
+    const { adminId, query } = req.body;
+    await checkAdmin(adminId);
+
+    const faqs = await FAQ.find({ question: { $regex: query, $options: 'i' } }).lean();
+    return res.status(200).json(faqs);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+/**
  * Get FAQs by category
  */
 export const getFAQsByCategory = async (req, res) => {
@@ -186,3 +201,16 @@ export const getAllCategoriesPublic = async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
   };
+
+  /**
+ * Public API: Search FAQs by question
+ */
+export const searchFAQsByQuestion = async (req, res) => {
+  try {
+    const { query } = req.query;
+    const faqs = await FAQ.find({ question: { $regex: query, $options: 'i' } }).lean();
+    return res.status(200).json(faqs);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};

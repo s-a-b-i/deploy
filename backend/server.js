@@ -60,7 +60,10 @@ app.use('/api/advertiser', cart);
 // admin routes
 app.use('/api/admin', usersMangAdmin);
 app.use('/api/admin', contentRoutesAdmin);
+// admin FAQ routes
 app.use('/api/admin', faqRoutes);
+// public FAQ routes
+app.use('/api', faqRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;

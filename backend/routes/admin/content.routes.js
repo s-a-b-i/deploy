@@ -6,7 +6,8 @@ import {
   changeWebsiteStatus,
   deleteWebsite,
   getWebsiteData,
-  sendEmail
+  sendEmail,
+  getUserById,
 } from '../../controllers/admin/content.controller.js';
 
 const router = Router();
@@ -18,5 +19,6 @@ router.post('/content/change-status', changeWebsiteStatus);
 router.post('/content/delete', deleteWebsite);
 router.post('/content/data', getWebsiteData);
 router.post('/content/send-email', sendEmail);
+router.post('/content/get-user', getUserById);
 
 export default router;
