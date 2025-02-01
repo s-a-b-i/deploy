@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { websiteService } from '../../utils/services';
 import toast from 'react-hot-toast';
 import Loader from '../Loader';
+import { useAuthStore } from '../../store/authStore';
 
 const HighlightMediaModal = ({
   isOpen,
@@ -13,6 +14,9 @@ const HighlightMediaModal = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const PRICE_PER_MONTH = 29.00;
+  
+  // 🔥 Get user from Auth Store
+  const { user } = useAuthStore();
 
   useEffect(() => {
     if (isOpen && selectedMonths) {
@@ -40,13 +44,15 @@ const HighlightMediaModal = ({
 
     try {
       if (!websiteId) throw new Error('Website ID is required');
+      if (!user?._id) throw new Error('User ID is missing');
 
       const highlightData = {
         months: parseInt(selectedMonths),
         highlightMonths: selectedMonths,
+        userId: user._id, // ✅ Sending userId from store
       };
 
-      await websiteService.highlightMedia(websiteId, highlightData);
+      await websiteService.highlightMedia(websiteId, highlightData, user._id);
       toast.success('Media highlighted successfully');
       onClose(highlightData);
     } catch (error) {

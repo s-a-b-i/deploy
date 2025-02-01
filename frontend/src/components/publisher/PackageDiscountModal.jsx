@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { websiteService } from '../../utils/services';
 import toast from 'react-hot-toast';
 import Loader from '../Loader'; // Adjust the path as necessary
+import { useAuthStore } from '../../store/authStore'; // ✅ Import auth store
 
 const PackageDiscountModal = ({ 
   isOpen, 
@@ -16,6 +17,9 @@ const PackageDiscountModal = ({
   const [slots, setSlots] = useState('5');
   const [pricePerPublication, setPricePerPublication] = useState('20');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // 🔥 Get user from Auth Store
+  const { user } = useAuthStore();
 
   useEffect(() => {
     if (isOpen) {
@@ -35,14 +39,18 @@ const PackageDiscountModal = ({
       if (!websiteId) {
         throw new Error('Website ID is required');
       }
+      if (!user?._id) {
+        throw new Error('User ID is missing');
+      }
   
       const discountData = {
+        userId: user._id, // ✅ Sending userId from store
         discount: isDiscountActive,
         slots: parseInt(slots),
         pricePerPublication: parseFloat(pricePerPublication),
       };
   
-      await websiteService.applyDiscount(websiteId, discountData);
+      await websiteService.applyDiscount(websiteId, discountData, user._id);
       toast.success('Discount package updated successfully');
       onClose(discountData);
     } catch (error) {

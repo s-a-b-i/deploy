@@ -1,295 +1,269 @@
 import React, { useState, useEffect } from "react";
-import {
- EyeIcon as EyeIconOutline,
- CheckCircleIcon as CheckCircleIconOutline,
- XCircleIcon as XCircleIconOutline,
- FlagIcon as FlagIconOutline,
- TrashIcon as TrashIconOutline,
- MailIcon as MailIconOutline,
-} from "@heroicons/react/outline";
-
-import {
- CheckCircleIcon as CheckCircleIconSolid,
- XCircleIcon as XCircleIconSolid,
- FlagIcon as FlagIconSolid,
-} from "@heroicons/react/solid";
+import StatCard from '../../components/Admin/StatCard';
+import WebsiteDetailsModal from '../../components/Admin/WebsiteDetailsModal';
+import WebsiteTable from '../../components/Admin/WebsiteTable';
+import EmailModal from '../../components/Admin/CotentEmail.jsx';
+import { useAuthStore } from "../../store/authStore";
+import { adminWebsiteService } from "../../utils/services";
 
 const Content = () => {
- const [pendingContent, setPendingContent] = useState([]);
- const [loading, setLoading] = useState(true);
- const [searchTerm, setSearchTerm] = useState("");
- const [statusFilter, setStatusFilter] = useState("");
- const [loadingActionId, setLoadingActionId] = useState(null);
+  const { user } = useAuthStore();
+  const [pendingContent, setPendingContent] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [loadingActionId, setLoadingActionId] = useState(null);
+  const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedWebsite, setSelectedWebsite] = useState(null);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState(null);
 
- useEffect(() => {
-   setTimeout(() => {
-     setPendingContent([
-       {
-         id: 1,
-         mediaType: "image",
-         title: "Gaming Laptop XPS 15",
-         status: "pending",
-         dateSubmitted: "2025-01-28",
-       },
-       {
-         id: 2,
-         mediaType: "video", 
-         title: "Summer Sale Campaign",
-         status: "flagged",
-         dateSubmitted: "2025-01-29",
-       },
-     ]);
-     setLoading(false);
-   }, 2000);
- }, []);
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      if (!user?._id || !user.isAdmin) {
+        setError("Unauthorized access");
+        setLoading(false);
+        return;
+      }
 
- const handleAction = async (id, newStatus) => {
-   setLoadingActionId(id);
-   try {
-     setPendingContent((prevContent) =>
-       prevContent.map((item) =>
-         item.id === id ? { ...item, status: newStatus } : item
-       )
-     );
-   } finally {
-     setLoadingActionId(null);
-   }
- };
+      try {
+        setLoading(true);
+        const [pending, flagged, approved, rejected] = await Promise.all([
+          adminWebsiteService.getWebsitesByStatus(user._id, "pending"),
+          adminWebsiteService.getWebsitesByStatus(user._id, "flagged"),
+          adminWebsiteService.getWebsitesByStatus(user._id, "approved"),
+          adminWebsiteService.getWebsitesByStatus(user._id, "rejected")
+        ]);
+        
+        const allContent = [...pending, ...flagged, ...approved, ...rejected];
+        setPendingContent(allContent);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching content:", error);
+        setError("Failed to load content");
+      } finally {
+        setLoading(false);
+      }
+    };
 
- const filteredContent = pendingContent.filter(
-   (item) =>
-     item.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-     (statusFilter ? item.status === statusFilter : true)
- );
+    fetchInitialData();
+  }, [user]);
 
- return (
-   <div className="min-h-screen p-6 bg-gray-50">
-     <div className="max-w-7xl mx-auto">
-       <div className="mb-8">
-         <h1 className="text-3xl font-bold text-gray-900">
-           Content Management
-         </h1>
-         <p className="mt-2 text-gray-600">Manage and moderate site content</p>
-       </div>
+  useEffect(() => {
+    const searchContent = async () => {
+      if (!user?._id || !user.isAdmin) return;
 
-       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-         {loading ? (
-           [1, 2, 3, 4].map((index) => (
-             <div
-               key={index}
-               className="bg-white rounded-xl shadow-sm p-6 animate-pulse"
-             >
-               <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
-               <div className="h-10 bg-gray-300 rounded w-1/2"></div>
-             </div>
-           ))
-         ) : (
-           <>
-             <StatCard
-               title="Pending Review"
-               value={
-                 pendingContent.filter((item) => item.status === "pending")
-                   .length
-               }
-               status="pending"
-             />
-             <StatCard
-               title="Flagged Content"
-               value={
-                 pendingContent.filter((item) => item.status === "flagged")
-                   .length
-               }
-               status="flagged"
-             />
-             <StatCard
-               title="Approved Content"
-               value={
-                 pendingContent.filter((item) => item.status === "approved")
-                   .length
-               }
-               status="approved"
-             />
-             <StatCard
-               title="Rejected Content"
-               value={
-                 pendingContent.filter((item) => item.status === "rejected")
-                   .length
-               }
-               status="rejected"
-             />
-           </>
-         )}
-       </div>
+      if (searchTerm) {
+        try {
+          const results = await adminWebsiteService.searchWebsites(user._id, searchTerm);
+          setPendingContent(results);
+          setError(null);
+        } catch (error) {
+          console.error("Error searching content:", error);
+          setError("Search failed");
+        }
+      }
+    };
 
-       <div className="mb-4 flex space-x-4">
-         <input
-           type="text"
-           placeholder="Search"
-           value={searchTerm}
-           onChange={(e) => setSearchTerm(e.target.value)}
-           className="w-1/2 p-2 border rounded-lg"
-         />
-         <select
-           value={statusFilter}
-           onChange={(e) => setStatusFilter(e.target.value)}
-           className="p-2 border rounded-lg"
-         >
-           <option value="">All Statuses</option>
-           <option value="pending">Pending</option>
-           <option value="flagged">Flagged</option>
-           <option value="approved">Approved</option>
-           <option value="rejected">Rejected</option>
-         </select>
-       </div>
+    const debounceTimeout = setTimeout(searchContent, 500);
+    return () => clearTimeout(debounceTimeout);
+  }, [searchTerm, user]);
 
-       <div className="bg-white border rounded-xl shadow-sm">
-         <div>
-           <div className="overflow-x-auto">
-             <table className="min-w-full divide-y divide-gray-200">
-               <thead>
-                 <tr>
-                   {[
-                     "View",
-                     "Title",
-                     "Media Type",
-                     "Status",
-                     "Date",
-                     "Moderation Actions",
-                     "Management Actions",
-                   ].map((heading) => (
-                     <th
-                       key={heading}
-                       className="px-6 py-3 text-left text-xs font-medium  bg-gray-50 text-gray-500 uppercase tracking-wider"
-                     >
-                       {heading}
-                     </th>
-                   ))}
-                 </tr>
-               </thead>
-               <tbody className="divide-y divide-gray-200">
-                 {loading
-                   ? [1, 2].map((index) => (
-                       <tr key={index} className="animate-pulse">
-                         {Array(7)
-                           .fill()
-                           .map((_, i) => (
-                             <td key={i} className="px-6 py-4">
-                               <div className="h-6 bg-gray-300 rounded w-full"></div>
-                             </td>
-                           ))}
-                       </tr>
-                     ))
-                   : filteredContent.map((item) => (
-                       <tr key={item.id}>
-                         <td className="px-6 py-4 whitespace-nowrap">
-                           <EyeIconOutline className="h-5 w-5 text-gray-500 hover:text-blue-600 cursor-pointer" />
-                         </td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                           {item.title}
-                         </td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                           {item.mediaType}
-                         </td>
-                         <td className="px-6 py-4 whitespace-nowrap">
-                           <span
-                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                               item.status === "pending"
-                                 ? "bg-yellow-100 text-yellow-800"
-                                 : item.status === "flagged"
-                                 ? "bg-red-100 text-red-800"
-                                 : item.status === "approved"
-                                 ? "bg-green-100 text-green-800"
-                                 : "bg-gray-100 text-gray-800"
-                             }`}
-                           >
-                             {item.status}
-                           </span>
-                         </td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                           {item.dateSubmitted}
-                         </td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                           <div className="flex justify-center space-x-2">
-                             {loadingActionId === item.id ? (
-                               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
-                             ) : (
-                               <>
-                                 <CheckCircleIconOutline
-                                   onClick={() => handleAction(item.id, "approved")}
-                                   className="h-5 w-5 text-green-600 hover:text-green-900 cursor-pointer"
-                                   title="Approve"
-                                 />
-                                 <XCircleIconOutline
-                                   onClick={() => handleAction(item.id, "rejected")}
-                                   className="h-5 w-5 text-red-600 hover:text-red-900 cursor-pointer"
-                                   title="Reject"
-                                 />
-                                 <FlagIconOutline
-                                   onClick={() => handleAction(item.id, "flagged")}
-                                   className="h-5 w-5 text-yellow-600 hover:text-yellow-900 cursor-pointer"
-                                   title="Flag"
-                                 />
-                               </>
-                             )}
-                           </div>
-                         </td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                           <div className="flex justify-center space-x-2">
-                             <MailIconOutline
-                               onClick={() => {}}
-                               className="h-5 w-5 text-blue-600 hover:text-blue-900 cursor-pointer"
-                               title="Send Message"
-                             />
-                             <TrashIconOutline
-                               onClick={() => {
-                                 setPendingContent((prevContent) =>
-                                   prevContent.filter(
-                                     (content) => content.id !== item.id
-                                   )
-                                 );
-                               }}
-                               className="h-5 w-5 text-red-600 hover:text-gray-900 cursor-pointer"
-                               title="Delete"
-                             />
-                           </div>
-                         </td>
-                       </tr>
-                     ))}
-               </tbody>
-             </table>
-           </div>
-         </div>
-       </div>
-     </div>
-   </div>
- );
-};
+  const handleViewDetails = (website) => {
+    setSelectedWebsite(website);
+    setIsModalOpen(true);
+  };
 
-const StatCard = ({ title, value, status }) => {
- const getIcon = () => {
-   switch (status) {
-     case "pending":
-       return "⏳";
-     case "flagged":
-       return <FlagIconSolid className="h-6 w-6 text-yellow-500" />;
-     case "approved":
-       return <CheckCircleIconSolid className="h-6 w-6 text-green-500" />;
-     case "rejected":
-       return <XCircleIconSolid className="h-6 w-6 text-red-500" />;
-     default:
-       return "📊";
-   }
- };
+  const handleAction = async (id, newStatus) => {
+    if (!user?._id || !user.isAdmin) return;
 
- return (
-   <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200">
-     <div className="flex items-center justify-between mb-4">
-       <span className="text-2xl">{getIcon()}</span>
-     </div>
-     <h3 className="text-gray-500 text-sm font-medium mb-2">{title}</h3>
-     <p className="text-2xl font-bold text-gray-900">{value}</p>
-   </div>
- );
+    setLoadingActionId(id);
+    try {
+      await adminWebsiteService.changeWebsiteStatus(user._id, id, newStatus);
+      setPendingContent((prevContent) =>
+        prevContent.map((item) =>
+          item._id === id ? { ...item, status: newStatus } : item
+        )
+      );
+      setError(null);
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setError("Failed to update status");
+    } finally {
+      setLoadingActionId(null);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!user?._id || !user.isAdmin) return;
+
+    try {
+      await adminWebsiteService.deleteWebsite(user._id, id);
+      setPendingContent((prevContent) =>
+        prevContent.filter((content) => content._id !== id)
+      );
+      setError(null);
+    } catch (error) {
+      console.error("Error deleting content:", error);
+      setError("Failed to delete content");
+    }
+  };
+
+  const handleEmailClick = async (userId) => {
+    if (!userId) {
+      setError("No user ID found");
+      return;
+    }
+  
+    try {
+      const userData = await adminWebsiteService.getUserById(user._id, userId);
+      if (!userData?.email) {
+        setError("No email address found for this user");
+        return;
+      }
+      setSelectedEmail(userData.email);
+      setIsEmailModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching user email:", error);
+      setError("Failed to fetch user email");
+    }
+  };
+
+  const handleStatusFilter = async (status) => {
+    if (!user?._id || !user.isAdmin) return;
+
+    setStatusFilter(status);
+    if (status) {
+      try {
+        const filteredContent = await adminWebsiteService.getWebsitesByStatus(user._id, status);
+        setPendingContent(filteredContent);
+        setError(null);
+      } catch (error) {
+        console.error("Error filtering content:", error);
+        setError("Failed to filter content");
+      }
+    }
+  };
+
+  const filteredContent = pendingContent.filter(
+    (item) =>
+      item.mediaName && 
+      item.mediaName.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (statusFilter ? item.status === statusFilter : true)
+  );
+
+  if (!user?.isAdmin) {
+    return (
+      <div className="min-h-screen p-6 bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
+          <p className="mt-2 text-gray-600">You do not have permission to view this page.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen p-6 bg-gray-50">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Website Management
+          </h1>
+          <p className="mt-2 text-gray-600">Manage and moderate website listings</p>
+        </div>
+
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          {loading ? (
+            [1, 2, 3, 4].map((index) => (
+              <div
+                key={index}
+                className="bg-white rounded-xl shadow-sm p-6 animate-pulse"
+              >
+                <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
+                <div className="h-10 bg-gray-300 rounded w-1/2"></div>
+              </div>
+            ))
+          ) : (
+            <>
+              <StatCard
+                title="Pending Review"
+                value={pendingContent.filter((item) => item.status === "pending").length}
+                status="pending"
+              />
+              <StatCard
+                title="Flagged Websites"
+                value={pendingContent.filter((item) => item.status === "flagged").length}
+                status="flagged"
+              />
+              <StatCard
+                title="Approved Websites"
+                value={pendingContent.filter((item) => item.status === "approved").length}
+                status="approved"
+              />
+              <StatCard
+                title="Rejected Websites"
+                value={pendingContent.filter((item) => item.status === "rejected").length}
+                status="rejected"
+              />
+            </>
+          )}
+        </div>
+
+        <div className="mb-4 flex space-x-4">
+          <input
+            type="text"
+            placeholder="Search by media name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-1/2 p-2 border rounded-lg"
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => handleStatusFilter(e.target.value)}
+            className="p-2 border rounded-lg"
+          >
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="flagged">Flagged</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+
+        <WebsiteTable 
+          loading={loading}
+          filteredContent={filteredContent}
+          loadingActionId={loadingActionId}
+          handleAction={handleAction}
+          handleSendEmail={handleEmailClick}
+          handleDelete={handleDelete}
+          handleViewDetails={handleViewDetails}
+        />
+
+        {isModalOpen && selectedWebsite && (
+          <WebsiteDetailsModal 
+            website={selectedWebsite} 
+            onClose={() => setIsModalOpen(false)} 
+          />
+        )}
+
+        {isEmailModalOpen && selectedEmail && (
+          <EmailModal 
+            userEmail={selectedEmail}
+            onClose={() => setIsEmailModalOpen(false)}
+          />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Content;

@@ -6,12 +6,13 @@
 // import toast from 'react-hot-toast';
 // import PackageDiscountModal from './PackageDiscountModal';
 // import HighlightMediaModal from './HighlightMediaModal';
+// import Loader from '../../components/Loader'; // Import your Loader component
 
 // const ToApproveList = () => {
 //   const navigate = useNavigate();
 //   const user = useAuthStore((state) => state.user);
 //   const [websites, setWebsites] = useState([]);
-//   const [isLoading, setIsLoading] = useState(true);
+//   const [isLoading, setIsLoading] = useState(true); // Loading state
 //   const [error, setError] = useState(null);
 //   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -24,13 +25,13 @@
 //     if (user?._id) {
 //       fetchWebsites();
 //     } else {
-//       console.warn('User not found, skipping fetch.');
+//       console.warn('User  not found, skipping fetch.');
 //     }
 //   }, [user]);
 
 //   const fetchWebsites = async () => {
 //     try {
-//       setIsLoading(true);
+//       setIsLoading(true); // Start loading
 //       const response = await websiteService.getWebsitesNotApproved(user._id);
 //       setWebsites(response);
 //       setError(null);
@@ -38,7 +39,7 @@
 //       setError('Failed to fetch websites');
 //       toast.error('Error loading websites');
 //     } finally {
-//       setIsLoading(false);
+//       setIsLoading(false); // End loading
 //     }
 //   };
 
@@ -77,7 +78,7 @@
 //   if (isLoading) {
 //     return (
 //       <div className="flex justify-center items-center h-64">
-//         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+//         <Loader /> {/* Use your Loader component here */}
 //       </div>
 //     );
 //   }
@@ -237,37 +238,68 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaGift, FaClock, FaPen, FaChartBar, FaGlobe, FaBars } from 'react-icons/fa';
+import { CheckCircleIcon, ClockIcon, FlagIcon, XCircleIcon } from '@heroicons/react/outline';
 import { websiteService } from '../../utils/services';
 import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 import PackageDiscountModal from './PackageDiscountModal';
 import HighlightMediaModal from './HighlightMediaModal';
-import Loader from '../../components/Loader'; // Import your Loader component
+import Loader from '../../components/Loader';
 
 const ToApproveList = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const [websites, setWebsites] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHighlightModalOpen, setIsHighlightModalOpen] = useState(false);
   const [selectedWebsite, setSelectedWebsite] = useState(null);
   const [selectedMonths, setSelectedMonths] = useState('1');
 
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'approved':
+        return {
+          icon: <CheckCircleIcon className="w-5 h-5" />,
+          className: 'text-green-600 bg-green-50',
+          text: 'Approved'
+        };
+      case 'pending':
+        return {
+          icon: <ClockIcon className="w-5 h-5" />,
+          className: 'text-yellow-600 bg-yellow-50',
+          text: 'Pending Approval'
+        };
+      case 'flagged':
+        return {
+          icon: <FlagIcon className="w-5 h-5" />,
+          className: 'text-orange-600 bg-orange-50',
+          text: 'Flagged'
+        };
+      case 'rejected':
+        return {
+          icon: <XCircleIcon className="w-5 h-5" />,
+          className: 'text-red-600 bg-red-50',
+          text: 'Rejected'
+        };
+      default:
+        return null;
+    }
+  };
+
   useEffect(() => {
     if (user?._id) {
       fetchWebsites();
     } else {
-      console.warn('User  not found, skipping fetch.');
+      console.warn('User not found, skipping fetch.');
     }
   }, [user]);
 
   const fetchWebsites = async () => {
     try {
-      setIsLoading(true); // Start loading
+      setIsLoading(true);
       const response = await websiteService.getWebsitesNotApproved(user._id);
       setWebsites(response);
       setError(null);
@@ -275,7 +307,7 @@ const ToApproveList = () => {
       setError('Failed to fetch websites');
       toast.error('Error loading websites');
     } finally {
-      setIsLoading(false); // End loading
+      setIsLoading(false);
     }
   };
 
@@ -314,7 +346,7 @@ const ToApproveList = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader /> {/* Use your Loader component here */}
+        <Loader />
       </div>
     );
   }
@@ -362,7 +394,6 @@ const ToApproveList = () => {
             className="border border-gray-200 rounded-lg p-4 md:p-6 bg-white hover:shadow-lg transition-all duration-300"
           >
             <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
-              {/* Thumbnail */}
               <div className="w-full md:w-48 h-48 md:h-32 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50">
                 {website.thumbnail ? (
                   <img
@@ -377,7 +408,6 @@ const ToApproveList = () => {
                 )}
               </div>
 
-              {/* Content */}
               <div className="flex-grow w-full">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
@@ -405,7 +435,6 @@ const ToApproveList = () => {
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="w-full md:w-auto flex flex-col items-start md:items-end gap-4">
                 <div className="text-xl md:text-2xl font-bold">€ {website.price}</div>
                 <div className="grid grid-cols-4 md:flex gap-2">
@@ -439,14 +468,16 @@ const ToApproveList = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-4 text-xs md:text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
-              Status: Pending Approval
-            </div>
+            {website.status && (
+              <div className={`mt-4 flex items-center gap-2 text-xs md:text-sm p-2 rounded ${getStatusIcon(website.status).className}`}>
+                {getStatusIcon(website.status).icon}
+                <span>Status: {getStatusIcon(website.status).text}</span>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Modals */}
       <PackageDiscountModal
         isOpen={isModalOpen}
         onClose={handleModalClose}

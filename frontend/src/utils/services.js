@@ -56,14 +56,15 @@ export const websiteService = {
     }
   },
 
-  updateWebsite: async (id, websiteData) => {
+  updateWebsite: async (id, websiteData, userId) => {
     try {
-      const response = await api.put(`/websites/${id}`, websiteData);
+      const response = await api.put(`/websites/${id}`, { ...websiteData, userId });
       return response.data;
     } catch (error) {
-      throw error.response.data;
+      throw error.response?.data || error;
     }
-  },
+},
+
 
   deleteWebsite: async (id) => {
     try {
@@ -74,23 +75,24 @@ export const websiteService = {
     }
   },
 
-  applyDiscount: async (id, discountData) => {
+  applyDiscount: async (id, discountData, userId) => {
     try {
-      const response = await api.put(`/websites/discount/${id}`, discountData);
-      return response.data;
-    } catch (error) {
-      throw error.response.data;
-    }
-  },
-
-  highlightMedia: async (id, highlightData) => {
-    try {
-      const response = await api.put(`/websites/highlight/${id}`, highlightData);
+      const response = await api.put(`/websites/discount/${id}`, { ...discountData, userId });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
-  },
+},
+
+
+highlightMedia: async (id, highlightData, userId) => {
+  try {
+    const response = await api.put(`/websites/highlight/${id}`, { ...highlightData, userId });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+},
 
   getWebsitesNotApproved: async (userId) => {
     try {
@@ -511,4 +513,89 @@ export const userService = {
       throw error.response.data;
     }
   },
+};
+
+
+export const adminWebsiteService = {
+  getWebsitesCountByStatus: async (adminId, status) => {
+    try {
+      const response = await api.post('/admin/content/count', { adminId, status });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  searchWebsites: async (adminId, searchInput) => {
+    try {
+      const response = await api.post('/admin/content/search', { adminId, searchInput });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  getWebsitesByStatus: async (adminId, status) => {
+    try {
+      const response = await api.post('/admin/content/status', { adminId, status });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  changeWebsiteStatus: async (adminId, websiteId, status) => {
+    try {
+      const response = await api.post('/admin/content/change-status', { 
+        adminId, 
+        websiteId, 
+        status 
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  deleteWebsite: async (adminId, websiteId) => {
+    try {
+      const response = await api.post('/admin/content/delete', { adminId, websiteId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  getWebsiteData: async (adminId, websiteId) => {
+    try {
+      const response = await api.post('/admin/content/data', { adminId, websiteId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  sendEmail: async (adminId, email, subject, message) => {
+    try {
+      const response = await api.post('/admin/content/send-email', {
+        adminId,
+        email,
+        subject,
+        message
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+   getUserById: async (adminId, userId) => {
+    try {
+      const response = await api.post('/admin/content/get-user', { adminId, userId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
 };
