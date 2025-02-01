@@ -1,28 +1,20 @@
 import Website  from '../models/website.model.js';
 import { User } from '../models/user.model.js';
 import { createOrUpdateStats } from '../utils/stats.js';
+import { checkUserAndBlockStatus } from '../utils/userCheck.js';
 
 // Get all websites
 export async function getWebsites(req, res) {
   try {
     const userId = req.body.userId;
 
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
-    // Perform user check
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
-    }
-
-    // Perform block check
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
-    }
-
-    const websites = await Website.find({status : 'approved'});
+    const websites = await Website.find({ status: 'approved' });
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching websites', error: error.message });
@@ -35,19 +27,10 @@ export async function viewWebsite(req, res) {
 
     const userId = req.body.userId;
 
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    // Perform user check
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
-    }
-
-    // Perform block check
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const website = await Website.findById(req.params.id);
@@ -79,29 +62,18 @@ export async function viewWebsite(req, res) {
 }
 
 
-// get recently created 5 websites
+// Get recently created 5 websites
 export async function getRecentlyCreatedWebsites(req, res) {
   try {
-
     const userId = req.body.userId;
 
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
-    // Perform user check
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
-    }
-
-    // Perform block check
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
-    }
-
-    const websites = await Website.find({status : 'approved'}).sort({ createdAt: -1 }).limit(req.params.limit || 5);
+    const websites = await Website.find({ status: 'approved' }).sort({ createdAt: -1 }).limit(req.params.limit || 5);
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching websites', error: error.message });
@@ -111,22 +83,12 @@ export async function getRecentlyCreatedWebsites(req, res) {
 // Get single website
 export async function getWebsite(req, res) {
   try {
-
     const userId = req.body.userId;
 
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    // Perform user check
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
-    }
-
-    // Perform block check
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const foundwebsite = await Website.findById(req.params.id);
@@ -144,19 +106,10 @@ export async function createWebsite(req, res) {
   try {
     const userId = req.body.userId;
 
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    // Perform user check
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
-    }
-
-    // Perform block check
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const website = new Website(req.body);
@@ -172,13 +125,12 @@ export async function updateWebsite(req, res) {
   try {
     const { userId, ...updateData } = req.body;
 
-    // Perform user check
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
-    // Update the website and set status to pending
     const website = await Website.findByIdAndUpdate(
       req.params.id,
       { ...updateData, status: 'pending' },
@@ -200,19 +152,10 @@ export async function deleteWebsite(req, res) {
   try {
     const { userId } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    // Perform user check
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
-    }
-
-    // Perform block check
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const website = await Website.findByIdAndDelete(req.params.id);
@@ -231,19 +174,10 @@ export async function discount(req, res) {
   try {
     const { userId, ...updateData } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    // Perform user check
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
-    }
-
-    // Perform block check
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const website = await Website.findByIdAndUpdate(
@@ -266,19 +200,10 @@ export async function highlightMedia(req, res) {
   try {
     const { userId, months } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    // Perform user check
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
-    }
-
-    // Perform block check
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const website = await Website.findByIdAndUpdate(
@@ -297,25 +222,15 @@ export async function highlightMedia(req, res) {
   }
 }
 
-
 // Get websites for a user where status is not approved
 export async function getWebsitesForUserNotApproved(req, res) {
   try {
     const { userId } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    // Perform user check
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
-    }
-
-    // Perform block check
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const websites = await Website.find({
@@ -334,19 +249,10 @@ export async function getWebsitesForUserApproved(req, res) {
   try {
     const { userId } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    // Perform user check
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(403).json({ message: 'User not found or not authorized' });
-    }
-
-    // Perform block check
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const websites = await Website.find({

@@ -1,23 +1,15 @@
 import Website from '../../models/website.model.js';
 import { User } from '../../models/user.model.js';
+import { checkUserAndBlockStatus } from '../../utils/userCheck.js';
 
 export async function searchWebsites(req, res) {
   try {
     const userId = req.body.userId;
 
-    if(!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    // perfrom user check 
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // perfrom block check 
-    if (user.status === false) {
-      return res.status(403).json({ message: 'User is blocked' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const {
