@@ -57,6 +57,20 @@ const RankisterPromo = ({ isLoading, rankisterPromo, onViewProduct }) => {
     );
   }
 
+  // Check if there are no promos available
+  if (rankisterPromo.length === 0) {
+    return (
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Rankister Promo</h2>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <p className="text-center text-gray-500">No promo available at the moment.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">

@@ -311,11 +311,9 @@ import { useAuthStore } from "../../store/authStore";
 import {
   profileService,
   invoiceAccountService,
-  emailChangeService,
 } from "../../utils/services";
 import ProfileSection from "../../components/publisher/ProfileSection";
 import InvoicingAccountsSection from "../../components/publisher/InvoicingAccountsSection";
-import ChangeEmailModal from "../../components/publisher/ChangeEmailModal";
 import EditInvoicingForm from "../../components/publisher/EditInvoicingForm";
 import { toast } from "react-hot-toast";
 import Loader from "../../components/Loader";
@@ -337,8 +335,6 @@ const Profile = () => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [isEditingOrAdding, setIsEditingOrAdding] = useState(false);
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [email, setEmail] = useState("");
   const [invoicingAccounts, setInvoicingAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -365,7 +361,6 @@ const Profile = () => {
               publisherCompanyName: profileData.publisherCompanyName || "",
               avatar: profileData.avatar || null,
             });
-            setEmail(profileData.email || "");
             setAvatarPreview(profileData.avatar || null);
             setIsProfileCreated(true);
           }
@@ -398,18 +393,29 @@ const Profile = () => {
     }
   };
 
+  const validatePhoneNumber = (phone) => {
+    const phoneRegex = /^[0-9]{10}$/; // Example: 10-digit phone number
+    return phoneRegex.test(phone);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     // Validation checks for empty fields
-    const requiredFields = ['firstName', 'lastName', 'phone', 'publisherCompanyName', 'email'];
+    const requiredFields = ['firstName', 'lastName', 'phone', 'publisherCompanyName'];
     const emptyFields = requiredFields.filter(field => !formData[field]);
 
     if (emptyFields.length > 0) {
       toast.error(`Please fill in the following fields: ${emptyFields.join(', ')}`);
       setLoading(false);
       return; // Stop the submission if there are empty fields
+    }
+
+    if (!validatePhoneNumber(formData.phone)) {
+      toast.error("Please enter a valid phone number (10 digits).");
+      setLoading(false);
+      return; // Stop the submission if the phone number is invalid
     }
 
     try {
@@ -423,8 +429,6 @@ const Profile = () => {
           formDataToSend.append(key, formData[key]);
         }
       });
-      
-      formDataToSend.append('email', email);
       
       if (avatarFile) {
         formDataToSend.append('avatar', avatarFile);
@@ -514,45 +518,6 @@ const Profile = () => {
     setIsEditingOrAdding(true);
   };
 
-  const handleEmailChange = async (newEmail) => {
-    setLoading(true); // Start loading
-    try {
-      const lastLogin = useAuthStore.getState().lastLogin;
-      const now = new Date();
-      const oneDayInMs = 24 * 60 * 60 * 1000;
-
-      if (now - new Date(lastLogin) > oneDayInMs) {
-        toast.error(
-          "It's been more than a day since your last login. Please log in again to change your email."
-        );
-        await useAuthStore.getState().logout();
-        return;
-      }
-
-      await emailChangeService.requestEmailChange(userId, newEmail);
-
-      const verificationToken = prompt(
-        "Enter verification token sent to your new email"
-      );
-
-      if (verificationToken) {
-        await emailChangeService.verifyEmailChange(
-          userId,
-          verificationToken,
-          newEmail
-        );
-
-        setEmail(newEmail);
-        toast.success("Email changed successfully!");
-        await useAuthStore.getState().logout();
-      }
-    } catch (error) {
-      toast.error(error.message || "Failed to change email");
-    } finally {
-      setLoading(false); // End loading
-    }
-  };
-
   if (loading) return <Loader />;
   if (error) return <div>{error}</div>;
 
@@ -568,8 +533,6 @@ const Profile = () => {
         handleSubmit={handleSubmit}
         handleAvatarChange={handleAvatarChange}
         avatarPreview={avatarPreview}
-        email={email}
-        setShowEmailModal={setShowEmailModal}
       />
 
       <InvoicingAccountsSection
@@ -582,15 +545,6 @@ const Profile = () => {
         setIsEditingOrAdding={setIsEditingOrAdding}
         setEditingAccount={setEditingAccount}
       />
-
-      {showEmailModal && (
-        <ChangeEmailModal
-          currentEmail={email}
-          onClose={() => setShowEmailModal(false)}
-          onSave={handleEmailChange}
-          userId={userId}
-        />
-      )}
 
       {showEditForm && (
         <div className="mt-4">

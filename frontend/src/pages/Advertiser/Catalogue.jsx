@@ -417,179 +417,183 @@ const Catalog = () => {
           </button>
         </div>
 
-        {viewMode === 'table' ? (
-          <div className="w-full">
-            <div className="table-wrapper overflow-x-auto shadow-md sm:rounded-lg">
-              <div className="min-w-full inline-block align-middle">
-                <div className="border rounded-lg">
-                  <table className="min-w-full divide-y divide-foundations-tertiary bg-foundations-light">
-                    <thead className="bg-gradient-to-r from-foundations-primary to-foundations-secondary">
-                      <tr>
-                        <th className="sticky left-0 z-20 p-3 text-left text-white bg-gradient-to-r from-foundations-primary to-foundations-secondary">
-                          Actions
-                        </th>
-                        {visibleColumns.country && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">Country</th>
+        {websites.length === 0 ? (
+  <div className="w-full text-center py-8">
+    <p className="text-foundations-dark text-lg font-semibold">No products available.</p>
+  </div>
+) : viewMode === 'table' ? (
+  <div className="w-full">
+    <div className="table-wrapper overflow-x-auto shadow-md sm:rounded-lg">
+      <div className="min-w-full inline-block align-middle">
+        <div className="border rounded-lg">
+          <table className="min-w-full divide-y divide-foundations-tertiary bg-foundations-light">
+            <thead className="bg-gradient-to-r from-foundations-primary to-foundations-secondary">
+              <tr>
+                <th className="sticky left-0 z-20 p-3 text-left text-white bg-gradient-to-r from-foundations-primary to-foundations-secondary">
+                  Actions
+                </th>
+                {visibleColumns.country && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">Country</th>
+                )}
+                {visibleColumns.name && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">Name</th>
+                )}
+                {visibleColumns.price && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">Price</th>
+                )}
+                {visibleColumns.type && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">Type</th>
+                )}
+                {visibleColumns.category && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">Category</th>
+                )}
+                {visibleColumns.cbd && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">CBD</th>
+                )}
+                {visibleColumns.trading && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">Trading</th>
+                )}
+                {visibleColumns.adult && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">Adult</th>
+                )}
+                {visibleColumns.gambling && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">Gambling</th>
+                )}
+                {visibleColumns.da && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">DA</th>
+                )}
+                {visibleColumns.ascore && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">AScore</th>
+                )}
+                {visibleColumns.za && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">ZA</th>
+                )}
+                {visibleColumns.gnews && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">GNews</th>
+                )}
+                {visibleColumns.bl && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">BL</th>
+                )}
+                {visibleColumns.edu && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">EDU</th>
+                )}
+                {visibleColumns.gov && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">GOV</th>
+                )}
+                {visibleColumns.date && (
+                  <th className="p-3 text-left text-white whitespace-nowrap">Date</th>
+                )}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-foundations-tertiary">
+              {websites.map((item) => (
+                <tr key={item._id} className="hover:bg-foundations-secondary transition-colors">
+                  <td className="sticky left-0 z-10 p-3 bg-white">
+                    <div className="flex gap-2">
+                      <button
+                        className="p-2 bg-foundations-primary rounded-full text-white hover:bg-foundations-secondary transition-colors"
+                        onClick={() => handleViewProduct(item._id)}
+                      >
+                        <FaEye />
+                      </button>
+                      <button
+                        className="p-2 bg-foundations-primary rounded-full text-white hover:bg-foundations-secondary transition-colors"
+                        onClick={() => handleAddToCart(item._id)}
+                      >
+                        <FaShoppingCart />
+                      </button>
+                      <button
+                        className={`p-2 rounded-full ${
+                          favorites.has(item._id)
+                            ? "bg-foundations-tertiary text-foundations-dark"
+                            : "bg-foundations-primary text-white"
+                        } hover:bg-foundations-secondary transition-colors`}
+                        onClick={() => toggleFavorite(item._id)}
+                      >
+                        <FaStar />
+                      </button>
+                    </div>
+                  </td>
+                  {visibleColumns.country && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">{item.language}</td>
+                  )}
+                  {visibleColumns.name && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">{item.webDomain}</td>
+                  )}
+                  {visibleColumns.price && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">€ {item.price.toFixed(2)}</td>
+                  )}
+                  {visibleColumns.type && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">{item.mediaType}</td>
+                  )}
+                  {visibleColumns.category && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">
+                      <div className="relative group">
+                        <span>{item.category[0]}</span>
+                        {item.category.length > 1 && (
+                          <span className="ml-1 text-foundations-tertiary">
+                            +{item.category.length - 1}
+                          </span>
                         )}
-                        {visibleColumns.name && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">Name</th>
+                        {item.category.length > 1 && (
+                          <div className="absolute hidden group-hover:block left-0 mt-1 p-2 bg-white border rounded shadow-lg z-20">
+                            {item.category.join(", ")}
+                          </div>
                         )}
-                        {visibleColumns.price && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">Price</th>
-                        )}
-                        {visibleColumns.type && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">Type</th>
-                        )}
-                        {visibleColumns.category && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">Category</th>
-                        )}
-                        {visibleColumns.cbd && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">CBD</th>
-                        )}
-                        {visibleColumns.trading && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">Trading</th>
-                        )}
-                        {visibleColumns.adult && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">Adult</th>
-                        )}
-                        {visibleColumns.gambling && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">Gambling</th>
-                        )}
-                        {visibleColumns.da && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">DA</th>
-                        )}
-                        {visibleColumns.ascore && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">AScore</th>
-                        )}
-                        {visibleColumns.za && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">ZA</th>
-                        )}
-                        {visibleColumns.gnews && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">GNews</th>
-                        )}
-                        {visibleColumns.bl && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">BL</th>
-                        )}
-                        {visibleColumns.edu && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">EDU</th>
-                        )}
-                        {visibleColumns.gov && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">GOV</th>
-                        )}
-                        {visibleColumns.date && (
-                          <th className="p-3 text-left text-white whitespace-nowrap">Date</th>
-                        )}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-foundations-tertiary">
-                      {websites.map((item) => (
-                        <tr key={item._id} className="hover:bg-foundations-secondary transition-colors">
-                          <td className="sticky left-0 z-10 p-3 bg-white">
-                            <div className="flex gap-2">
-                              <button
-                                className="p-2 bg-foundations-primary rounded-full text-white hover:bg-foundations-secondary transition-colors"
-                                onClick={() => handleViewProduct(item._id)}
-                              >
-                                <FaEye />
-                              </button>
-                              <button
-                                className="p-2 bg-foundations-primary rounded-full text-white hover:bg-foundations-secondary transition-colors"
-                                onClick={() => handleAddToCart(item._id)}
-                              >
-                                <FaShoppingCart />
-                              </button>
-                              <button
-                                className={`p-2 rounded-full ${
-                                  favorites.has(item._id)
-                                    ? "bg-foundations-tertiary text-foundations-dark"
-                                    : "bg-foundations-primary text-white"
-                                } hover:bg-foundations-secondary transition-colors`}
-                                onClick={() => toggleFavorite(item._id)}
-                              >
-                                <FaStar />
-                              </button>
-                            </div>
-                          </td>
-                          {visibleColumns.country && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">{item.language}</td>
-                          )}
-                          {visibleColumns.name && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">{item.webDomain}</td>
-                          )}
-                          {visibleColumns.price && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">€ {item.price.toFixed(2)}</td>
-                          )}
-                          {visibleColumns.type && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">{item.mediaType}</td>
-                          )}
-                          {visibleColumns.category && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">
-                              <div className="relative group">
-                                <span>{item.category[0]}</span>
-                                {item.category.length > 1 && (
-                                  <span className="ml-1 text-foundations-tertiary">
-                                    +{item.category.length - 1}
-                                  </span>
-                                )}
-                                {item.category.length > 1 && (
-                                  <div className="absolute hidden group-hover:block left-0 mt-1 p-2 bg-white border rounded shadow-lg z-20">
-                                    {item.category.join(", ")}
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                          )}
-                          {visibleColumns.cbd && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">
-                              {item.sensitiveTopics?.includes("CBD") ? "✔" : "✖"}
-                            </td>
-                          )}
-                          {visibleColumns.trading && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">
-                              {item.sensitiveTopics?.includes("Trading") ? "✔" : "✖"}
-                            </td>
-                          )}
-                          {visibleColumns.adult && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">
-                              {item.sensitiveTopics?.includes("Adult") ? "✔" : "✖"}
-                            </td>
-                          )}
-                          {visibleColumns.gambling && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">
-                              {item.sensitiveTopics?.includes("Gambling") ? "✔" : "✖"}
-                            </td>
-                          )}
-                          {visibleColumns.da && <td className="p-3 text-foundations-dark whitespace-nowrap">-</td>}
-                          {visibleColumns.ascore && <td className="p-3 text-foundations-dark whitespace-nowrap">-</td>}
-                          {visibleColumns.za && <td className="p-3 text-foundations-dark whitespace-nowrap">-</td>}
-                          {visibleColumns.gnews && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">
-                              {item.googleNews ? "✔" : "✖"}
-                            </td>
-                          )}
-                          {visibleColumns.bl && <td className="p-3 text-foundations-dark whitespace-nowrap">-</td>}
-                          {visibleColumns.edu && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">
-                              {item.category.includes("Education") ? "✔" : "✖"}
-                            </td>
-                          )}
-                          {visibleColumns.gov && <td className="p-3 text-foundations-dark whitespace-nowrap">✖</td>}
-                          {visibleColumns.date && (
-                            <td className="p-3 text-foundations-dark whitespace-nowrap">
-                              {new Date(item.createdAt).toLocaleDateString()}
-                            </td>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          renderCards()
-        )}
+                      </div>
+                    </td>
+                  )}
+                  {visibleColumns.cbd && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">
+                      {item.sensitiveTopics?.includes("CBD") ? "✔" : "✖"}
+                    </td>
+                  )}
+                  {visibleColumns.trading && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">
+                      {item.sensitiveTopics?.includes("Trading") ? "✔" : "✖"}
+                    </td>
+                  )}
+                  {visibleColumns.adult && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">
+                      {item.sensitiveTopics?.includes("Adult") ? "✔" : "✖"}
+                    </td>
+                  )}
+                  {visibleColumns.gambling && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">
+                      {item.sensitiveTopics?.includes("Gambling") ? "✔" : "✖"}
+                    </td>
+                  )}
+                  {visibleColumns.da && <td className="p-3 text-foundations-dark whitespace-nowrap">-</td>}
+                  {visibleColumns.ascore && <td className="p-3 text-foundations-dark whitespace-nowrap">-</td>}
+                  {visibleColumns.za && <td className="p-3 text-foundations-dark whitespace-nowrap">-</td>}
+                  {visibleColumns.gnews && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">
+                      {item.googleNews ? "✔" : "✖"}
+                    </td>
+                  )}
+                  {visibleColumns.bl && <td className="p-3 text-foundations-dark whitespace-nowrap">-</td>}
+                  {visibleColumns.edu && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">
+                      {item.category.includes("Education") ? "✔" : "✖"}
+                    </td>
+                  )}
+                  {visibleColumns.gov && <td className="p-3 text-foundations-dark whitespace-nowrap">✖</td>}
+                  {visibleColumns.date && (
+                    <td className="p-3 text-foundations-dark whitespace-nowrap">
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+) : (
+  renderCards()
+)}
       </div>
 
       <ColumnModal />

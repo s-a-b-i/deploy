@@ -84,8 +84,14 @@ const WebsiteTable = ({
             {filteredContent.map((item) => (
               <tr key={item._id}>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <button onClick={() => handleViewDetails(item)}>
-                    <EyeIcon className="h-5 w-5 text-gray-500 hover:text-blue-600 cursor-pointer" />
+                  <button 
+                    onClick={() => handleViewDetails(item)}
+                    className="group relative"
+                  >
+                    <EyeIcon className="h-5 w-5 text-gray-500 hover:text-blue-600 cursor-pointer transition-colors duration-200" />
+                    <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                      View Details
+                    </span>
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -122,21 +128,33 @@ const WebsiteTable = ({
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
                     ) : (
                       <>
-                        <CheckCircleIcon
-                          onClick={() => handleAction(item._id, "approved")}
-                          className="h-5 w-5 text-green-600 hover:text-green-900 cursor-pointer"
-                          title="Approve"
-                        />
-                        <XCircleIcon
-                          onClick={() => handleAction(item._id, "rejected")}
-                          className="h-5 w-5 text-red-600 hover:text-red-900 cursor-pointer"
-                          title="Reject"
-                        />
-                        <FlagIcon
-                          onClick={() => handleAction(item._id, "flagged")}
-                          className="h-5 w-5 text-yellow-600 hover:text-yellow-900 cursor-pointer"
-                          title="Flag"
-                        />
+                        <div className="group relative">
+                          <CheckCircleIcon
+                            onClick={() => handleAction(item._id, "approved")}
+                            className="h-5 w-5 text-green-600 hover:text-green-900 cursor-pointer transition-colors duration-200"
+                          />
+                          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                            Approve
+                          </span>
+                        </div>
+                        <div className="group relative">
+                          <XCircleIcon
+                            onClick={() => handleAction(item._id, "rejected")}
+                            className="h-5 w-5 text-red-600 hover:text-red-900 cursor-pointer transition-colors duration-200"
+                          />
+                          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                            Reject
+                          </span>
+                        </div>
+                        <div className="group relative">
+                          <FlagIcon
+                            onClick={() => handleAction(item._id, "flagged")}
+                            className="h-5 w-5 text-yellow-600 hover:text-yellow-900 cursor-pointer transition-colors duration-200"
+                          />
+                          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                            Flag
+                          </span>
+                        </div>
                       </>
                     )}
                   </div>
@@ -144,16 +162,24 @@ const WebsiteTable = ({
                 {/* Other Actions Column */}
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <div className="flex justify-center space-x-2">
-                    <MailIcon
-                      onClick={() => handleSendEmail(item.userId)} // Change from item.email to item.userId
-                      className="h-5 w-5 text-blue-600 hover:text-blue-900 cursor-pointer"
-                      title="Send Message"
-                    />
-                    <TrashIcon
-                      onClick={() => handleDelete(item._id)}
-                      className="h-5 w-5 text-red-600 hover:text-gray-900 cursor-pointer"
-                      title="Delete"
-                    />
+                    <div className="group relative">
+                      <MailIcon
+                        onClick={() => handleSendEmail(item.userId)}
+                        className="h-5 w-5 text-blue-600 hover:text-blue-900 cursor-pointer transition-colors duration-200"
+                      />
+                      <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                        Send Message
+                      </span>
+                    </div>
+                    <div className="group relative">
+                      <TrashIcon
+                        onClick={() => handleDelete(item._id)}
+                        className="h-5 w-5 text-red-600 hover:text-gray-900 cursor-pointer transition-colors duration-200"
+                      />
+                      <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                        Delete
+                      </span>
+                    </div>
                   </div>
                 </td>
               </tr>

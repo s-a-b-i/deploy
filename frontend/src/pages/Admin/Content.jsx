@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from 'react-hot-toast'; // Import toast
 import StatCard from '../../components/Admin/StatCard';
 import WebsiteDetailsModal from '../../components/Admin/WebsiteDetailsModal';
 import WebsiteTable from '../../components/Admin/WebsiteTable';
@@ -87,9 +88,11 @@ const Content = () => {
         )
       );
       setError(null);
+      toast.success(`Status updated to ${newStatus}`); // Toast notification
     } catch (error) {
       console.error("Error updating status:", error);
       setError("Failed to update status");
+      toast.error("Failed to update status"); // Toast notification
     } finally {
       setLoadingActionId(null);
     }
@@ -104,9 +107,11 @@ const Content = () => {
         prevContent.filter((content) => content._id !== id)
       );
       setError(null);
+      toast.success("Content deleted successfully"); // Toast notification
     } catch (error) {
       console.error("Error deleting content:", error);
       setError("Failed to delete content");
+      toast.error("Failed to delete content"); // Toast notification
     }
   };
 
@@ -124,9 +129,11 @@ const Content = () => {
       }
       setSelectedEmail(userData.email);
       setIsEmailModalOpen(true);
+      toast.success("Email fetched successfully"); // Toast notification
     } catch (error) {
       console.error("Error fetching user email:", error);
       setError("Failed to fetch user email");
+      toast.error("Failed to fetch user email"); // Toast notification
     }
   };
 
@@ -139,9 +146,11 @@ const Content = () => {
         const filteredContent = await adminWebsiteService.getWebsitesByStatus(user._id, status);
         setPendingContent(filteredContent);
         setError(null);
+        toast.success(`Filtered by status: ${status}`); // Toast notification
       } catch (error) {
         console.error("Error filtering content:", error);
         setError("Failed to filter content");
+        toast.error("Failed to filter content"); // Toast notification
       }
     }
   };

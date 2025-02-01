@@ -8,6 +8,10 @@ const RecentServices = ({ isLoading, recentServices, onViewProduct }) => {
       </h3>
       {isLoading ? (
         <div className="text-center py-6 text-lg text-gray-600">Loading...</div>
+      ) : recentServices.length === 0 ? (
+        <div className="text-center py-6 text-lg text-gray-600">
+          No recent services available.
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-base text-left">
