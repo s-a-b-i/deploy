@@ -195,7 +195,7 @@ export const getAllCategoriesPublic = async (req, res) => {
   export const getFAQsByCategoryPublic = async (req, res) => {
     try {
       const { categoryId } = req.params;
-      const faqs = await FAQ.find({ category: categoryId }).lean();
+      const faqs = await FAQ.find({ category: categoryId,active : true }).lean();
       return res.status(200).json(faqs);
     } catch (error) {
       return res.status(500).json({ error: error.message });
@@ -208,7 +208,7 @@ export const getAllCategoriesPublic = async (req, res) => {
 export const searchFAQsByQuestion = async (req, res) => {
   try {
     const { query } = req.query;
-    const faqs = await FAQ.find({ question: { $regex: query, $options: 'i' } }).lean();
+    const faqs = await FAQ.find({ question: { $regex: query, $options: 'i' }, active : true }).lean();
     return res.status(200).json(faqs);
   } catch (error) {
     return res.status(500).json({ error: error.message });
