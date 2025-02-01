@@ -45,7 +45,8 @@ const Favorite = () => {
       const favoritesData = await favouriteService.getFavourites(userId);
       const websiteDetailsPromises = favoritesData.map(async (favorite) => {
         try {
-          const websiteDetails = await websiteService.getWebsiteById(favorite.websiteId);
+          // Updated to match the new API signature - passing both websiteId and userId
+          const websiteDetails = await websiteService.getWebsiteById(favorite.websiteId, userId);
           return {
             ...websiteDetails,
             favoriteId: favorite._id
@@ -55,7 +56,7 @@ const Favorite = () => {
           return null;
         }
       });
-
+  
       const websiteDetails = await Promise.all(websiteDetailsPromises);
       const validWebsites = websiteDetails.filter(website => website !== null);
       setFavorites(validWebsites);

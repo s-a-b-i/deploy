@@ -6,6 +6,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import useCartStore from "../../store/cartStore";
 import ProductCard from "../../components/Advertiser/ProductCard";
 import { toast } from "react-hot-toast";
+import { use } from "react";
 
 const Cart = () => {
   const { user } = useAuthStore();
@@ -16,7 +17,7 @@ const Cart = () => {
   const [error, setError] = useState(null);
 
   const fetchCartItems = async () => {
-    if (!user?._id) return; // Ensure user is logged in
+    if (!user?._id) return;
 
     try {
       setLoading(true);
@@ -25,7 +26,8 @@ const Cart = () => {
       const enhancedCarts = await Promise.all(
         carts.map(async (item) => {
           try {
-            const websiteDetails = await websiteService.getWebsiteById(item.websiteId);
+            // Updated to match new API signature
+            const websiteDetails = await websiteService.getWebsiteById(item.websiteId, user._id);
             return { ...item, websiteDetails };
           } catch (err) {
             console.error(`Failed to fetch website details for ${item._id}:`, err);
@@ -36,12 +38,11 @@ const Cart = () => {
 
       setCartItems(enhancedCarts);
 
-      // Only fetch similar products if cart has items
       if (enhancedCarts.length > 0) {
         const categories = enhancedCarts.map((item) => item.websiteDetails?.category).flat();
         const uniqueCategories = [...new Set(categories)];
 
-        const allWebsites = await websiteService.getAllWebsites();
+        const allWebsites = await websiteService.getAllWebsites(user._id);
 
         const similarItems = allWebsites
           .filter(
@@ -53,7 +54,6 @@ const Cart = () => {
 
         setSimilarProducts(similarItems);
       } else {
-        // Clear similar products if cart is empty
         setSimilarProducts([]);
       }
 
@@ -71,11 +71,9 @@ const Cart = () => {
       setCartItems(updatedCartItems);
       updateCartCount(user._id);
       
-      // Clear similar products if this was the last item
       if (updatedCartItems.length === 0) {
         setSimilarProducts([]);
       } else {
-        // Add the deleted item back to similar products if it matches the category
         const deletedItem = cartItems.find(item => item._id === cartId);
         if (deletedItem?.websiteDetails) {
           setSimilarProducts(prev => [...prev, deletedItem.websiteDetails].slice(0, 6));
@@ -98,9 +96,9 @@ const Cart = () => {
       const response = await cartService.createCart(user._id, websiteId);
       updateCartCount(user._id);
       setSimilarProducts((prev) => prev.filter((item) => item._id !== websiteId));
-      toast.success("Item added to cart");
-
-      const websiteDetails = await websiteService.getWebsiteById(websiteId);
+      
+      // Updated to match new API signature
+      const websiteDetails = await websiteService.getWebsiteById(websiteId, user._id);
       
       setCartItems((prev) => [...prev, { 
         _id: response._id,
@@ -108,6 +106,8 @@ const Cart = () => {
         websiteDetails,
         userId: user._id
       }]);
+      
+      toast.success("Item added to cart");
     } catch (err) {
       console.error("Failed to add item to cart:", err);
       toast.error(err.message || "Failed to add item to cart");

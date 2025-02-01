@@ -42,38 +42,56 @@
 
 // export default EditWebsiteForm;
 
-// components/EditWebsiteForm.jsx
+/// components/EditWebsiteForm.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { websiteService } from '../../utils/services';
 import AddWebsiteForm from './AddWebsiteForm';
 import Loader from '../Loader';
+import { useAuthStore } from '../../store/authStore';
 
 const EditWebsiteForm = () => {
+  const { user } = useAuthStore();
   const { id } = useParams();
   const navigate = useNavigate();
   const [initialData, setInitialData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchWebsiteData = async () => {
+      if (!user?._id || !id) {
+        toast.error('Missing required data');
+        navigate('/websites');
+        return;
+      }
+
       try {
-        const data = await websiteService.getWebsiteById(id);
+        const data = await websiteService.getWebsiteById(id, user._id);
+        if (!data) {
+          toast.error('Website not found');
+          navigate('/websites');
+          return;
+        }
         setInitialData(data);
       } catch (error) {
-        toast.error('Error fetching website data');
+        console.error('Error fetching website:', error);
+        toast.error(error.message || 'Error fetching website data');
         navigate('/websites');
       } finally {
-        setIsLoading(false); // End loading
+        setIsLoading(false);
       }
     };
 
     fetchWebsiteData();
-  }, [id, navigate]);
+  }, [id, navigate, user?._id]);
 
   if (isLoading) {
-    return  <Loader />;
+    return <Loader />;
+  }
+
+  if (!initialData) {
+    return null;
   }
 
   return (

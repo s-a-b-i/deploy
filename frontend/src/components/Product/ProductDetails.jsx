@@ -111,7 +111,7 @@ const ProductDetails = () => {
       toast.success('Item added to cart successfully! 🛒');
 
       // Optionally, you can also update the cart items state if needed
-      const websiteDetails = await websiteService.getWebsiteById(id);
+      const websiteDetails = await websiteService.getWebsiteById(id, user._id);
       setProductData(prev => ({
         ...prev,
         cartItem: {

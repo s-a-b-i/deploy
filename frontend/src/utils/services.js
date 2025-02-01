@@ -29,15 +29,15 @@ export const websiteService = {
     }
   },
 
-  getWebsiteById: async (id) => {
+  getWebsiteById: async (id, userId) => {
     try {
-      const response = await api.get(`/websites/${id}`);
+      const response = await api.post(`/websites/${id}`, { userId });
       return response.data;
     } catch (error) {
-      throw error.response.data;
+      throw error.response?.data || { message: "An error occurred" };
     }
   },
-
+  
   getAllWebsites: async (userId) => {
     try {
       const response = await api.post('/websites/get-all', { userId });

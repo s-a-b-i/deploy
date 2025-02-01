@@ -100,7 +100,7 @@ const Dashboard = () => {
           const websiteDetails = await Promise.all(
             maxProductsPromo.products.map(async websiteId => {
               try {
-                return await websiteService.getWebsiteById(websiteId);
+                return await websiteService.getWebsiteById(websiteId, user._id);
               } catch (error) {
                 console.error(`Error fetching website ${websiteId}:`, error);
                 return null;
