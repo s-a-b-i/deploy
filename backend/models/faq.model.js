@@ -43,4 +43,17 @@ const faqSchema = new mongoose.Schema({
 const Category = mongoose.model('Category', categorySchema);
 const FAQ = mongoose.model('FAQ', faqSchema);
 
+
+// Middleware to delete related FAQs when a category is deleted
+categorySchema.pre('findOneAndDelete', async function(next) {
+  const categoryId = this.getQuery()._id;
+  try {
+    await FAQ.deleteMany({ category: categoryId });
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 export { Category, FAQ };
