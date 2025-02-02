@@ -36,9 +36,9 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
       { name: "Balance", path: "/balance", icon: <MdAccountBalance size={24} /> },
       { 
         name: "Faq", 
-        path: "https://sqlinkbuildings.help", 
+        path: "/faq", 
         icon: <MdHelp size={24} />, 
-        external: true 
+      
       },
     ],
     Advertiser: [
@@ -53,9 +53,9 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
       { name: "Balance", path: "/balance", icon: <MdAccountBalance size={24} /> },
       { 
         name: "Faq", 
-        path: "https://sqlinkbuildings.help", 
+        path: "/faq", 
         icon: <MdHelp size={24} />, 
-        external: true 
+        // external: true 
       },
     ],
   };

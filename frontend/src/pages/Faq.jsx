@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Header from "../components/Faq/Header";
+import Header from "../components/Faq//Header";
 import HeroSection from "../components/Faq/HeroSection";
 import ViewToggle from "../components/Faq/ViewToggle";
 import Card from "../components/Faq/Card";

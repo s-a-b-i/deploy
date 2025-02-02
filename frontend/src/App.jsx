@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
+import Faq from "./pages/Faq.jsx";
 
 // Layout
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -28,6 +29,7 @@ import Orders from "./pages/Publisher/Orders";
 import Profile from "./pages/Publisher/Profile";
 import Withdraw from "./pages/Publisher/Withdraw";
 import Balance from "./pages/Publisher/Balance";
+// import Faq from "./pages/Publisher/Faq.jsx";
 import Deposit from "./components/Forms/Deposit";
 import AddWebsiteForm from "./components/Forms/AddWebsiteForm";
 import EditWebsiteForm from './components/Forms/EditWebsiteForm';
@@ -41,8 +43,10 @@ import Favorite from "./pages/Advertiser/Favorite";
 import Cart from "./pages/Advertiser/Cart";
 import AdvertiserDeposit from "./pages/Advertiser/Deposit";
 import AdvertiserBalance from "./pages/Advertiser/Balance";
+// import Faq from "./pages/Advertiser/Faq.jsx";
 import CreateProject from "./components/Forms/CreateProject";
 import ProductDetails from "./components/Product/ProductDetails";
+
 
 // Admin Pages
 import AdminDashboard from "./pages/Admin/Dashboard";
@@ -246,7 +250,7 @@ const App = () => {
               <Route path="/publisher/promos" element={<Promos />} />
               <Route path="/publisher/orders" element={<Orders />} />
               <Route path="/publisher/profile" element={<Profile />} />
-              {/* <Route path="/publisher/faq" element={<Faq />} /> */}
+              <Route path="/publisher/faq" element={<Faq />} />
             </>
           ) : (
             <>
@@ -261,7 +265,7 @@ const App = () => {
               <Route path="/advertiser/cart" element={<Cart />} />
               <Route path="/advertiser/deposit" element={<AdvertiserDeposit />} />
               <Route path="/advertiser/balance" element={<AdvertiserBalance />} />
-              {/* <Route path="/advertiser/faq" element={<AdvertiserFaq />} /> */}
+              <Route path="/advertiser/faq" element={<AdvertiserFaq />} />
             </>
           )}
 

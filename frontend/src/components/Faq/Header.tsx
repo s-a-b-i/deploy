@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import logoImage from "../assets/SEOLINKBUILDING.png"; // Corrected import path
+import logoImage from "../../assets/Logo.svg"; // Corrected import path
 
 const Header = ({ selectedLanguage, onLanguageChange }) => {
   const [showLanguageList, setShowLanguageList] = useState(false);
