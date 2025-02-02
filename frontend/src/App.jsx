@@ -265,7 +265,7 @@ const App = () => {
               <Route path="/advertiser/cart" element={<Cart />} />
               <Route path="/advertiser/deposit" element={<AdvertiserDeposit />} />
               <Route path="/advertiser/balance" element={<AdvertiserBalance />} />
-              <Route path="/advertiser/faq" element={<AdvertiserFaq />} />
+              <Route path="/advertiser/faq" element={<Faq />} />
             </>
           )}
 
