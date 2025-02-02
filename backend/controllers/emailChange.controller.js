@@ -1,13 +1,21 @@
 import { User } from "../models/user.model.js";
 import { sendVerificationEmail } from '../mailtrap/emails.js';
+import { checkUserAndBlockStatus } from '../utils/userCheck.js';
 
 export const requestEmailChange = async (req, res) => {
   const { userId, newEmail } = req.body;
 
   try {
+    await checkUserAndBlockStatus(userId);
+  } catch (error) {
+    return res.status(403).json({ message: error.message });
+  }
+
+  try {
     const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+
+    if(user.email === newEmail) {
+      return res.status(400).json({ message: 'New email address is the same as the current email address' });
     }
 
     const emailExists = await User.findOne({ email: newEmail });
@@ -38,10 +46,13 @@ export const verifyEmailChange = async (req, res) => {
   const { userId, verificationToken, newEmail } = req.body;
 
   try {
+    await checkUserAndBlockStatus(userId);
+  } catch (error) {
+    return res.status(403).json({ message: error.message });
+  }
+  
+  try {
     const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
 
     if (user.verificationToken !== verificationToken || user.verificationTokenExpireAt < Date.now()) {
       return res.status(400).json({ message: 'Invalid or expired verification token' });

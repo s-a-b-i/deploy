@@ -1,5 +1,6 @@
 import Profile from '../models/profile.model.js';
 import cloudinary from 'cloudinary';
+import { checkUserAndBlockStatus } from '../utils/userCheck.js';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -10,6 +11,14 @@ cloudinary.config({
 
 // Create a new profile
 export async function createProfile(req, res) {
+  const userId = req.body.userId;
+
+  try {
+    await checkUserAndBlockStatus(userId);
+  } catch (error) {
+    return res.status(403).json({ message: error.message });
+  }
+
   try {
     const { file } = req;
     let avatarUrl = '';
@@ -39,8 +48,10 @@ export async function getProfile(req, res) {
 
     const userId = req.body.userId;
 
-    if(!userId){
-        return res.status(400).json({ message: 'User ID is required' });
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const profile = await Profile.findOne({ userId: userId });
@@ -66,6 +77,14 @@ export async function getProfile(req, res) {
 
 // Update a profile by ID
 export async function updateProfile(req, res) {
+  const userId = req.body.userId;
+
+  try {
+    await checkUserAndBlockStatus(userId);
+  } catch (error) {
+    return res.status(403).json({ message: error.message });
+  }
+
   try {
     const { file } = req;
     let avatarUrl = '';
@@ -93,6 +112,14 @@ export async function updateProfile(req, res) {
 
 // Delete a profile by ID
 export async function deleteProfile(req, res) {
+  const userId = req.body.userId;
+
+  try {
+    await checkUserAndBlockStatus(userId);
+  } catch (error) {
+    return res.status(403).json({ message: error.message });
+  }
+
   try {
     const deletedProfile = await Profile.findByIdAndDelete(req.params.id);
     if (!deletedProfile) {
