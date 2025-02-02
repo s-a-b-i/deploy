@@ -9,7 +9,7 @@ const HeroSection = ({ onSearch }) => {
   };
 
   return (
-    <section className="text-center py-10 bg-[#7091E6] text-white">
+    <section className="text-center py-10 bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white">
       <h2 className="text-3xl font-semibold mb-4">Read all FAQs to use Rankister</h2>
       <form onSubmit={handleSearch} className="relative max-w-lg mx-auto">
         <input

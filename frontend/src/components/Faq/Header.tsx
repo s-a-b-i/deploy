@@ -10,11 +10,11 @@ const Header = ({ selectedLanguage, onLanguageChange }) => {
   };
 
   return (
-    <header className="bg-[#7091E6] text-white px-6 py-4 flex justify-between items-center">
+    <header className="bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white px-6 py-4 flex justify-between items-center">
       <div className="flex items-center">
         <div className="flex items-center space-x-2">
           {/* Image Logo */}
-          <div className="bg-gradient-to-r from-[#7091E6] to-[#8697C4] p-3">
+          <div className=" p-3">
             <img
               src={logoImage} // Use your imported logo image here
               alt="Rankister Logo"
@@ -22,38 +22,14 @@ const Header = ({ selectedLanguage, onLanguageChange }) => {
             />
           </div>
           {/* Dynamic Header Text */}
-          <h1 className="text-xl font-semibold">
+          {/* <h1 className="text-xl font-semibold">
             {selectedLanguage === "Italian" ? "FAQ Rankister" : "Rankister Help Center"}
-          </h1>
+          </h1> */}
         </div>
       </div>
       <div className="flex items-center space-x-6">
-        <button className="text-white hover:underline">Submit Ticket</button>
-        <div className="relative">
-          <button
-            className="text-white hover:underline"
-            onClick={() => setShowLanguageList(!showLanguageList)} // Toggle list on click
-          >
-            {selectedLanguage} {/* Display the selected language */}
-          </button>
-          {/* Language List */}
-          {showLanguageList && (
-            <div className="absolute top-full left-0 mt-2 bg-white text-gray-800 rounded-lg shadow-lg">
-              <button
-                className="block w-full px-4 py-2 hover:bg-gray-100 rounded-lg text-left"
-                onClick={() => handleLanguageChange("Italian")}
-              >
-                Italian
-              </button>
-              <button
-                className="block w-full px-4 py-2 hover:bg-gray-100 rounded-lg text-left"
-                onClick={() => handleLanguageChange("English")}
-              >
-                English
-              </button>
-            </div>
-          )}
-        </div>
+        {/* <button className="text-white hover:underline">Submit Ticket</button> */}
+        
       </div>
     </header>
   );
