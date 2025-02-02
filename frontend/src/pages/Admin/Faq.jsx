@@ -80,36 +80,6 @@ const FaqCard = ({ faq, categories, onEdit, onDelete, onStatusChange }) => {
               {faq.active ? 'Active' : 'Inactive'}
             </span>
           </div>
-          <div className="flex items-center">
-            <button 
-              className="text-gray-400 hover:text-gray-500 transition-colors duration-200"
-              onClick={() => onStatusChange(faq._id, faq.active)}
-              title={faq.active ? 'Deactivate' : 'Activate'}
-            >
-              <svg 
-                className="w-5 h-5" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                {faq.active ? (
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M5 13l4 4L19 7"
-                  />
-                ) : (
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
         </div>
         
         <h3 className="text-lg font-semibold text-gray-900 leading-tight mb-2">
@@ -138,6 +108,17 @@ const FaqCard = ({ faq, categories, onEdit, onDelete, onStatusChange }) => {
               Edit
             </button>
             <button
+              onClick={() => onStatusChange(faq._id, faq.active)}
+              className={`inline-flex items-center text-sm font-medium ${
+                faq.active ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'
+              } transition-colors duration-200`}
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+              {faq.active ? 'Deactivate' : 'Activate'}
+            </button>
+            <button
               onClick={() => onDelete(faq._id)}
               className="inline-flex items-center text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200"
             >
@@ -162,6 +143,7 @@ const Faq = () => {
   const [editingFaq, setEditingFaq] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showFaqForm, setShowFaqForm] = useState(false);
 
   const [newFaq, setNewFaq] = useState({
     question: '',
@@ -196,6 +178,11 @@ const Faq = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleFaqForm = () => {
+    setShowFaqForm(!showFaqForm);
+    setNewFaq({ question: '', answer: '', categoryId: '', userId: user._id });
   };
 
   const handleAddCategory = async (e) => {
@@ -263,6 +250,7 @@ const Faq = () => {
 
       await faqService.createFAQ(user._id, faqData);
       setNewFaq({ question: '', answer: '', categoryId: '', userId: user._id });
+      setShowFaqForm(false);
       
       const updatedFaqs = await faqService.getFAQsByCategory(user._id, newFaq.categoryId);
       setFaqs(updatedFaqs);
@@ -305,7 +293,6 @@ const Faq = () => {
   
       await faqService.updateFAQ(user._id, editingFaq._id, updatedData);
       
-      // Refresh FAQs after update
       const updatedFaqs = await faqService.getFAQsByCategory(user._id, selectedCategory);
       setFaqs(updatedFaqs);
       
@@ -421,7 +408,7 @@ const Faq = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white px-4 py-2 rounded-lg  shadow-sm"
+                  className="w-full bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white px-4 py-2 rounded-lg shadow-sm"
                 >
                   Add Category
                 </button>
@@ -459,30 +446,38 @@ const Faq = () => {
 
         {/* Main Content Area */}
         <div className="lg:col-span-2">
-          {/* Search Bar */}
+          {/* Search Bar with Add FAQ Button */}
           <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <div className="relative">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Search FAQs..."
-              />
-              <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+            <div className="flex justify-between items-center mb-4">
+              <div className="relative flex-1 mr-4">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Search FAQs..."
+                />
+                <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <button
+                  onClick={handleSearch}
+                  className="absolute right-2 top-2 bg-foundations-primary text-white px-4 py-1.5 rounded-md"
+                >
+                  Search
+                </button>
+              </div>
               <button
-                onClick={handleSearch}
-                className="absolute right-2 top-2 bg-foundations-primary text-white px-4 py-1.5 rounded-md "
+                onClick={toggleFaqForm}
+                className="bg-foundations-primary text-white px-4 py-2 rounded-lg hover:bg-foundations-secondary transition-colors duration-200"
               >
-                Search
+                {showFaqForm ? 'Cancel' : 'Add FAQ'}
               </button>
             </div>
           </div>
 
-          {/* Add New FAQ Form */}
-          {!editingFaq && (
+          {/* Add New FAQ Form - Conditionally rendered */}
+          {!editingFaq && showFaqForm && (
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Add New FAQ</h2>
               <form onSubmit={handleAddFaq} className="space-y-4">
@@ -514,12 +509,21 @@ const Faq = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   placeholder="Answer"
                 />
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-sm"
-                >
-                  Add FAQ
-                </button>
+                <div className="flex space-x-4">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white px-6 py-3 rounded-lg transition-all duration-200 shadow-sm"
+                  >
+                    Add FAQ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={toggleFaqForm}
+                    className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </form>
             </div>
           )}
