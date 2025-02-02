@@ -421,7 +421,7 @@ const Faq = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm"
+                  className="w-full bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white px-4 py-2 rounded-lg  shadow-sm"
                 >
                   Add Category
                 </button>
@@ -474,7 +474,7 @@ const Faq = () => {
               </svg>
               <button
                 onClick={handleSearch}
-                className="absolute right-2 top-2 bg-blue-600 text-white px-4 py-1.5 rounded-md hover:bg-blue-700 transition-colors duration-200"
+                className="absolute right-2 top-2 bg-foundations-primary text-white px-4 py-1.5 rounded-md "
               >
                 Search
               </button>
@@ -516,7 +516,7 @@ const Faq = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-sm"
+                  className="w-full bg-gradient-to-r from-foundations-primary to-foundations-secondary text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-sm"
                 >
                   Add FAQ
                 </button>
