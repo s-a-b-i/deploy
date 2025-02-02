@@ -1,5 +1,6 @@
 import { User } from "../models/user.model.js";
 import { sendVerificationEmail } from '../mailtrap/emails.js';
+import { checkUserAndBlockStatus } from '../utils/userCheck.js';
 
 export const requestEmailChange = async (req, res) => {
   const { userId, newEmail } = req.body;

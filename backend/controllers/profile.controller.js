@@ -1,5 +1,6 @@
 import Profile from '../models/profile.model.js';
 import cloudinary from 'cloudinary';
+import { checkUserAndBlockStatus } from '../utils/userCheck.js';
 
 // Configure Cloudinary
 cloudinary.config({
