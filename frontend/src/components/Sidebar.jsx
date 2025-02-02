@@ -55,7 +55,7 @@ const Sidebar = ({ mode, toggleMode, userName = "Michael Smyth" }) => {
         name: "Faq", 
         path: "/faq", 
         icon: <MdHelp size={24} />, 
-        // external: true 
+        external: true 
       },
     ],
   };
