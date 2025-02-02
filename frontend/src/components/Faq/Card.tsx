@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { MdArrowRight, MdQuestionAnswer } from "react-icons/md";
 
 const Card = ({ card, viewMode }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -41,10 +42,19 @@ const Card = ({ card, viewMode }) => {
             {isExpanded && (
               <div className="mt-2 space-y-2">
                 {card.questions.map((faq) => (
-                  <div key={faq._id} className="text-left p-2 bg-gray-50 rounded">
-                    <h4 className="font-medium">{faq.question}</h4>
-                    <p className="text-sm text-gray-600 mt-1">{faq.answer}</p>
+                  <div
+                  key={faq._id}
+                  className="border p-4 rounded-md bg-white shadow-md my-2 transition duration-150 hover:shadow-lg"
+                >
+                  <div className="flex items-center space-x-2 mb-1">
+                    <MdQuestionAnswer className="text-blue-500" size={16} />
+                    <h4 className="font-semibold text-lg text-gray-800">{faq.question}</h4>
                   </div>
+                  <p className="text-sm text-gray-600 mt-1 flex items-start">
+                    <MdArrowRight className="text-gray-400 mr-2" size={20} />
+                    {faq.answer}
+                  </p>
+                </div>
                 ))}
               </div>
             )}
