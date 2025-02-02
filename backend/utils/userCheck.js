@@ -11,7 +11,7 @@ export const checkUserAndBlockStatus = async (userId) => {
   }
 
   if (user.status === false) {
-    throw new Error('User account has been deactivated');
+    throw new Error('This user account has been deactivated');
   }
 
   return user;

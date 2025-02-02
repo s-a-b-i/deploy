@@ -1,10 +1,16 @@
 import Cart from '../../models/cart.model.js';
+import { checkUserAndBlockStatus } from '../../utils/userCheck.js';
 
 // get all carts for a user
 export const getCarts = async (req, res) => {
   try {
     const { userId } = req.body;
-    if (!userId) return res.status(400).json({ error: 'User ID is required' });
+    
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
 
     const carts = await Cart.find({ userId });
     res.status(200).json(carts);
@@ -19,6 +25,12 @@ export const createCart = async (req, res) => {
     const { userId, websiteId } = req.body;
     if (!userId || !websiteId) return res.status(400).json({ error: 'User ID and Website ID are required' });
 
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
+
     const cart = new Cart({ userId, websiteId });
     await cart.save();
     res.status(201).json(cart);
@@ -32,7 +44,12 @@ export const getCartById = async (req, res) => {
   try {
     const { userId } = req.body;
     const { cartId } = req.params;
-    if (!userId) return res.status(400).json({ error: 'User ID is required' });
+   
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
 
     const cart = await Cart.findOne({ _id: cartId, userId });
     if (!cart) return res.status(404).json({ error: 'Cart not found' });
@@ -50,6 +67,12 @@ export const updateCart = async (req, res) => {
     const { cartId } = req.params;
     if (!userId || !websiteId) return res.status(400).json({ error: 'User ID and Website ID are required' });
 
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
+
     const cart = await Cart.findOneAndUpdate({ _id: cartId, userId }, { websiteId }, { new: true });
     if (!cart) return res.status(404).json({ error: 'Cart not found' });
 
@@ -64,7 +87,12 @@ export const deleteCart = async (req, res) => {
   try {
     const { userId } = req.body;
     const { cartId } = req.params;
-    if (!userId) return res.status(400).json({ error: 'User ID is required' });
+   
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
 
     const cart = await Cart.findOneAndDelete({ _id: cartId, userId });
     if (!cart) return res.status(404).json({ error: 'Cart not found' });

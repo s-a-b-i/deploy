@@ -1,10 +1,16 @@
 import Favourite from '../../models/favourite.model.js';
+import { checkUserAndBlockStatus } from '../../utils/userCheck.js';
 
 // get all favourites for a user
 export const getFavourites = async (req, res) => {
   try {
     const { userId } = req.body;
-    if (!userId) return res.status(400).json({ error: 'User ID is required' });
+    
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
 
     const favourites = await Favourite.find({ userId });
     res.status(200).json(favourites);
@@ -19,6 +25,12 @@ export const createFavourite = async (req, res) => {
     const { userId, websiteId } = req.body;
     if (!userId || !websiteId) return res.status(400).json({ error: 'User ID and Website ID are required' });
 
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
+
     const favourite = new Favourite({ userId, websiteId });
     await favourite.save();
     res.status(201).json(favourite);
@@ -32,7 +44,12 @@ export const getFavouriteById = async (req, res) => {
   try {
     const { userId } = req.body;
     const { favouriteId } = req.params;
-    if (!userId) return res.status(400).json({ error: 'User ID is required' });
+    
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
 
     const favourite = await Favourite.findOne({ _id: favouriteId, userId });
     if (!favourite) return res.status(404).json({ error: 'Favourite not found' });
@@ -50,6 +67,12 @@ export const updateFavourite = async (req, res) => {
     const { favouriteId } = req.params;
     if (!userId || !websiteId) return res.status(400).json({ error: 'User ID and Website ID are required' });
 
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
+
     const favourite = await Favourite.findOneAndUpdate({ _id: favouriteId, userId }, { websiteId }, { new: true });
     if (!favourite) return res.status(404).json({ error: 'Favourite not found' });
 
@@ -64,7 +87,12 @@ export const deleteFavourite = async (req, res) => {
   try {
     const { userId } = req.body;
     const { favouriteId } = req.params;
-    if (!userId) return res.status(400).json({ error: 'User ID is required' });
+    
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
 
     const favourite = await Favourite.findOneAndDelete({ _id: favouriteId, userId });
     if (!favourite) return res.status(404).json({ error: 'Favourite not found' });

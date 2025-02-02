@@ -63,6 +63,12 @@ export const getStatsByYearAndMonth = async (req, res) => {
       return res.status(400).json({ error: 'User ID, Website ID, Year, and Month are required' });
     }
 
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
+
     const stats = await Stats.findOne({ userId, websiteId });
     if (!stats) {
       return res.status(404).json({ error: 'Stats not found' });
@@ -91,6 +97,12 @@ export const getLast30DaysStats = async (req, res) => {
     const { userId, websiteId } = req.body;
     if (!userId || !websiteId) {
       return res.status(400).json({ error: 'User ID and Website ID are required' });
+    }
+
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
     }
 
     const stats = await Stats.findOne({ userId, websiteId });
@@ -133,6 +145,12 @@ export const getLast12MonthsStats = async (req, res) => {
       const { userId, websiteId } = req.body;
       if (!userId || !websiteId) {
         return res.status(400).json({ error: 'User ID and Website ID are required' });
+      }
+
+      try {
+        await checkUserAndBlockStatus(userId);
+      } catch (error) {
+        return res.status(403).json({ message: error.message });
       }
   
       const stats = await Stats.findOne({ userId, websiteId });
