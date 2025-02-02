@@ -602,3 +602,138 @@ export const adminWebsiteService = {
   },
 
 };
+
+export const faqService = {
+  // Admin: Add new category
+  addCategory: async (adminId, name) => {
+    try {
+      const response = await api.post('/category/add', { adminId, name });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Admin: Delete category
+  deleteCategory: async (adminId, categoryId) => {
+    try {
+      const response = await api.post('/category/delete', { adminId, categoryId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Admin: Get all categories
+  getAllCategories: async (adminId) => {
+    try {
+      const response = await api.post('/category/all', { adminId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Admin: Create new FAQ
+  createFAQ: async (adminId, faqData) => {
+    try {
+      const response = await api.post('/faq/create', {
+        adminId,
+        ...faqData
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Admin: Update FAQ
+  updateFAQ: async (adminId, faqId, faqData) => {
+    try {
+      const response = await api.post('/faq/update', {
+        adminId,
+        faqId,
+        ...faqData
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Admin: Delete FAQ
+  deleteFAQ: async (adminId, faqId) => {
+    try {
+      const response = await api.post('/faq/delete', { adminId, faqId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Admin: Change FAQ status
+  changeFAQStatus: async (adminId, faqId, active) => {
+    try {
+      const response = await api.post('/faq/change-status', {
+        adminId,
+        faqId,
+        active
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Admin: Search FAQs
+  searchFAQsAdmin: async (adminId, query) => {
+    try {
+      const response = await api.post('/faq/search', { adminId, query });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Admin: Get FAQs by category
+  getFAQsByCategory: async (adminId, categoryId) => {
+    try {
+      const response = await api.post('/faq/category', { adminId, categoryId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Public: Get all categories
+  getAllCategoriesPublic: async () => {
+    try {
+      const response = await api.get('/public/categories');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Public: Get FAQs by category
+  getFAQsByCategoryPublic: async (categoryId) => {
+    try {
+      const response = await api.get(`/public/faqs/${categoryId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Public: Search FAQs
+  searchFAQsPublic: async (query) => {
+    try {
+      const response = await api.get('/public/faqs/search', {
+        params: { query }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+};
