@@ -1,16 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 
-const HeroSection = () => {
+const HeroSection = ({ onSearch }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    onSearch(searchQuery);
+  };
+
   return (
     <section className="text-center py-10 bg-[#7091E6] text-white">
       <h2 className="text-3xl font-semibold mb-4">Read all FAQs to use Rankister</h2>
-      <div className="relative max-w-lg mx-auto">
+      <form onSubmit={handleSearch} className="relative max-w-lg mx-auto">
         <input
           type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search for answers"
           className="w-full px-4 py-2 rounded-md text-gray-700"
         />
-        <button className="absolute right-2 top-2 text-gray-400 hover:text-gray-600">
+        <button
+          type="submit"
+          className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -26,7 +38,7 @@ const HeroSection = () => {
             />
           </svg>
         </button>
-      </div>
+      </form>
     </section>
   );
 };

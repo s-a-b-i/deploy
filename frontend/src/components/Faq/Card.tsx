@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 
 const Card = ({ card, viewMode }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <div
-      className={`bg-white shadow-md p-6 rounded-lg border border-gray-200 transition-all duration-300 ease-in-out transform hover:border-blue-500 hover:-translate-y-1 ${
+      className={`bg-white shadow-md p-6 rounded-lg border border-gray-200 transition-all duration-300 ease-in-out transform hover:border-blue-500 ${
         viewMode === "list" ? "flex items-center space-x-4" : "text-center"
       }`}
     >
@@ -23,10 +25,31 @@ const Card = ({ card, viewMode }) => {
           />
         </svg>
       </div>
-      <div>
+      <div className="flex-1">
         <h3 className="text-xl font-semibold">{card.title}</h3>
         <p className="text-sm text-[#7091E6]">{card.articles}</p>
         <p className="text-xs text-gray-500">{card.updated}</p>
+        
+        {card.questions && card.questions.length > 0 && (
+          <div className="mt-4">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-blue-500 text-sm"
+            >
+              {isExpanded ? "Hide Questions" : "Show Questions"}
+            </button>
+            {isExpanded && (
+              <div className="mt-2 space-y-2">
+                {card.questions.map((faq) => (
+                  <div key={faq._id} className="text-left p-2 bg-gray-50 rounded">
+                    <h4 className="font-medium">{faq.question}</h4>
+                    <p className="text-sm text-gray-600 mt-1">{faq.answer}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

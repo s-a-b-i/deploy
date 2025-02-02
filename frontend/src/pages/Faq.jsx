@@ -1,69 +1,85 @@
-import React, { useState } from "react";
-import Header from "../components/Faq//Header";
+import React, { useState, useEffect } from "react";
+import Header from "../components/Faq/Header";
 import HeroSection from "../components/Faq/HeroSection";
 import ViewToggle from "../components/Faq/ViewToggle";
 import Card from "../components/Faq/Card";
-import Footer from "../components/Faq/Footer";
+// import Footer from "../components/Faq/Footer";
+import { faqService } from "../utils/services";
 
 const Faq = () => {
   const [viewMode, setViewMode] = useState("grid");
-  const [language, setLanguage] = useState("Italian"); // Default language
+  const [language, setLanguage] = useState("Italian");
+  const [categories, setCategories] = useState([]);
+  const [faqs, setFaqs] = useState({});
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample data for cards
-  const cards = [
-    // Italian Cards
-    {
-      id: 1,
-      title: "Come usare Rankister?",
-      articles: "5 Articoli",
-      updated: "Ultimo aggiornamento 2 giorni fa",
-      language: "Italian",
-    },
-    {
-      id: 2,
-      title: "Come contattare il supporto?",
-      articles: "7 Articoli",
-      updated: "Ultimo aggiornamento 3 giorni fa",
-      language: "Italian",
-    },
-    {
-      id: 3,
-      title: "Come resettare la password?",
-      articles: "2 Articoli",
-      updated: "Ultimo aggiornamento 5 giorni fa",
-      language: "Italian",
-    },
-    // English Cards
-    {
-      id: 4,
-      title: "How to use Rankister?",
-      articles: "5 Articles",
-      updated: "Last updated 2 days ago",
-      language: "English",
-    },
-    {
-      id: 5,
-      title: "How to contact support?",
-      articles: "7 Articles",
-      updated: "Last updated 3 days ago",
-      language: "English",
-    },
-    {
-      id: 6,
-      title: "How to reset your password?",
-      articles: "2 Articles",
-      updated: "Last updated 5 days ago",
-      language: "English",
-    },
-  ];
+  // Fetch categories on component mount
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
-  // Filter cards based on the selected language
-  const filteredCards = cards.filter((card) => card.language === language);
+  const fetchCategories = async () => {
+    try {
+      const categoriesData = await faqService.getAllCategoriesPublic();
+      setCategories(categoriesData);
+      // Fetch FAQs for each category
+      categoriesData.forEach(category => {
+        fetchFAQsByCategory(category._id);
+      });
+    } catch (err) {
+      setError("Error fetching categories");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchFAQsByCategory = async (categoryId) => {
+    try {
+      const faqsData = await faqService.getFAQsByCategoryPublic(categoryId);
+      setFaqs(prev => ({
+        ...prev,
+        [categoryId]: faqsData
+      }));
+    } catch (err) {
+      console.error(`Error fetching FAQs for category ${categoryId}:`, err);
+    }
+  };
+
+  const handleSearch = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      const results = await faqService.searchFAQsPublic(query);
+      setSearchResults(results);
+    } catch (err) {
+      console.error("Error searching FAQs:", err);
+    }
+  };
+
+  // Transform categories and FAQs into card format
+  const transformToCards = () => {
+    return categories.map(category => ({
+      id: category._id,
+      title: category.name,
+      articles: `${faqs[category._id]?.length || 0} Articles`,
+      updated: "Last updated recently",
+      language: language,
+      questions: faqs[category._id] || []
+    }));
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="min-h-screen bg-white">
       <Header selectedLanguage={language} onLanguageChange={setLanguage} />
-      <HeroSection />
+      <HeroSection onSearch={handleSearch} />
       <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
       <section className="bg-white py-10">
         <div
@@ -73,12 +89,25 @@ const Faq = () => {
               : "space-y-4"
           }`}
         >
-          {filteredCards.map((card) => (
-            <Card key={card.id} card={card} viewMode={viewMode} />
-          ))}
+          {searchResults.length > 0
+            ? searchResults.map((faq) => (
+                <Card
+                  key={faq._id}
+                  card={{
+                    id: faq._id,
+                    title: faq.question,
+                    content: faq.answer,
+                    language: language
+                  }}
+                  viewMode={viewMode}
+                />
+              ))
+            : transformToCards().map((card) => (
+                <Card key={card.id} card={card} viewMode={viewMode} />
+              ))}
         </div>
       </section>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
