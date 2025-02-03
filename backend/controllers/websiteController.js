@@ -15,6 +15,23 @@ export async function getWebsites(req, res) {
     }
 
     const websites = await Website.find({ status: 'approved' });
+
+    // Update stats for each website found
+    const { year, month, day } = getCurrentDateTime();
+
+    for (const website of websites) {
+      await createOrUpdateStats({
+        userId,
+        websiteId: website._id,
+        year,
+        month,
+        day,
+        updates: {
+          impressions: 1
+        }
+      });
+    }
+    
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching websites', error: error.message });
@@ -74,6 +91,23 @@ export async function getRecentlyCreatedWebsites(req, res) {
     }
 
     const websites = await Website.find({ status: 'approved' }).sort({ createdAt: -1 }).limit(req.params.limit || 5);
+
+    // Update stats for each website found
+    const { year, month, day } = getCurrentDateTime();
+
+    for (const website of websites) {
+      await createOrUpdateStats({
+        userId,
+        websiteId: website._id,
+        year,
+        month,
+        day,
+        updates: {
+          impressions: 1
+        }
+      });
+    }
+
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching websites', error: error.message });
