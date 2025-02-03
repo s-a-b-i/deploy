@@ -1,5 +1,7 @@
 import Cart from '../../models/cart.model.js';
 import { checkUserAndBlockStatus } from '../../utils/userCheck.js';
+import { createOrUpdateStats } from "../../utils/stats.js";
+import { getCurrentDateTime } from "../../utils/getCurrentDateTime.js";
 
 // get all carts for a user
 export const getCarts = async (req, res) => {
@@ -33,6 +35,23 @@ export const createCart = async (req, res) => {
 
     const cart = new Cart({ userId, websiteId });
     await cart.save();
+
+    // update stats
+    const { year, month, day } = getCurrentDateTime();
+
+    await createOrUpdateStats({
+      userId,
+      websiteId,
+      year,
+      month,
+      day,
+      updates: {
+        clicks: 1,
+        impressions: 1,
+        addToCarts: 1,
+      },
+    });
+
     res.status(201).json(cart);
   } catch (error) {
     res.status(500).json({ error: error.message });
