@@ -1,5 +1,6 @@
 import { Router } from 'express';
 const router = Router();
+import { updateStats } from '../middleware/updateStats.js';
 
 // Import each function separately
 import { 
@@ -20,7 +21,7 @@ import {
 // for advertisers
 router.post('/get-all', getWebsites);
 router.post('/recently-created/:limit', getRecentlyCreatedWebsites);
-router.post('/view/:id', viewWebsite);
+router.post('/view/:id',updateStats, viewWebsite);
 
 // Place specific routes before dynamic routes
 router.post('/notApproved', getWebsitesForUserNotApproved);

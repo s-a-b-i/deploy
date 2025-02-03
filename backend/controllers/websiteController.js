@@ -38,22 +38,6 @@ export async function viewWebsite(req, res) {
       return res.status(404).json({ message: 'Website not found' });
     }
 
-    // Update stats
-    // const today = new Date();
-    // const year = today.getFullYear();
-    // const month = today.getMonth() + 1; // Months are 0-based in JavaScript
-    // const day = today.getDate();
-
-    // await createOrUpdateStats({
-    //   userId,
-    //   websiteId : req.params.id,
-    //   year,
-    //   month,
-    //   day,
-    //   field: 'clicks',
-    //   value: 1
-    // });
-
     res.status(200).json(website);
   } catch (error) {
     console.log(error);

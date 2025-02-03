@@ -6,8 +6,8 @@ const getDaysInMonth = (year, month) => {
 };
 
 // Utility function to create or update stats
-export const createOrUpdateStats = async ({ userId, websiteId, year, month, day, field, value }) => {
-  if (!userId || !websiteId || !year || !month || !day || !field || value === undefined) {
+export const createOrUpdateStats = async ({ userId, websiteId, year, month, day, updates }) => {
+  if (!userId || !websiteId || !year || !month || !day || !updates) {
     throw new Error('All fields are required');
   }
 
@@ -24,35 +24,34 @@ export const createOrUpdateStats = async ({ userId, websiteId, year, month, day,
     stats.years.push(yearData);
   }
 
-  // Ensure the field is initialized as an array
-  if (!yearData[field]) {
-    yearData[field] = [];
-  }
+  // Update each field in the updates object
+  for (const [field, value] of Object.entries(updates)) {
+    // Ensure the field is initialized as an array
+    if (!yearData[field]) {
+      yearData[field] = [];
+    }
 
-//   console.log(`Updating field: ${field} for year: ${year}, month: ${month}, day: ${day}`);
+    // Find or initialize the month data
+    const fieldData = yearData[field];
+    let monthData = fieldData.find(m => m.month === month);
+    if (!monthData) {
+      const daysInMonth = getDaysInMonth(year, month);
+      monthData = { month, days: Array.from({ length: daysInMonth }, (_, i) => ({ day: i + 1, value: 0 })) };
+      fieldData.push(monthData);
+    }
 
-  // Find or initialize the month data
-  const fieldData = yearData[field];
-  let monthData = fieldData.find(m => m.month === month);
-  if (!monthData) {
-    const daysInMonth = getDaysInMonth(year, month);
-    monthData = { month, days: Array.from({ length: daysInMonth }, (_, i) => ({ day: i + 1, value: 0 })) };
-    fieldData.push(monthData);
-  }
-
-  // Find or initialize the day data
-  const dayData = monthData.days.find(d => d.day === day);
-  if (dayData) {
-    dayData.value += value; // Increment the value
-  } else {
-    monthData.days.push({ day, value });
+    // Find or initialize the day data
+    const dayData = monthData.days.find(d => d.day === day);
+    if (dayData) {
+      dayData.value += value; // Increment the value
+    } else {
+      monthData.days.push({ day, value });
+    }
   }
 
   // Update the yearData in the stats object
   const yearIndex = stats.years.findIndex(y => y.year === year);
   stats.years[yearIndex] = yearData;
-
-//   console.log(`Updated stats: ${JSON.stringify(stats, null, 2)}`);
 
   // Save the updated stats document
   await stats.save();
