@@ -1,6 +1,7 @@
 import Website from '../../models/website.model.js';
 import { User } from '../../models/user.model.js';
 import { checkUserAndBlockStatus } from '../../utils/userCheck.js';
+import { createOrUpdateStats } from '../../utils/stats.js';
 
 export async function searchWebsites(req, res) {
   try {
@@ -32,6 +33,8 @@ export async function searchWebsites(req, res) {
 
     if (searchQuery) {
       filters.webDomain = { $regex: searchQuery, $options: 'i' };
+      filters.mediaType = { $regex: searchQuery, $options: 'i' };
+      filters.mediaName = { $regex: searchQuery, $options: 'i' };
     }
     if (minPrice) {
       filters.price = { ...filters.price, $gte: Number(minPrice) };
@@ -72,6 +75,26 @@ export async function searchWebsites(req, res) {
 
     // fetch websites with filters and approved true
     const websites = await Website.find({ ...filters, status: 'approved' });
+
+    // Update stats for each website found
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1; // Months are 0-based in JavaScript
+    const day = today.getDate();
+
+    for (const website of websites) {
+      await createOrUpdateStats({
+        userId : website.userId,
+        websiteId: website._id,
+        year,
+        month,
+        day,
+        updates: {
+          impressions: 1
+        }
+      });
+    }
+
     res.status(200).json(websites);
   } catch (error) {
     res.status(500).json({ message: 'Error searching websites', error: error.message });
