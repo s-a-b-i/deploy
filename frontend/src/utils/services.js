@@ -728,6 +728,7 @@ export const faqService = {
   // Public: Search FAQs
   searchFAQsPublic: async (query) => {
     try {
+      // console.log('Sending search request for:', query); // Debug log
       const response = await api.get('/public/faqs/search', {
         params: { query }
       });

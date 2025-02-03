@@ -30,8 +30,9 @@ router.post('/faq/category', getFAQsByCategory);
 
 // Public routes
 router.get('/public/categories', getAllCategoriesPublic);
-router.get('/public/faqs/:categoryId', getFAQsByCategoryPublic);
 router.get('/public/faqs/search', searchFAQsByQuestion);
+router.get('/public/faqs/:categoryId', getFAQsByCategoryPublic);
+
 
 
 export default router;

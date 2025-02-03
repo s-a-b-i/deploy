@@ -5,7 +5,17 @@ const HeroSection = ({ onSearch }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    onSearch(searchQuery);
+    if (searchQuery.trim()) {
+      onSearch(searchQuery.trim());
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (!value.trim()) {
+      onSearch(""); // Clear results when search is empty
+    }
   };
 
   return (
@@ -15,7 +25,7 @@ const HeroSection = ({ onSearch }) => {
         <input
           type="text"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleInputChange}
           placeholder="Search for answers"
           className="w-full px-4 py-2 rounded-md text-gray-700"
         />

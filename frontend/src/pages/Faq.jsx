@@ -3,7 +3,6 @@ import Header from "../components/Faq/Header";
 import HeroSection from "../components/Faq/HeroSection";
 import ViewToggle from "../components/Faq/ViewToggle";
 import Card from "../components/Faq/Card";
-// import Footer from "../components/Faq/Footer";
 import { faqService } from "../utils/services";
 
 const Faq = () => {
@@ -49,15 +48,26 @@ const Faq = () => {
   };
 
   const handleSearch = async (query) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
     try {
+      setLoading(true);
+      if (!query.trim()) {
+        setSearchResults([]);
+        return;
+      }
+      
       const results = await faqService.searchFAQsPublic(query);
-      setSearchResults(results);
+      console.log('Search results:', results); // Debug log
+      setSearchResults(Array.isArray(results) ? results : []);
+      
     } catch (err) {
-      console.error("Error searching FAQs:", err);
+      console.error("Error details:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      setError("Error searching FAQs");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,31 +92,39 @@ const Faq = () => {
       <HeroSection onSearch={handleSearch} />
       <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
       <section className="bg-white py-10">
-        <div
-          className={`container mx-auto px-6 ${
-            viewMode === "grid"
-              ? "grid grid-cols-1 md:grid-cols-3 gap-6"
-              : "space-y-4"
-          }`}
-        >
-          {searchResults.length > 0
-            ? searchResults.map((faq) => (
-                <Card
-                  key={faq._id}
-                  card={{
-                    id: faq._id,
-                    title: faq.question,
-                    content: faq.answer,
-                    language: language
-                  }}
-                  viewMode={viewMode}
-                />
-              ))
-            : transformToCards().map((card) => (
-                <Card key={card.id} card={card} viewMode={viewMode} />
-              ))}
-        </div>
-      </section>
+  {searchResults.length > 0 ? (
+    <div className={`container mx-auto px-6 ${
+      viewMode === "grid" 
+        ? "grid grid-cols-1 md:grid-cols-3 gap-6" 
+        : "space-y-4"
+    }`}>
+      {searchResults.map((faq) => (
+        <Card
+          key={faq._id}
+          card={{
+            id: faq._id,
+            title: faq.question,
+            content: faq.answer,
+            language: language,
+            isSearchResult: true,
+            questions: [{ _id: faq._id, question: faq.question, answer: faq.answer }]
+          }}
+          viewMode={viewMode}
+        />
+      ))}
+    </div>
+  ) : (
+    <div className={`container mx-auto px-6 ${
+      viewMode === "grid" 
+        ? "grid grid-cols-1 md:grid-cols-3 gap-6" 
+        : "space-y-4"
+    }`}>
+      {transformToCards().map((card) => (
+        <Card key={card.id} card={card} viewMode={viewMode} />
+      ))}
+    </div>
+  )}
+</section>
       {/* <Footer /> */}
     </div>
   );
