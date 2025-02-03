@@ -1,7 +1,7 @@
 import Website  from '../models/website.model.js';
-import { User } from '../models/user.model.js';
 import { createOrUpdateStats } from '../utils/stats.js';
 import { checkUserAndBlockStatus } from '../utils/userCheck.js';
+import { getCurrentDateTime } from '../utils/getCurrentDateTime.js';
 
 // Get all websites
 export async function getWebsites(req, res) {
@@ -37,6 +37,22 @@ export async function viewWebsite(req, res) {
     if (!website) {
       return res.status(404).json({ message: 'Website not found' });
     }
+
+
+    // update stats
+    const { year, month, day } = getCurrentDateTime();
+
+    await createOrUpdateStats({
+      userId,
+      websiteId: req.params.id,
+      year,
+      month,
+      day,
+      updates: {
+        clicks: 1,
+        impressions: 1
+      }
+    });
 
     res.status(200).json(website);
   } catch (error) {

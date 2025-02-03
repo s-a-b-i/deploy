@@ -14,9 +14,9 @@ export const createOrUpdateStats = async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    let stats = await Stats.findOne({ userId, websiteId });
+    let stats = await Stats.findOne({ websiteId });
     if (!stats) {
-      stats = new Stats({ userId, websiteId, years: [] });
+      stats = new Stats({ websiteId, years: [] });
     }
 
     let yearData = stats.years.find(y => y.year === year);
@@ -70,7 +70,7 @@ export const getStatsByYearAndMonth = async (req, res) => {
       return res.status(403).json({ message: error.message });
     }
 
-    const stats = await Stats.findOne({ userId, websiteId });
+    const stats = await Stats.findOne({ websiteId });
     if (!stats) {
       return res.status(404).json({ error: 'Stats not found' });
     }
@@ -106,7 +106,7 @@ export const getLast30DaysStats = async (req, res) => {
       return res.status(403).json({ message: error.message });
     }
 
-    const stats = await Stats.findOne({ userId, websiteId });
+    const stats = await Stats.findOne({websiteId });
     if (!stats) {
       return res.status(404).json({ error: 'Stats not found' });
     }
@@ -154,7 +154,7 @@ export const getLast12MonthsStats = async (req, res) => {
         return res.status(403).json({ message: error.message });
       }
   
-      const stats = await Stats.findOne({ userId, websiteId });
+      const stats = await Stats.findOne({ websiteId });
       if (!stats) {
         return res.status(404).json({ error: 'Stats not found' });
       }

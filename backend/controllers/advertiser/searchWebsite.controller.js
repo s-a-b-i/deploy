@@ -1,7 +1,7 @@
 import Website from '../../models/website.model.js';
-import { User } from '../../models/user.model.js';
 import { checkUserAndBlockStatus } from '../../utils/userCheck.js';
 import { createOrUpdateStats } from '../../utils/stats.js';
+import { getCurrentDateTime } from '../../utils/getCurrentDateTime.js';
 
 export async function searchWebsites(req, res) {
   try {
@@ -77,14 +77,11 @@ export async function searchWebsites(req, res) {
     const websites = await Website.find({ ...filters, status: 'approved' });
 
     // Update stats for each website found
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth() + 1; // Months are 0-based in JavaScript
-    const day = today.getDate();
+    const { year, month, day } = getCurrentDateTime();
 
     for (const website of websites) {
       await createOrUpdateStats({
-        userId : website.userId,
+        userId,
         websiteId: website._id,
         year,
         month,

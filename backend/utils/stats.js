@@ -12,9 +12,9 @@ export const createOrUpdateStats = async ({ userId, websiteId, year, month, day,
   }
 
   // Find the stats document for the user and website
-  let stats = await Stats.findOne({ userId, websiteId });
+  let stats = await Stats.findOne({ websiteId });
   if (!stats) {
-    stats = new Stats({ userId, websiteId, years: [] });
+    stats = new Stats({ websiteId, years: [] });
   }
 
   // Find or initialize the year data
