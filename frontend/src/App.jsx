@@ -28,7 +28,7 @@ import Orders from "./pages/Publisher/Orders";
 import Profile from "./pages/Publisher/Profile";
 import Withdraw from "./pages/Publisher/Withdraw";
 import Balance from "./pages/Publisher/Balance";
-// import Faq from "./pages/Publisher/Faq.jsx";
+import WebsiteStatsPage from "./components/publisher/WebsiteStatsPage";
 import Deposit from "./components/Forms/Deposit";
 import AddWebsiteForm from "./components/Forms/AddWebsiteForm";
 import EditWebsiteForm from "./components/Forms/EditWebsiteForm";
@@ -259,6 +259,7 @@ const App = () => {
                 path="/publisher/products"
                 element={<Products toggleMode={toggleMode} />}
               />
+              <Route path="/publisher/products/:websiteId/stats" element={<WebsiteStatsPage />} />
               <Route
                 path="/publisher/products/add"
                 element={<AddWebsiteForm />}
@@ -271,6 +272,7 @@ const App = () => {
               <Route path="/publisher/orders" element={<Orders />} />
               <Route path="/publisher/profile" element={<Profile />} />
               <Route path="/publisher/faq" element={<Faq />} />
+
             </>
           ) : (
             <>

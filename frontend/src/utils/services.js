@@ -738,3 +738,32 @@ export const faqService = {
     }
   }
 };
+
+export const statsService = {
+  getMonthlyStats: async (userId, websiteId, year, month) => {
+    try {
+      const response = await api.post('/stats/get-monthly', { userId, websiteId, year, month });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  getLast30DaysStats: async (userId, websiteId) => {
+    try {
+      const response = await api.post('/stats/get-last30days', { userId, websiteId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  getLast12MonthsStats: async (userId, websiteId) => {
+    try {
+      const response = await api.post('/stats/get-last12months', { userId, websiteId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+};

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const Loader = () => {
-  const fullText = "SEOLINKBUILDINGS"; // Text for the loader
+  const fullText = "Linkntop"; // Text for the loader
   const [displayText, setDisplayText] = useState(fullText);
   const [removing, setRemoving] = useState(true);
   const [showDots, setShowDots] = useState(false);
