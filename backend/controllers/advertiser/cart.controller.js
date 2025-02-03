@@ -46,9 +46,9 @@ export const createCart = async (req, res) => {
       month,
       day,
       updates: {
+        addToCarts: 1,
         clicks: 1,
         impressions: 1,
-        addToCarts: 1,
       },
     });
 

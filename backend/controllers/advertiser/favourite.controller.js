@@ -49,9 +49,9 @@ export const createFavourite = async (req, res) => {
       month,
       day,
       updates: {
+        favourites: 1,
         clicks: 1,
         impressions: 1,
-        favourites: 1,
       },
     });
 
