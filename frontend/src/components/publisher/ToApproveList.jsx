@@ -335,6 +335,10 @@ const ToApproveList = () => {
     setIsHighlightModalOpen(true);
   };
 
+  const handleStatsClick = (websiteId) => {
+    navigate(`/publisher/products/${websiteId}/stats`);
+  };
+
   const handleEditClick = (websiteId) => {
     navigate(`/publisher/products/${websiteId}/edit`);
   };
@@ -459,12 +463,13 @@ const ToApproveList = () => {
                   >
                     <FaPen size={18} />
                   </button>
-                  <button
-                    className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 hover:bg-orange-200 transition-colors"
-                    title="Analytics"
-                  >
-                    <FaChartBar size={18} />
-                  </button>
+                   <button
+                                     className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 hover:bg-orange-200 transition-colors"
+                                     onClick={() => handleStatsClick(website._id)}
+                                     title="Analytics"
+                                   >
+                                     <FaChartBar size={18} />
+                                   </button>
                 </div>
               </div>
             </div>
