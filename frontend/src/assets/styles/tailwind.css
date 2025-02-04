@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 
+
 .scrollbar-thin {
     scrollbar-width: thin;
     -ms-overflow-style: -ms-autohiding-scrollbar;
