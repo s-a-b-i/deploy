@@ -114,7 +114,7 @@ export const getLast30DaysStats = async (req, res) => {
       return res.status(403).json({ message: error.message });
     }
 
-    const stats = await Stats.findOne({websiteId });
+    const stats = await Stats.findOne({ websiteId });
     if (!stats) {
       return res.status(404).json({ error: 'Stats not found' });
     }
@@ -130,13 +130,13 @@ export const getLast30DaysStats = async (req, res) => {
     ['impressions', 'clicks', 'revenues', 'sales', 'addToCarts', 'positions', 'favourites'].forEach(field => {
       result[field] = last30Days.map(date => {
         const yearData = stats.years.find(y => y.year === date.getFullYear());
-        if (!yearData) return { date, value: 0 };
+        if (!yearData) return { date: date.toISOString().split('T')[0], value: 0 };
 
         const monthData = yearData[field].find(m => m.month === date.getMonth() + 1);
-        if (!monthData) return { date, value: 0 };
+        if (!monthData) return { date: date.toISOString().split('T')[0], value: 0 };
 
         const dayData = monthData.days.find(d => d.day === date.getDate());
-        return { date, value: dayData ? dayData.value : 0 };
+        return { date: date.toISOString().split('T')[0], value: dayData ? dayData.value : 0 };
       });
     });
 
@@ -146,48 +146,46 @@ export const getLast30DaysStats = async (req, res) => {
   }
 };
 
-
-
 // Get Last 12 Months Stats
 export const getLast12MonthsStats = async (req, res) => {
-    try {
-      const { userId, websiteId } = req.body;
-      if (!userId || !websiteId) {
-        return res.status(400).json({ error: 'User ID and Website ID are required' });
-      }
-
-      try {
-        await checkUserAndBlockStatus(userId);
-      } catch (error) {
-        return res.status(403).json({ message: error.message });
-      }
-  
-      const stats = await Stats.findOne({ websiteId });
-      if (!stats) {
-        return res.status(404).json({ error: 'Stats not found' });
-      }
-  
-      const result = {};
-      const today = new Date();
-      const last12Months = Array.from({ length: 12 }, (_, i) => {
-        const date = new Date(today);
-        date.setMonth(today.getMonth() - i);
-        return date;
-      }).reverse();
-  
-      ['impressions', 'clicks', 'revenues', 'sales', 'addToCarts', 'positions', 'favourites'].forEach(field => {
-        result[field] = last12Months.map(date => {
-          const yearData = stats.years.find(y => y.year === date.getFullYear());
-          if (!yearData) return { month: date.getMonth() + 1, value: 0 };
-  
-          const monthData = yearData[field].find(m => m.month === date.getMonth() + 1);
-          const monthValue = monthData ? monthData.days.reduce((sum, day) => sum + day.value, 0) : 0;
-          return { month: date.getMonth() + 1, value: monthValue };
-        });
-      });
-  
-      res.status(200).json(result);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  try {
+    const { userId, websiteId } = req.body;
+    if (!userId || !websiteId) {
+      return res.status(400).json({ error: 'User ID and Website ID are required' });
     }
-  };
+
+    try {
+      await checkUserAndBlockStatus(userId);
+    } catch (error) {
+      return res.status(403).json({ message: error.message });
+    }
+
+    const stats = await Stats.findOne({ websiteId });
+    if (!stats) {
+      return res.status(404).json({ error: 'Stats not found' });
+    }
+
+    const result = {};
+    const today = new Date();
+    const last12Months = Array.from({ length: 12 }, (_, i) => {
+      const date = new Date(today);
+      date.setMonth(today.getMonth() - i);
+      return date;
+    }).reverse();
+
+    ['impressions', 'clicks', 'revenues', 'sales', 'addToCarts', 'positions', 'favourites'].forEach(field => {
+      result[field] = last12Months.map(date => {
+        const yearData = stats.years.find(y => y.year === date.getFullYear());
+        if (!yearData) return { month: date.toISOString().split('T')[0], value: 0 };
+
+        const monthData = yearData[field].find(m => m.month === date.getMonth() + 1);
+        const monthValue = monthData ? monthData.days.reduce((sum, day) => sum + day.value, 0) : 0;
+        return { month: date.toISOString().split('T')[0], value: monthValue };
+      });
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
