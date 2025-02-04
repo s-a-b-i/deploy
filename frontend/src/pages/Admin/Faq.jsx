@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { faqService } from '../../utils/services';
 import { useAuthStore } from '../../store/authStore';
 import { toast } from 'react-hot-toast';
+import Popup from '../../components/Admin/Popup';
 
 const SkeletonFaqCard = () => (
   <div className="animate-pulse bg-white border border-gray-100 rounded-xl shadow-sm">
@@ -111,9 +112,15 @@ const FaqCard = ({ faq, categories, onEdit, onDelete, onStatusChange }) => {
     setIsStatusLoading(false);
   };
 
-  const handleDelete = async () => {
+  // const handleDelete = async () => {
+  //   setIsDeleteLoading(true);
+  //   await onDelete(faq._id);
+  //   setIsDeleteLoading(false);
+  // };
+
+  const handleDelete = () => {
     setIsDeleteLoading(true);
-    await onDelete(faq._id);
+    onDelete(faq._id);
     setIsDeleteLoading(false);
   };
 
@@ -205,6 +212,10 @@ const Faq = () => {
   const [editingFaq, setEditingFaq] = useState(null);
   const [showFaqForm, setShowFaqForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Add these with other state declarations
+const [showDeleteFaqPopup, setShowDeleteFaqPopup] = useState(false);
+const [showDeleteCategoryPopup, setShowDeleteCategoryPopup] = useState(false);
+const [deleteTargetId, setDeleteTargetId] = useState(null);
 
   const [newFaq, setNewFaq] = useState({
     question: '',
@@ -264,16 +275,18 @@ const Faq = () => {
   };
 
   const handleDeleteCategory = async (categoryId) => {
-    if (!window.confirm('Are you sure you want to delete this category? All associated FAQs will be deleted.')) {
-      return;
-    }
+    setDeleteTargetId(categoryId);
+    setShowDeleteCategoryPopup(true);
+  };
+
+  const confirmDeleteCategory = async () => {
     setIsSubmitting(true);
     try {
-      await faqService.deleteCategory(user._id, categoryId);
+      await faqService.deleteCategory(user._id, deleteTargetId);
       const updatedCategories = await faqService.getAllCategories(user._id);
       setCategories(updatedCategories);
       
-      if (categoryId === selectedCategory && updatedCategories.length > 0) {
+      if (deleteTargetId === selectedCategory && updatedCategories.length > 0) {
         const newSelectedCategory = updatedCategories[0]._id;
         setSelectedCategory(newSelectedCategory);
         const faqsData = await faqService.getFAQsByCategory(user._id, newSelectedCategory);
@@ -288,6 +301,8 @@ const Faq = () => {
       console.error('Error deleting category:', error);
     } finally {
       setIsSubmitting(false);
+      setShowDeleteCategoryPopup(false);
+      setDeleteTargetId(null);
     }
   };
 
@@ -350,17 +365,22 @@ const Faq = () => {
   };
 
   const handleDeleteFaq = async (faqId) => {
-    if (!window.confirm('Are you sure you want to delete this FAQ?')) {
-      return;
-    }
+    setDeleteTargetId(faqId);
+    setShowDeleteFaqPopup(true);
+  };
+
+  const confirmDeleteFaq = async () => {
     const loadingToast = toast.loading('Deleting FAQ...');
     try {
-      await faqService.deleteFAQ(user._id, faqId);
-      setFaqs(faqs.filter(faq => faq._id !== faqId));
+      await faqService.deleteFAQ(user._id, deleteTargetId);
+      setFaqs(faqs.filter(faq => faq._id !== deleteTargetId));
       toast.success('FAQ deleted successfully', { id: loadingToast });
     } catch (error) {
       toast.error('Failed to delete FAQ', { id: loadingToast });
       console.error('Error deleting FAQ:', error);
+    } finally {
+      setShowDeleteFaqPopup(false);
+      setDeleteTargetId(null);
     }
   };
 
@@ -631,10 +651,38 @@ const Faq = () => {
                         : 'Please select a category to view its FAQs.'}
                     </p>
                   </div>
+                  
                 )}
+                {/* Add just before the final closing div */}
+
               </>
             )}
           </div>
+          <Popup
+  isOpen={showDeleteCategoryPopup}
+  onClose={() => {
+    setShowDeleteCategoryPopup(false);
+    setDeleteTargetId(null);
+  }}
+  onConfirm={confirmDeleteCategory}
+  title="Confirm Category Delete"
+  message="Are you sure you want to delete this category? All associated FAQs will be permanently deleted."
+  confirmText="Delete"
+  cancelText="Cancel"
+/>
+
+<Popup
+  isOpen={showDeleteFaqPopup}
+  onClose={() => {
+    setShowDeleteFaqPopup(false);
+    setDeleteTargetId(null);
+  }}
+  onConfirm={confirmDeleteFaq}
+  title="Confirm FAQ Delete"
+  message="Are you sure you want to delete this FAQ? This action cannot be undone."
+  confirmText="Delete"
+  cancelText="Cancel"
+/>
         </div>
       </div>
     </div>
