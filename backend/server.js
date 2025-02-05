@@ -30,7 +30,7 @@ connectDB();
 const __dirname = path.resolve();
 
 app.use(cors({
-  origin: 'https://deploy-32sfi9hq4-sohaib-s-projects-7db94bde.vercel.app/', credentials: true,
+  origin: 'https://deploy-32sfi9hq4-sohaib-s-projects-7db94bde.vercel.app', credentials: true,
 }))
 
 // Middlewares
