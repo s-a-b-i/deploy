@@ -279,12 +279,12 @@
 
 import React, { useState, useEffect } from "react";
 import { toast } from 'react-hot-toast'; // Import toast
-import StatCard from '../../components/Admin/StatCard';
-import WebsiteDetailsModal from '../../components/Admin/WebsiteDetailsModal';
-import WebsiteTable from '../../components/Admin/WebsiteTable';
+import StatCard from '../../components/Admin/StatCard.jsx';
+import WebsiteDetailsModal from '../../components/Admin/WebsiteDetailsModal.jsx';
+import WebsiteTable from '../../components/Admin/WebsiteTable.jsx';
 import EmailModal from '../../components/Admin/CotentEmail.jsx';
-import { useAuthStore } from "../../store/authStore";
-import { adminWebsiteService } from "../../utils/services";
+import { useAuthStore } from "../../store/authStore.js";
+import { adminWebsiteService } from "../../utils/services.js";
 import Popup from "../../components/Admin/Popup.jsx";
 
 const Content = () => {

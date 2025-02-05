@@ -204,11 +204,11 @@
 
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { promoService, websiteService } from "../../utils/services";
+import { promoService, websiteService } from "../../utils/services.js";
 import PromoForm from "../../components/Forms/PromoForm.jsx";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "../../store/authStore.js";
 import { toast } from 'react-hot-toast';
-import Loader from "../../components/Loader"; // Import your Loader component
+import Loader from "../../components/Loader.jsx"; // Import your Loader component
 
 const Promos = () => {
   const [showForm, setShowForm] = useState(false);

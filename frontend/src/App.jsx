@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
-import Faq from "./pages/Faq.jsx";
+import Faq from "./Pages/Faq.jsx";
 
 // Layout
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -11,50 +11,50 @@ import FloatingShape from "./components/FloatingShape";
 import LoadingSpinner from "./components/LoadingSpinner";
 
 // Home Components
-import Home from "./pages/Home";
+import Home from "./Pages/Home.jsx";
 
 // Auth Pages
-import SignUpPage from "./Pages/SignUpPage";
-import LoginPage from "./Pages/LoginPage";
-import EmailVerificationPage from "./Pages/EmailVerificationPage";
-import ForgotPasswordPage from "./Pages/ForgotPasswordPage";
+import SignUpPage from "./Pages/SignUpPage.jsx";
+import LoginPage from "./Pages/LoginPage.jsx";
+import EmailVerificationPage from "./Pages/EmailVerificationPage.jsx";
+import ForgotPasswordPage from "./Pages/ForgotPasswordPage.jsx";
 import ResetPasswordPage from "./Pages/ResetPasswordPage.jsx";
 
 // Publisher Pages
-import PublisherDashboard from "./pages/Publisher/Dashboard";
-import Products from "./pages/Publisher/Products";
-import Promos from "./pages/Publisher/Promos";
-import Orders from "./pages/Publisher/Orders";
-import Profile from "./pages/Publisher/Profile";
-import Withdraw from "./pages/Publisher/Withdraw";
-import Balance from "./pages/Publisher/Balance";
+import PublisherDashboard from "./Pages/Publisher/Dashboard.jsx";
+import Products from "./Pages/Publisher/Products.jsx";
+import Promos from "./Pages/Publisher/Promos.jsx";
+import Orders from "./Pages/Publisher/Orders.jsx";
+import Profile from "./Pages/Publisher/Profile.jsx";
+import Withdraw from "./Pages/Publisher/Withdraw.jsx";
+import Balance from "./Pages/Publisher/Balance.jsx";
 import WebsiteStatsPage from "./components/publisher/WebsiteStatsPage";
 import Deposit from "./components/Forms/Deposit";
 import AddWebsiteForm from "./components/Forms/AddWebsiteForm";
 import EditWebsiteForm from "./components/Forms/EditWebsiteForm";
 
 // Advertiser Pages
-import AdvertiserDashboard from "./pages/Advertiser/Dashboard";
-import Projects from "./pages/Advertiser/Projects";
-import Catalogue from "./pages/Advertiser/Catalogue";
-import AdvertiserOrders from "./pages/Advertiser/Orders";
-import Favorite from "./pages/Advertiser/Favorite";
-import Cart from "./pages/Advertiser/Cart";
-import AdvertiserDeposit from "./pages/Advertiser/Deposit";
-import AdvertiserBalance from "./pages/Advertiser/Balance";
+import AdvertiserDashboard from "./Pages/Advertiser/Dashboard.jsx";
+import Projects from "./Pages/Advertiser/Projects.jsx";
+import Catalogue from "./Pages/Advertiser/Catalogue.jsx";
+import AdvertiserOrders from "./Pages/Advertiser/Orders.jsx";
+import Favorite from "./Pages/Advertiser/Favorite.jsx";
+import Cart from "./Pages/Advertiser/Cart.jsx";
+import AdvertiserDeposit from "./Pages/Advertiser/Deposit.jsx";
+import AdvertiserBalance from "./Pages/Advertiser/Balance.jsx";
 // import Faq from "./pages/Advertiser/Faq.jsx";
 import CreateProject from "./components/Forms/CreateProject";
 import ProductDetails from "./components/Product/ProductDetails";
 
 // Admin Pages
-import AdminDashboard from "./pages/Admin/Dashboard";
-import AdminUsers from "./pages/Admin/Users";
-import AdminContent from "./pages/Admin/Content";
-import AdminTransactions from "./pages/Admin/Transactions";
-import AdminChatbot from "./pages/Admin/Faq";
-import AdminReports from "./pages/Admin/Reports";
-import AdminSettings from "./pages/Admin/Settings";
-import AdminProfile from "./pages/Admin/Profile";
+import AdminDashboard from "./Pages/Admin/Dashboard.jsx";
+import AdminUsers from "./Pages/Admin/Users.jsx";
+import AdminContent from "./Pages/Admin/Content.jsx";
+import AdminTransactions from "./Pages/Admin/Transactions.jsx";
+import AdminChatbot from "./Pages/Admin/Faq.jsx";
+import AdminReports from "./Pages/Admin/Reports.jsx";
+import AdminSettings from "./Pages/Admin/Settings.jsx";
+import AdminProfile from "./Pages/Admin/Profile.jsx";
 import { LogOutIcon, UserX } from "lucide-react";
 
 const ProtectedRoutes = ({ children }) => {
