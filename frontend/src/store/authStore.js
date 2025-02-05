@@ -2,7 +2,7 @@ import { create } from "zustand";
 import axios from "axios";
 import { profileService } from "../utils/services";
 
-const API_URL = "https://deploy-sder.onrender.com";
+const API_URL = "https://linkntop-api.onrender.com";
 
 axios.defaults.withCredentials = true;
 
