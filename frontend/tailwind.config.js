@@ -24,3 +24,10 @@ export default {
   },
   plugins: [],
 }
+
+// 'foundations-primary': '#8B2BC8',      /* Purple - primary color */
+// 'foundations-secondary': '#FF8A2B',    /* Orange - accent color */
+// 'foundations-tertiary': '#A5B6FF',     /* Light blue tint */
+// 'foundations-hover': '#E8F0FF',        /* Light sky blue */
+// 'foundations-light': '#F5F9FF',        /* Clean white/light gray */
+// 'foundations-dark': '#1A1D45',  

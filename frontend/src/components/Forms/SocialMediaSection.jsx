@@ -82,11 +82,12 @@ const SocialMediaSection = ({ formData, handleInputChange }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-4xl p-6"> {/* Added p-6 for consistent padding */}
+    <div className="space-y-8 border-t pt-6">
       {socialPlatforms.map((platform) => (
-        <div key={platform.name} className="space-y-3">
-          <div className="flex items-center gap-2">
-            <label className="block font-medium text-gray-700 capitalize">{platform.name}</label>
+        <div key={platform.name} className="flex items-center gap-8"> {/* Changed to items-center */}
+          <label className="font-semibold flex items-center gap-2 w-1/4 capitalize">
+            {platform.name}
             <Popover className="relative">
               <Popover.Button className="focus:outline-none">
                 <FiInfo className="text-gray-500 hover:text-gray-700 transition-colors" size={16} />
@@ -95,48 +96,48 @@ const SocialMediaSection = ({ formData, handleInputChange }) => {
                 {platform.tooltip}
               </Popover.Panel>
             </Popover>
+          </label>
+  
+          <div className="w-3/4 space-y-4">
+            {(formData.socialMedia[platform.name]?.length ? 
+              formData.socialMedia[platform.name] : 
+              [""]
+            ).map((link, index) => (
+              <div key={index} className="relative">
+                <input
+                  type="url"
+                  value={link || ""}
+                  onChange={(e) => handleLinkChange(platform.name, index, e.target.value)}
+                  placeholder={platform.placeholder}
+                  className="w-full border border-gray-300 rounded-md p-2.5 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {index > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveLink(platform.name, index)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
+                  >
+                    <FiX size={20} />
+                  </button>
+                )}
+              </div>
+            ))}
+            
+            <button
+              type="button"
+              onClick={() => handleAddLink(platform.name)}
+              className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-2"
+            >
+              <span className="text-xl">+</span> Add another {platform.name} link
+            </button>
           </div>
-
-          {/* Always ensure at least one input field exists */}
-          {(formData.socialMedia[platform.name]?.length ? 
-            formData.socialMedia[platform.name] : 
-            [""]
-          ).map((link, index) => (
-            <div key={index} className="relative">
-              <input
-                type="url"
-                value={link || ""}
-                onChange={(e) => handleLinkChange(platform.name, index, e.target.value)}
-                placeholder={platform.placeholder}
-                className="w-full border border-gray-300 rounded-md p-2 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              {index > 0 && ( // Only show remove button for additional fields
-                <button
-                  type="button"
-                  onClick={() => handleRemoveLink(platform.name, index)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
-                >
-                  <FiX size={20} />
-                </button>
-              )}
-            </div>
-          ))}
-
-          <button
-            type="button"
-            onClick={() => handleAddLink(platform.name)}
-            className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2"
-          >
-            <span className="text-xl">+</span> Add another {platform.name} link
-          </button>
         </div>
       ))}
-
-
+  
       {/* Sensitive Topics section */}
-      <div className="border-t pt-6 mt-6">
-        <div className="flex flex-col md:flex-row md:items-start md:space-x-4">
-          <label className="font-semibold mb-2 md:mb-0 md:mr-12 flex items-center gap-1">
+      <div className="border-t pt-6">
+        <div className="flex items-center gap-8"> {/* Changed to items-center */}
+          <label className="font-semibold flex items-center gap-2 w-1/4">
             Sensitive Topics
             <Popover className="relative">
               <Popover.Button className="focus:outline-none">
@@ -147,14 +148,15 @@ const SocialMediaSection = ({ formData, handleInputChange }) => {
               </Popover.Panel>
             </Popover>
           </label>
-          <div className="grid grid-cols-2 gap-4 md:flex md:space-x-10">
+          
+          <div className="w-3/4 grid grid-cols-2 gap-4">
             {["Gambling", "CBD", "Adult", "Trading"].map((topic) => (
-              <label key={topic} className="flex items-center space-x-2 cursor-pointer">
+              <label key={topic} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={formData.sensitiveTopics.includes(topic)}
                   onChange={(e) => {
-                    const isChecked = e.target.checked
+                    const isChecked = e.target.checked;
                     handleInputChange({
                       target: {
                         name: "sensitiveTopics",
@@ -162,9 +164,9 @@ const SocialMediaSection = ({ formData, handleInputChange }) => {
                           ? [...formData.sensitiveTopics, topic]
                           : formData.sensitiveTopics.filter((t) => t !== topic),
                       },
-                    })
+                    });
                   }}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-gray-700">{topic}</span>
               </label>
@@ -172,36 +174,43 @@ const SocialMediaSection = ({ formData, handleInputChange }) => {
           </div>
         </div>
       </div>
-
+  
       {/* Google News section */}
       <div className="border-t pt-6">
-        <label className="flex items-center gap-2">
-          <span className="font-semibold">Google News</span>
-          <Popover className="relative">
-            <Popover.Button className="focus:outline-none">
-              <FiInfo className="text-gray-500 hover:text-gray-700 transition-colors" size={16} />
-            </Popover.Button>
-            <Popover.Panel className="absolute z-10 w-64 p-3 mt-2 text-sm text-gray-600 bg-white border rounded-lg shadow-lg">
-              {tooltipContent.googleNews}
-            </Popover.Panel>
-          </Popover>
-          <input
-            type="checkbox"
-            name="googleNews"
-            checked={formData.googleNews}
-            onChange={(e) =>
-              handleInputChange({
-                target: {
-                  name: "googleNews",
-                  value: e.target.checked,
-                },
-              })
-            }
-            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-        </label>
+        <div className="flex items-center gap-8">
+          <label className="font-semibold flex items-center gap-2 w-1/4">
+            Google News
+            <Popover className="relative">
+              <Popover.Button className="focus:outline-none">
+                <FiInfo className="text-gray-500 hover:text-gray-700 transition-colors" size={16} />
+              </Popover.Button>
+              <Popover.Panel className="absolute z-10 w-64 p-3 mt-2 text-sm text-gray-600 bg-white border rounded-lg shadow-lg">
+                {tooltipContent.googleNews}
+              </Popover.Panel>
+            </Popover>
+          </label>
+          
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="googleNews"
+              checked={formData.googleNews}
+              onChange={(e) =>
+                handleInputChange({
+                  target: {
+                    name: "googleNews",
+                    value: e.target.checked,
+                  },
+                })
+              }
+              className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-gray-700">Yes</span>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
   )
 }
 

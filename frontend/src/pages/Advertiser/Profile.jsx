@@ -191,11 +191,13 @@ import { useAuthStore } from "../../store/authStore";
 import {
   profileService,
   invoiceAccountService,
+  emailChangeService
 } from "../../utils/services";
 import ProfileSection from "../../components/publisher/ProfileSection";
 import InvoicingAccountsSection from "../../components/publisher/InvoicingAccountsSection";
 import EditInvoicingForm from "../../components/publisher/EditInvoicingForm";
 import { toast } from "react-hot-toast";
+import ChangeEmailModal from '../../components/publisher/ChangeEmailModal'; // Adjust the import path as needed
 import Loader from "../../components/Loader";
 
 const Profile = () => {
@@ -221,6 +223,7 @@ const Profile = () => {
   const [isProfileCreated, setIsProfileCreated] = useState(false);
   const [profileId, setProfileId] = useState(null);
   const [editingAccount, setEditingAccount] = useState(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   
   const [isProfileSectionOpen, setIsProfileSectionOpen] = useState(true);
   const [isInvoicingSectionOpen, setIsInvoicingSectionOpen] = useState(true);
@@ -276,6 +279,18 @@ const Profile = () => {
   const validatePhoneNumber = (phone) => {
     const phoneRegex = /^[0-9]{10}$/; // Example: 10-digit phone number
     return phoneRegex.test(phone);
+  };
+
+  const handleEmailChange = async (newEmail) => {
+    try {
+      // Add your email change logic here
+      // For example: await profileService.updateEmail(userId, newEmail);
+      toast.success("Email updated successfully!");
+      setShowEmailModal(false);
+    } catch (error) {
+      console.error("Error updating email:", error);
+      toast.error("Failed to update email");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -413,6 +428,7 @@ const Profile = () => {
         handleSubmit={handleSubmit}
         handleAvatarChange={handleAvatarChange}
         avatarPreview={avatarPreview}
+        setShowEmailModal={setShowEmailModal} // Add this line
       />
 
       <InvoicingAccountsSection
@@ -452,6 +468,13 @@ const Profile = () => {
           Rankister.com
         </Link>
       </div>
+      {showEmailModal && (
+      <ChangeEmailModal
+        onClose={() => setShowEmailModal(false)}
+        onSave={handleEmailChange}
+        userId={userId}
+      />
+    )}
     </div>
   );
 };

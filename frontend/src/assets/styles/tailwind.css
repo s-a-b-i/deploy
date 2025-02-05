@@ -27,21 +27,14 @@
     background: #555;
   }
 
-  .quill-editor {
-    .ql-container {
-      min-height: 150px; /* Adjust as needed */
-      width: 100%;
-    }
-    
-    .ql-editor {
-      width: 100%;
-      word-break: break-word;
-    }
+  .ql-editor {
+    direction: ltr !important;
+    text-align: left !important;
   }
-
-
-  .input-container {
-    position: relative;
+  
+  .ql-editor p {
+    direction: ltr !important;
+    text-align: left !important;
   }
   
   .input-container input {

@@ -110,10 +110,17 @@ const AddWebsiteForm = ({ initialData, isEditing, websiteId }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full mx-auto bg-white shadow-lg rounded-lg p-8 space-y-6">
+    <form onSubmit={handleSubmit} className="max-w-6xl space-y-6">
       <h1 className="text-2xl font-bold mb-6">
         {isEditing ? 'Edit Website / Fanpage' : 'Add Website / Fanpage'}
       </h1>
+
+      <p>In this section you can put descriptions for your Media.
+Rankister is designed as an outside Salesperson for your Company and retains 20% of orders, so please enter the price you normally charge for your sales and do not increase price. Rankister provides the platform and technology to make you sell more. In this you will get more orders monthly.
+Publishers who charge increased prices from their public prices will NOT be approved!
+First you need to name your Media, for example if the website is Rankister.com you can put the name Rankister.
+You can sell publications on the website by putting the domain name in the Website Domain field. If the website also has social channels and to share an article you ask for extra you can add in the Extras field for example: Share on Facebook Page and put the price in the Box next to it.
+Rankister was also designed for companies or people who do not own a website but have pages or groups on social, for example who work as Influencers and have only Social profiles. In that case the Site Domain Name is left Blank and only the Social part is filled in by putting the link of the page or Group. If you want more information before proceeding, you can contact us from the Contact page.</p>
 
       <BasicInfo 
         formData={formData} 
