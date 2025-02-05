@@ -2,7 +2,7 @@ import { create } from "zustand";
 import axios from "axios";
 import { profileService } from "../utils/services";
 
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "https://deploy-32sfi9hq4-sohaib-s-projects-7db94bde.vercel.app/api/auth";
 
 axios.defaults.withCredentials = true;
 
