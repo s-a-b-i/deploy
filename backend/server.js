@@ -16,6 +16,8 @@ import stats from './routes/stats.routes.js';
 import usersMangAdmin from './routes/admin/userMang.routes.js';
 import contentRoutesAdmin from './routes/admin/content.routes.js';
 import faqRoutes from './routes/admin/faq.routes.js';
+import path from 'path';
+import exp from 'constants';
 
 dotenv.config();
 
@@ -24,6 +26,8 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+
+const __dirname = path.resolve();
 
 app.use(cors({
   origin: 'http://localhost:5173', credentials: true,
@@ -64,6 +68,12 @@ app.use('/api/admin', contentRoutesAdmin);
 app.use('/api/admin', faqRoutes);
 // public FAQ routes
 app.use('/api', faqRoutes);
+
+
+app.use(express.static(path.join(__dirname, '/frontend/dist' )));
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'));
+})
 
 // Start the server
 const PORT = process.env.PORT || 5000;
