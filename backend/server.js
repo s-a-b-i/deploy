@@ -30,7 +30,7 @@ connectDB();
 const __dirname = path.resolve();
 
 app.use(cors({
-  origin: 'https://deploy-two-drab.vercel.app/', credentials: true,
+  origin: 'https://topnlink-ui.vercel.app/', credentials: true,
 }))
 
 // Middlewares
