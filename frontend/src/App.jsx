@@ -14,7 +14,7 @@ import LoadingSpinner from "./components/LoadingSpinner";
 import Home from "./pages/Home";
 
 // Auth Pages
-import SignUpPage from "./Pages/SignUpPage.jsx";
+import SignUpPage from "./pages/SignUpPage.jsx";
 import LoginPage from "./Pages/LoginPage.jsx";
 import EmailVerificationPage from "./Pages/EmailVerificationPage";
 import ForgotPasswordPage from "./Pages/ForgotPasswordPage";
