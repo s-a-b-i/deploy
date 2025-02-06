@@ -39,10 +39,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
-// // Routes
-// app.get("/" , (req, res) => {
-//   res.send("Hello World!");
-// })
+
 
 app.use("/api/auth" , authRoutes)
 app.use("/api/websites" , websiteRoutes)
